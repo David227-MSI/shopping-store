@@ -12,21 +12,26 @@
       />
 
       <select v-model="filters.noticeType" class="filter-select">
-        <option value="">全部種類</option>
-        <option value="ORDER">下單通知</option>
+        <option :value=null>全部種類</option>
+        <option value="ORDER">訂單通知</option>
         <option value="PROMOTION">促銷通知</option>
       </select>
 
       <div class="checkbox-group">
         <label class="checkbox-label">
-          <input type="checkbox" value="true" v-model="filters.isRead" />
+          <input type="radio" :value="null" v-model="filters.isRead" name="readStatus" />
+          全部
+        </label>
+        <label class="checkbox-label">
+          <input type="radio" :value="true" v-model="filters.isRead" name="readStatus" />
           已讀
         </label>
         <label class="checkbox-label">
-          <input type="checkbox" value="false" v-model="filters.isRead" />
+          <input type="radio" :value="false" v-model="filters.isRead" name="readStatus" />
           未讀
         </label>
       </div>
+
     </div>
 
     <!-- 通知清單 -->
@@ -73,14 +78,9 @@ const showModal = ref(false)
 
 const search = async () => {
   try {
-    console.log(1);
-    
     // user query for notification list
     const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/notifications/user/query`, filters.value)
     notifications.value = res.data.data.notificationList
-    
-    console.log(res);
-    
   } catch (err) {
     Swal.fire('查詢失敗', err.response.data.message || '錯誤', 'error')
   }
@@ -89,7 +89,7 @@ const search = async () => {
 // open modal
 const openDetail = async (id) => {
   try {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/notifications/user/notifications/${id}`)
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/notifications/user/notification/${id}`)
     selectedNotification.value = res.data.data
     showModal.value = true
   } catch (err) {
