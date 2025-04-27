@@ -6,17 +6,27 @@ import Home from '@/views/Home.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
+// ttpp
+import NotificationList from '@/views/pages/ttpp/notifications/NotificationList.vue'
+
 
 // 設定頁面參數 
 // path:網址, name:頁面名稱, component:元件名
 const routes = [
   // 一般頁面
   { path: '/', name: 'home', component: Home},
-  // { path: '/', name: '', component:  },
-
+  
   // 錯誤顯示頁面
   { path: "/:pathMatch(.*)", component: NotFound, name: "notfound-link" },
   { path: "/403", component: Forbidden, name: "forbidden-link" },
+  
+  
+  // ttpp
+  // { path: '/', name: '', component:  },
+  { path: '/notificationList', name: 'NotificationList', component: NotificationList},
+
+
+
 ]
 
 // 註冊頁面給Router管理
