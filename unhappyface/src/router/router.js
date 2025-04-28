@@ -6,6 +6,9 @@ import Home from '@/views/Home.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
+// 商品評論頁面
+import ProductReviewPage from '@/views/pages/ra/ProductReviewPage.vue';
+
 
 // 設定頁面參數 
 // path:網址, name:頁面名稱, component:元件名
@@ -17,6 +20,9 @@ const routes = [
   // 錯誤顯示頁面
   { path: "/:pathMatch(.*)", component: NotFound, name: "notfound-link" },
   { path: "/403", component: Forbidden, name: "forbidden-link" },
+
+  // 商品評論頁面
+  { path: '/product/:pid/reviews', name: 'ProductReviews', component: ProductReviewPage, props: true },
 ]
 
 // 註冊頁面給Router管理
