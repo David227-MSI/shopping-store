@@ -44,6 +44,18 @@
 
     <!-- 優惠券清單 -->
     <div class="coupon-list">
+      <CouponCard
+        class="coupon-card"
+        v-for="item in coupons"
+        :key="item.id"
+        :coupon="item"
+        @open-detail="openDetail"
+      />
+    </div>
+
+
+
+    <!-- <div class="coupon-list">
       <div
         v-for="item in coupons"
         :key="item.id"
@@ -63,14 +75,11 @@
           <span v-if="item.tradeable" class="status tradeable">可交易</span>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <!-- Modal -->
-    <CouponModal
-      v-if="showModal"
-      :coupon="selectedCoupon"
-      @close="showModal = false"
-    />
+
+
+
   </div>
 </template>
 
@@ -78,7 +87,7 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import CouponModal from '@/components/ttpp/CouponDetailModal.vue';
+import CouponCard from '@/components/ttpp/CouponCard3.vue'
 
 const filters = ref({
   userId: 1001,
@@ -89,8 +98,6 @@ const filters = ref({
 });
 
 const coupons = ref([]);
-const selectedCoupon = ref(null);
-const showModal = ref(false);
 
 const search = async () => {
   try {
@@ -101,64 +108,23 @@ const search = async () => {
   }
 };
 
-const openDetail = async (id) => {
-  try {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/coupons/user/coupon/${id}`);
-    selectedCoupon.value = res.data.data;
-    showModal.value = true;
-  } catch (err) {
-    Swal.fire('查詢細節失敗', err.response?.data?.message || '錯誤', 'error');
-  }
-};
-
-const formatCouponTitle = (coupon) => {
-  if (coupon.discountType === 'VALUE') {
-    return `$${coupon.discountValue} 折扣`;
-  }
-  return `${coupon.discountValue}% 折扣${coupon.maxDiscount ? ` (最高 $${coupon.maxDiscount})` : ''}`;
-};
-
-const formatApplicableType = (type) => {
-  const types = {
-    ALL: '全品項適用',
-    BRAND: '特定品牌',
-    PRODUCT: '特定商品',
-    CATEGORY: '特定類別',
-  };
-  return types[type] || type;
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return '無';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
-};
-
-const formatDateRange = (start, end) => {
-  return `${formatDate(start)} - ${formatDate(end)}`;
-};
-
-const isExpiring = (endTime) => {
-  if (!endTime) return false;
-  const end = new Date(endTime);
-  const now = new Date();
-  const daysUntilExpiry = (end - now) / (1000 * 60 * 60 * 24);
-  return daysUntilExpiry > 0 && daysUntilExpiry <= 7; // 7 天內到期
-};
-
-const isExpired = (endTime) => {
-  if (!endTime) return false;
-  const end = new Date(endTime);
-  const now = new Date();
-  return end < now;
-};
-
 // 監聽篩選條件變化
 watch(filters, search, { deep: true });
 
 // 初始化查詢
 search();
 </script>
+
+
+
+
+
+
+
+
+
+
+
 
 <style scoped>
 .coupon-container {
