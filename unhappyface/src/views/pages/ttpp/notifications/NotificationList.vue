@@ -40,14 +40,17 @@
     </div>
 
     <!-- 通知清單 -->
-    <div class="notification-list">
+    <div v-if="notifications.length === 0" class="empty-state">
+      <p>暫無通知</p>
+    </div>
+    <div v-else class="notification-list">
       <div
         v-for="item in notifications"
         :key="item.id"
         class="notification-card"
         @click="openDetail(item.id)"
       >
-        <h2 class="notification-title">{{ item.title }}</h2>
+        <h2 class="notification-title">{{ item.title || '無標題' }}</h2>
         <div class="notification-info">
           <span class="notice-type">{{ formatNoticeType(item.noticeType) }}</span>
           <span class="created-date">{{ formatDate(item.createdAt) }}</span>
@@ -86,9 +89,9 @@ const search = async () => {
   try {
     // user query for notification list
     const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/notifications/user/query`, filters.value)
-    notifications.value = res.data.data.notificationList
+    notifications.value = res.data.data.notificationList || []
   } catch (err) {
-    Swal.fire('查詢失敗', err.response.data.message || '錯誤', 'error')
+    Swal.fire('查詢失敗', err.response?.data?.message || '錯誤', 'error')
   }
 }
 
@@ -99,20 +102,36 @@ const openDetail = async (id) => {
     selectedNotification.value = res.data.data
     showModal.value = true
   } catch (err) {
-    Swal.fire('查詢細節失敗', err.response.data.message || '錯誤', 'error')
+    Swal.fire('查詢細節失敗', err.response?.data?.message || '錯誤', 'error')
   }
 }
 
 // format date to locale
 const formatDate = (dateString) => {
+  if (!dateString) return '未知日期'
   const date = new Date(dateString)
-  return date.toLocaleString()
+  return date.toLocaleString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
+// format notice type
+const formatNoticeType = (type) => {
+  const types = {
+    ORDER: '訂單通知',
+    PROMOTION: '促銷通知'
+  }
+  return types[type] || '未知'
+}
 
-// listen filters 
+// listen filters
 watch(filters, search, { deep: true })
 
+// initial search
 search()
 </script>
 
