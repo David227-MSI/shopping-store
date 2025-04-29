@@ -110,11 +110,12 @@ const submitOrder = async () => {
     // 後端傳回來的form插進DOM並送出
     const div = document.createElement('div');
     div.innerHTML = paymentResponse;
-    document.body.appendChild(div.querySelector('form'));
-    div.querySelector('form').submit();
+    const form = div.querySelector('form');
+    document.body.appendChild(form);
+    form.submit();
 
-    // 送出後清空購物車（或付款完成後再清空）
-    cartStore.clearCart();
+    // 送出後清空購物車（或付款完成後再清空）建議付款成功後再清空購物車更穩定
+    //cartStore.clearCart();
 
   } catch (error) {
     console.error('送出訂單失敗', error);
