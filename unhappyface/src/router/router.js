@@ -25,7 +25,7 @@ const routes = [
     // 訂單相關頁面
   { path: '/cart', name: 'cart', component: CartPage },
   { path: '/checkout', name: 'checkout', component: CheckoutPage },
-  { path: '/order/complete', name: 'order-complete', component: OrderCompletePage },
+  { path: '/order/complete/:orderId', name: 'order-complete', component: OrderCompletePage },
   { path: '/member/orders', name: 'orders', component: OrdersPage }
 
 ]
