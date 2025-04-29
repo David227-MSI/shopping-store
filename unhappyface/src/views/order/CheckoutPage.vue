@@ -96,19 +96,26 @@ const submitOrder = async () => {
       items: orderItems,
     };
 
-    const response = await axios.post('/api/orders', orderRequest);
+    const orderResponse = await axios.post('/api/orders', orderRequest);
 
-    await Swal.fire({
-      icon: 'success',
-      title: '訂單成立成功！',
-      text: '即將跳轉到完成頁面',
-      timer: 1500,
-      showConfirmButton: false,
+    const orderId = orderResponse.orderId;
+    const finalAmount = orderResponse.finalAmount;
+
+    // 呼叫綠界付款 API
+    const paymentResponse = await axios.post('/api/ecpay/start-payment', {
+      orderId: orderId,
+      amount: finalAmount
     });
 
+    // 後端傳回來的form插進DOM並送出
+    const div = document.createElement('div');
+    div.innerHTML = paymentResponse;
+    document.body.appendChild(div.querySelector('form'));
+    div.querySelector('form').submit();
+
+    // 送出後清空購物車（或付款完成後再清空）
     cartStore.clearCart();
 
-    router.push({ name: 'order-complete', state: { order: response } });
   } catch (error) {
     console.error('送出訂單失敗', error);
     await Swal.fire({
