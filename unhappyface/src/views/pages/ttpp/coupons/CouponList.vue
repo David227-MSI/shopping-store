@@ -1,44 +1,51 @@
 <template>
-  <div class="coupon-container">
-    <h1 class="title">優惠券列表</h1>
+  <div class="container">
+    <h1>優惠券列表</h1>
 
     <!-- 搜尋欄位 -->
-    <div class="filters">
-      <input
-        v-model="filters.search"
-        type="text"
-        placeholder="輸入優惠券關鍵字..."
-        class="filter-input"
-      />
-
-      <select v-model="filters.applicableType" class="filter-select">
-        <option :value="null">全部種類</option>
-        <option value="ALL">全品項適用</option>
-        <option value="BRAND">特定品牌適用</option>
-        <option value="PRODUCT">特定商品適用</option>
-        <option value="CATEGORY">特定分類適用</option>
-      </select>
-
-      <select v-model="filters.status" class="filter-select">
-        <option :value="null">全部狀態</option>
-        <option value="VALID">有效</option>
-        <option value="EXPIRING">即將到期</option>
-        <option value="EXPIRED">已過期</option>
-      </select>
-
-      <div class="checkbox-group">
-        <label class="checkbox-label">
-          <input type="radio" :value="null" v-model="filters.isUsed" name="usedStatus" />
-          全部
-        </label>
-        <label class="checkbox-label">
-          <input type="radio" :value="true" v-model="filters.isUsed" name="usedStatus" />
-          已使用
-        </label>
-        <label class="checkbox-label">
-          <input type="radio" :value="false" v-model="filters.isUsed" name="usedStatus" />
-          未使用
-        </label>
+    <div class="search-bar">
+      <div class="filter-left">
+        <div>
+          <input
+            v-model="filters.search"
+            type="text"
+            placeholder="輸入優惠券關鍵字..."
+            class="search-input"
+          />
+        </div>
+        <div>
+          <select v-model="filters.applicableType" class="filter-select">
+            <option :value="null">全部種類</option>
+            <option value="ALL">全品項適用</option>
+            <option value="BRAND">特定品牌適用</option>
+            <option value="PRODUCT">特定商品適用</option>
+            <option value="CATEGORY">特定分類適用</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-right">
+        <div>
+          <select v-model="filters.status" class="filter-select">
+            <option :value="null">全部狀態</option>
+            <option value="VALID">有效</option>
+            <option value="EXPIRING">即將到期</option>
+            <option value="EXPIRED">已過期</option>
+          </select>
+        </div>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" :value="null" v-model="filters.isUsed" name="usedStatus" />
+            全部
+          </label>
+          <label class="radio-label">
+            <input type="radio" :value="true" v-model="filters.isUsed" name="usedStatus" />
+            已使用
+          </label>
+          <label class="radio-label">
+            <input type="radio" :value="false" v-model="filters.isUsed" name="usedStatus" />
+            未使用
+          </label>
+        </div>
       </div>
     </div>
 
@@ -52,34 +59,6 @@
         @open-detail="openDetail"
       />
     </div>
-
-
-
-    <!-- <div class="coupon-list">
-      <div
-        v-for="item in coupons"
-        :key="item.id"
-        class="coupon-item"
-        @click="openDetail(item.id)"
-      >
-        <h2 class="coupon-title">{{ formatCouponTitle(item) }}</h2>
-        <div class="coupon-info">
-          <span>{{ formatApplicableType(item.applicableType) }}</span>
-          <span>{{ formatDateRange(item.startTime, item.endTime) }}</span>
-        </div>
-        <div class="coupon-status">
-          <span v-if="item.isUsed" class="status used">已使用</span>
-          <span v-else-if="isExpiring(item.endTime)" class="status expiring">即將到期</span>
-          <span v-else-if="isExpired(item.endTime)" class="status expired">已過期</span>
-          <span v-else class="status valid">有效</span>
-          <span v-if="item.tradeable" class="status tradeable">可交易</span>
-        </div>
-      </div>
-    </div> -->
-
-
-
-
   </div>
 </template>
 
@@ -127,147 +106,77 @@ search();
 
 
 <style scoped>
-.coupon-container {
-  padding: 1.5rem;
-  background-color: #1c1a2e;
-  min-height: 100vh;
-  color: #e0e0e0;
+.container {
+  animation: float-in 0.5s ease-out;
 }
 
-.title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 1.5rem;
-  letter-spacing: 0.025em;
+.search-bar {
+  background: #fffaf4;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.filter-input,
+.search-input,
 .filter-select {
-  padding: 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid #3a3a5a;
-  background-color: #2a2a3e;
-  color: #e0e0e0;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  transition: border-color 0.3s;
 }
 
-.filter-input:focus,
+.search-input:focus,
 .filter-select:focus {
+  border-color: var(--accent);
   outline: none;
-  border-color: #6b7280;
-  background-color: #555590;
 }
 
-.filter-select {
-  flex: 1;
-  appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%23e0e0e0' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1.5rem;
-}
-
-.checkbox-group {
+.radio-group {
   display: flex;
-  gap: 0.75rem;
+  gap: 15px;
+  align-items: center;
 }
 
-.checkbox-label {
+.radio-label {
   display: flex;
   align-items: center;
-  font-weight: 500;
-  color: #d1d5db;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  background-color: #2a2a3e;
-  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  color: var(--text-dark);
 }
 
-.checkbox-label:hover {
-  background-color: #33334d;
-}
-
-.checkbox-label input {
-  accent-color: #6b7280;
+.radio-label input {
+  margin-right: 5px;
 }
 
 .coupon-list {
   display: grid;
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
 }
 
-.coupon-item {
-  background-color: #2a2a3e;
-  padding: 1.25rem;
-  border-radius: 0.5rem;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+.coupon-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
 }
 
-.coupon-item:hover {
-  transform: translateY(-4px);
-  background-color: #33334d;
-  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.3);
+.coupon-card:hover {
+  transform: translateY(-5px);
 }
 
-.coupon-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #ffffff;
-}
+@media (max-width: 768px) {
+  .search-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.coupon-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.875rem;
-  color: #9ca3af;
-  margin-top: 0.5rem;
-}
+  .filter-left,
+  .filter-right {
+    flex-direction: column;
+    gap: 10px;
+  }
 
-.coupon-status {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.status {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-}
-
-.status.valid {
-  background-color: #34d399;
-  color: #1a1a2e;
-}
-
-.status.expiring {
-  background-color: #facc15;
-  color: #1a1a2e;
-}
-
-.status.expired {
-  background-color: #9ca3af;
-  color: #1a1a2e;
-}
-
-.status.used {
-  background-color: #6b7280;
-  color: #e0e0e0;
-}
-
-.status.tradeable {
-  background-color: #3b82f6;
-  color: #e0e0e0;
+  .coupon-list {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
 }
 </style>

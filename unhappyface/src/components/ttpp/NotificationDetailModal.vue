@@ -2,15 +2,13 @@
 <template>
   <div class="modal-overlay">
     <div class="modal-content">
-      <button @click="$emit('close')" class="close-button">✖️</button>
+      <button class="close-button" @click="$emit('close')">✖️</button>
       <h2 class="modal-title">{{ notification.title }}</h2>
-      <span class="notice-type-badge">
-        {{ noticeTypeText(notification.noticeType) }}
-      </span>
-      <p class="modal-content-text">{{ notification.content }}</p>
+      <span class="notice-type">{{ noticeTypeText(notification.noticeType) }}</span>
+      <p class="modal-text">{{ notification.content }}</p>
       <div class="created-at">訊息發送時間：{{ formatDate(notification.createdAt) }}</div>
-      <div v-if="notification.isRead" class="read-status read">已讀</div>
-      <div v-else class="read-status unread">未讀</div>
+      <div v-if="notification.isRead" class="status read">已讀</div>
+      <div v-else class="status unread">未讀</div>
     </div>
   </div>
 </template>
@@ -41,112 +39,105 @@ const noticeTypeText = (type) => {
 </script>
 
 <style scoped>
-/* 模態框背景遮罩 */
 .modal-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.6); /* 稍深的遮罩，增加對比 */
-  z-index: 50;
-  backdrop-filter: blur(4px); /* 模糊效果，提升現代感 */
-  transition: opacity 0.3s ease;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* 模態框內容 */
 .modal-content {
-  background-color: #2a2a3e; /* 與父元件卡片背景一致 */
-  padding: 1.5rem;
-  border-radius: 0.75rem; /* 稍大的圓角，顯得更柔和 */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3); /* 與父元件懸停陰影對齊 */
-  width: 28rem; /* 略寬於原始 w-96，顯得更大氣 */
-  max-width: 90%; /* 適應小螢幕 */
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%;
   position: relative;
-  color: #e0e0e0; /* 與父元件文字顏色一致 */
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  animation: float-in 0.3s ease-out;
 }
 
-/* 模態框出現動畫 */
-.modal-content {
-  transform: translateY(20px);
-  opacity: 0;
-}
-.modal-overlay .modal-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-/* 關閉按鈕 */
 .close-button {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  color: #9ca3af; /* 與父元件次要文字一致 */
-  font-size: 1rem;
+  top: 10px;
+  right: 10px;
   background: none;
   border: none;
+  font-size: 1.2rem;
+  color: var(--text-dark);
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: color 0.3s;
 }
 
 .close-button:hover {
-  color: #ffffff; /* 懸停時變白，與父元件強調色一致 */
-  transform: scale(1.2); /* 輕微放大，增加交互感 */
+  color: var(--primary);
 }
 
-/* 標題 */
 .modal-title {
-  font-size: 1.5rem; /* 保持與原始一致 */
-  font-weight: 700; /* 與父元件標題字重一致 */
-  color: #ffffff; /* 與父元件標題顏色一致 */
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.025em; /* 與父元件標題間距一致 */
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 
-/* 通知類型標籤 */
-.notice-type-badge {
+.notice-type {
   display: inline-block;
-  background-color: #3a3a5a; /* 與父元件邊框色調一致 */
-  color: #e0e0e0; /* 與父元件文字一致 */
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  margin-bottom: 1rem;
-  transition: background-color 0.2s ease;
+  background-color: var(--accent);
+  color: var(--text-light);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
 }
 
-.notice-type-badge:hover {
-  background-color: #555590; /* 與父元件焦點背景一致 */
+.modal-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-dark);
+  margin-bottom: 15px;
 }
 
-/* 內容文字 */
-.modal-content-text {
-  color: #d1d5db; /* 與父元件次要文字一致 */
-  white-space: pre-line;
-  line-height: 1.6; /* 增加行距，提升可讀性 */
-}
-
-/* 建立時間 */
 .created-at {
-  font-size: 0.875rem;
-  color: #9ca3af; /* 與父元件次要資訊一致 */
-  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  margin-bottom: 10px;
 }
 
-/* 閱讀狀態 */
-.read-status {
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  font-weight: 500;
+.status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
 }
 
-.read-status.read {
-  color: #34d399; /* 更現代的綠色，與紅色形成對比 */
+.read {
+  background-color: #ccc;
+  color: #fff;
 }
 
-.read-status.unread {
-  color: #f87171; /* 更柔和的紅色，提升精緻感 */
+.unread {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+  }
+
+  .modal-text {
+    font-size: 0.95rem;
+  }
 }
 </style>
