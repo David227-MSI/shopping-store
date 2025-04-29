@@ -23,20 +23,27 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
+import axios from '@/services/order/axios';
 import Swal from 'sweetalert2';
 
 const route = useRoute();
 const router = useRouter();
+const order = ref(null);
+const paymentStatus = ref('');
 const isNavigating = ref(false);
-const paymentStatus = ref(''); // 付款狀態：'success' 或 'error'
 
-// 確認訂單資料是否成功
-const order = route.state?.order || null;
+// 取得訂單資料
+onMounted(async () => {
+  const orderId = route.params.orderId;
+  if (!orderId) return;
 
-// 付款狀態檢查
-onMounted(() => {
-  if (order) {
-    paymentStatus.value = order.paymentStatus === 'PAID' ? 'success' : 'error';
+  try {
+    const response = await axios.get(`/api/orders/${orderId}`);
+    order.value = response;
+
+    paymentStatus.value = order.value.paymentStatus === 'PAID' ? 'success' : 'error';
+  } catch (error) {
+    console.error('載入訂單失敗', error);
   }
 });
 
@@ -68,12 +75,13 @@ const goOrders = async () => {
   }
 };
 
-// 格式化時間
+// 格式化日期時間
 const formatDate = (datetime) => {
   if (!datetime) return '';
   const date = new Date(datetime);
-  return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}
-  -${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-` +
+      `${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:` +
+      `${date.getMinutes().toString().padStart(2, '0')}`;
 };
 </script>
 
@@ -86,20 +94,16 @@ const formatDate = (datetime) => {
   background: #f9f9f9;
   border-radius: 8px;
 }
-
 .order-info {
   margin: 20px 0;
   text-align: left;
 }
-
 .order-info p {
   margin: 10px 0;
 }
-
 .buttons {
   margin-top: 30px;
 }
-
 button {
   margin: 0 10px;
   padding: 10px 20px;
