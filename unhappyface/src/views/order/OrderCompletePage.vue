@@ -1,6 +1,6 @@
 <template>
   <div class="order-complete">
-    <h1>訂單完成！🎉</h1>
+    <h1>{{ paymentStatus === 'success' ? '訂單完成！🎉' : '付款失敗' }}</h1>
 
     <div class="order-info" v-if="order">
       <p><strong>訂單編號：</strong> {{ order.orderId }}</p>
@@ -22,14 +22,23 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 
 const route = useRoute();
 const router = useRouter();
 const isNavigating = ref(false);
+const paymentStatus = ref(''); // 付款狀態：'success' 或 'error'
 
+// 確認訂單資料是否成功
 const order = route.state?.order || null;
+
+// 付款狀態檢查
+onMounted(() => {
+  if (order) {
+    paymentStatus.value = order.paymentStatus === 'PAID' ? 'success' : 'error';
+  }
+});
 
 // 返回首頁
 const goHome = async () => {
