@@ -91,7 +91,7 @@
   
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/app/reviews/product/${pid}`, {
+      const res = await axios.get(`http://localhost:8080/api/reviews/product/${pid}`, {
         params: {
           sort: sortOption.value,
           onlyImages: onlyImages.value,
@@ -113,10 +113,11 @@
   
   const toggleLike = async (review) => {
     try {
-      await axios.post(`http://localhost:8080/app/reviews/${review.id}/like`, null, {
+      const res = await axios.post(`http://localhost:8080/api/reviews/${review.id}/like`, null, {
         params: { userId: userStore.userId }
       });
-      await fetchReviews(); // 按完重新撈評論資料
+      const newLikeCount = res.data.data; // 假設後端回傳的是最新 like 數
+      review.likeCount = newLikeCount; // 直接更新這一張 review 的 likeCount
     } catch (err) {
       console.error('點讚失敗', err);
     }

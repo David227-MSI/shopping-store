@@ -8,6 +8,7 @@ import Forbidden from '@/views/errors/Forbidden.vue'
 
 // 商品評論頁面
 import ProductReviewPage from '@/views/pages/ra/ProductReviewPage.vue';
+import ReviewPage from '@/views/pages/ra/ReviewPage.vue'
 
 
 // 設定頁面參數 
@@ -22,7 +23,12 @@ const routes = [
   { path: "/403", component: Forbidden, name: "forbidden-link" },
 
   // 商品評論頁面
-  { path: '/product/:pid/reviews', name: 'ProductReviews', component: ProductReviewPage, props: true },
+  // { path: '/product/:pid/reviews', name: 'ProductReviews', component: ProductReviewPage, props: true },
+  {
+    path: '/reviews',   // <--- 使用者輸入 http://localhost:5173/reviews 就會跳到這頁
+    name: 'ReviewPage',
+    component: ReviewPage
+  },
 ]
 
 // 註冊頁面給Router管理
