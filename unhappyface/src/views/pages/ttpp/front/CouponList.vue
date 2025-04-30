@@ -66,7 +66,7 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import CouponCard from '@/components/ttpp/CouponCard.vue'
+import CouponCard from '@/components/ttpp/CouponCard3.vue'
 
 const filters = ref({
   userId: 1001,

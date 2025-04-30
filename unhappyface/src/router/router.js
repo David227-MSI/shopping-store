@@ -7,7 +7,7 @@ import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
 // ttpp
-import NotificationList from '@/views/pages/ttpp/notifications/NotificationList.vue'
+import NotificationList from '@/views/pages/ttpp/front/NotificationList.vue'
 
 
 // 設定頁面參數 
