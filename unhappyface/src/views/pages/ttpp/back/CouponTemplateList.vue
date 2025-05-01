@@ -180,7 +180,7 @@
         Object.entries(query.value).filter(([_, value]) => value !== '' && value !== null)
       )
   
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/coupons/templates/findAll`, payload)
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/coupons/templates/findAll`, payload)
       if (res.data.success) {
         templates.value = res.data.data.templateList
       } else {

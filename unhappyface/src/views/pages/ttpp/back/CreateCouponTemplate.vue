@@ -144,7 +144,7 @@ const clientValidate = (field) => {
 const serverValidate = async (field) => {
   if (field === 'applicableId' && form.value.applicableType !== 'ALL' && form.value.applicableId) {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/validate/applicableId`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/validate/applicableId`, {
         params: {
           type: form.value.applicableType,
           id: form.value.applicableId
@@ -194,7 +194,7 @@ const onSubmit = async () => {
   }
 
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/coupons/template`, form.value)
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/coupons/template`, form.value)
     success.value = '優惠券模板建立成功，ID：' + res.data.data.id
   } catch (err) {
     if (err.response?.data?.errors) {

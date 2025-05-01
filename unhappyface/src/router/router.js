@@ -8,6 +8,7 @@ import Forbidden from '@/views/errors/Forbidden.vue'
 
 // ttpp
 import NotificationList from '@/views/pages/ttpp/front/NotificationList.vue'
+import AddPrizeToEvent from '@/views/pages/ttpp/back/AddPrizeToEvent.vue'
 
 
 // 設定頁面參數 
@@ -24,6 +25,7 @@ const routes = [
   // ttpp
   // { path: '/', name: '', component:  },
   { path: '/notificationList', name: 'NotificationList', component: NotificationList},
+  { path: '/events/:eventId/add-prizes', name: 'AddPrizeToEvent', component: AddPrizeToEvent},
 
 
 

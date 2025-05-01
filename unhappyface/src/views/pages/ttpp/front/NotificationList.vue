@@ -88,7 +88,7 @@ const showModal = ref(false)
 const search = async () => {
   try {
     // user query for notification list
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/notifications/user/query`, filters.value)
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/notifications/user/query`, filters.value)
     notifications.value = res.data.data.notificationList || []
   } catch (err) {
     Swal.fire('查詢失敗', err.response?.data?.message || '錯誤', 'error')
@@ -98,7 +98,7 @@ const search = async () => {
 // open modal
 const openDetail = async (id) => {
   try {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/notifications/user/notification/${id}`)
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/notifications/user/notification/${id}`)
     selectedNotification.value = res.data.data
     showModal.value = true
   } catch (err) {

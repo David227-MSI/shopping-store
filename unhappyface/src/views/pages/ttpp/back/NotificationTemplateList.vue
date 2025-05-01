@@ -63,7 +63,7 @@ const fetchTemplates = async () => {
   templates.value = []
 
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/notifications/templates/findAll`, {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/notifications/templates/findAll`, {
       title: query.value.title || null,
       noticeType: query.value.noticeType || null
     })

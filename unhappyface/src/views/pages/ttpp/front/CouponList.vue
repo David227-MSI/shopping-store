@@ -56,7 +56,6 @@
         v-for="item in coupons"
         :key="item.id"
         :coupon="item"
-        @open-detail="openDetail"
       />
     </div>
   </div>
@@ -80,7 +79,7 @@ const coupons = ref([]);
 
 const search = async () => {
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/coupons/user/query`, filters.value);
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/coupons/user/query`, filters.value);
     coupons.value = res.data.data.couponList;
   } catch (err) {
     Swal.fire('查詢失敗', err.response?.data?.message || '錯誤', 'error');
