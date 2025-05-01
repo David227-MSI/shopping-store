@@ -1,16 +1,31 @@
 <template>
   <div class="order-complete">
-    <h1>{{ paymentStatus === 'success' ? '訂單完成！🎉' : '付款失敗' }}</h1>
+    <h1>訂單完成！🎉</h1>
 
     <div class="order-info" v-if="order">
       <p><strong>訂單編號：</strong> {{ order.orderId }}</p>
       <p><strong>總金額：</strong> {{ order.finalAmount }} 元</p>
       <p><strong>付款狀態：</strong> {{ order.paymentStatusText }}</p>
       <p><strong>訂單建立時間：</strong> {{ formatDate(order.createdAt) }}</p>
-    </div>
 
-    <div v-else>
-      <p>未取得訂單資訊，請回首頁重新操作。</p>
+      <table class="product-table">
+        <thead>
+        <tr>
+          <th>商品名稱</th>
+          <th>數量</th>
+          <th>單價</th>
+          <th>小計</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in orderDetails" :key="item.productId">
+          <td>{{ item.productName }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unitPrice }} 元</td>
+          <td>{{ item.subtotal }} 元</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="buttons">
@@ -29,7 +44,7 @@ import Swal from 'sweetalert2';
 const route = useRoute();
 const router = useRouter();
 const order = ref(null);
-const paymentStatus = ref('');
+const orderDetails = ref([]);
 const isNavigating = ref(false);
 
 // 取得訂單資料
@@ -39,9 +54,8 @@ onMounted(async () => {
 
   try {
     const response = await axios.get(`/api/orders/${orderId}`);
-    order.value = response;
-
-    paymentStatus.value = order.value.paymentStatus === 'PAID' ? 'success' : 'error';
+    order.value = response.order;
+    orderDetails.value = response.orderDetails;
   } catch (error) {
     console.error('載入訂單失敗', error);
   }
@@ -54,7 +68,6 @@ const goHome = async () => {
   try {
     await router.push({ name: 'home' });
   } catch (error) {
-    console.error('跳轉首頁失敗', error);
     await Swal.fire('錯誤', '跳轉失敗，請稍後再試', 'error');
   } finally {
     isNavigating.value = false;
@@ -68,7 +81,6 @@ const goOrders = async () => {
   try {
     await router.push({ name: 'orders' });
   } catch (error) {
-    console.error('跳轉訂單列表失敗', error);
     await Swal.fire('錯誤', '跳轉失敗，請稍後再試', 'error');
   } finally {
     isNavigating.value = false;
@@ -87,26 +99,46 @@ const formatDate = (datetime) => {
 
 <style scoped>
 .order-complete {
-  max-width: 600px;
+  max-width: 800px;
   margin: 50px auto;
   padding: 30px;
   text-align: center;
-  background: #f9f9f9;
+  background: #fafafa;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
 .order-info {
-  margin: 20px 0;
   text-align: left;
+  margin-top: 20px;
 }
-.order-info p {
-  margin: 10px 0;
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
+
+.product-table th,
+.product-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.product-table th {
+  background-color: #f0f0f0;
+}
+
 .buttons {
   margin-top: 30px;
+  text-align: center;
 }
+
 button {
   margin: 0 10px;
   padding: 10px 20px;
+  font-size: 1rem;
   cursor: pointer;
 }
 </style>
