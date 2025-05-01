@@ -33,9 +33,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useCartStore } from '@/stores/cart/cartStore.js';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {useCartStore} from '@/stores/cart/cartStore.js';
 import axios from '@/services/order/axios';
 import Swal from 'sweetalert2';
 
@@ -107,15 +107,31 @@ const submitOrder = async () => {
       amount: finalAmount
     });
 
+    console.log('後端傳回來的內容：', paymentResponse);
+
     // 後端傳回來的form插進DOM並送出
-    const div = document.createElement('div');
-    div.innerHTML = paymentResponse;
-    const form = div.querySelector('form');
+    const fields = await axios.post('/api/ecpay/start-payment', {
+      orderId,
+      amount: finalAmount
+    });
+
+    console.log('🔍 綠界欄位內容：', fields);
+
+    // 🔧 改為純 JS 動態建立 form，避免瀏覽器阻擋
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
+
+    Object.entries(fields).forEach(([key, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    });
+
     document.body.appendChild(form);
     form.submit();
-
-    // 送出後清空購物車（或付款完成後再清空）建議付款成功後再清空購物車更穩定
-    //cartStore.clearCart();
 
   } catch (error) {
     console.error('送出訂單失敗', error);
@@ -138,6 +154,7 @@ onMounted(() => {
 .info-block {
   margin-bottom: 20px;
 }
+
 button {
   margin-top: 20px;
 }
