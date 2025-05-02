@@ -1,94 +1,87 @@
 <template>
   <form @submit.prevent="onSubmit">
-    <div>
+    <div class="form-group">
       <label>適用類型</label>
-      <select v-model="form.applicableType" @blur="validateField('applicableType')">
+      <select v-model="form.applicableType" @input="validateField('applicableType')">
         <option value="ALL">全品項適用</option>
         <option value="PRODUCT">商品適用</option>
         <option value="BRAND">品牌適用</option>
       </select>
-      <p class="error" v-if="errors.applicableType">{{ errors.applicableType }}</p>
+      <div class="error">{{ errors.applicableType }}</div>
     </div>
 
-    <div v-if="form.applicableType !== 'ALL'">
+    <div v-if="form.applicableType !== 'ALL'" class="form-group">
       <label>Applicable ID</label>
-      <input type="number" v-model.number="form.applicableId" @blur="validateField('applicableId')" />
-      <p class="error" v-if="errors.applicableId">{{ errors.applicableId }}</p>
+      <input type="number" v-model.number="form.applicableId" @input="validateField('applicableId')" />
+      <div class="error">{{ errors.applicableId }}</div>
     </div>
 
-    <div>
+    <div class="form-group">
       <label>最低消費</label>
-      <input type="number" v-model.number="form.minSpend" @blur="validateField('minSpend')" />
-      <p class="error" v-if="errors.minSpend">{{ errors.minSpend }}</p>
+      <input type="number" v-model.number="form.minSpend" @input="validateField('minSpend')" />
+      <div class="error">{{ errors.minSpend }}</div>
     </div>
 
-    <div>
+    <div class="form-group">
       <label>折扣類型</label>
-      <select v-model="form.discountType" @blur="validateField('discountType')">
+      <select v-model="form.discountType" @input="validateField('discountType')">
         <option value="VALUE">金額折扣</option>
         <option value="PERCENTAGE">百分比折扣</option>
       </select>
-      <p class="error" v-if="errors.discountType">{{ errors.discountType }}</p>
+      <div class="error">{{ errors.discountType }}</div>
     </div>
 
-    <div>
+    <div class="form-group">
       <label>折扣值</label>
-      <input type="number" v-model.number="form.discountValue" @blur="validateField('discountValue')" />
-      <p class="error" v-if="errors.discountValue">{{ errors.discountValue }}</p>
+      <input type="number" v-model.number="form.discountValue" @input="validateField('discountValue')" />
+      <div class="error">{{ errors.discountValue }}</div>
     </div>
 
-    <div v-if="form.discountType === 'PERCENTAGE'">
+    <div v-if="form.discountType === 'PERCENTAGE'" class="form-group">
       <label>最高折抵金額</label>
-      <input type="number" v-model.number="form.maxDiscount" @blur="validateField('maxDiscount')" />
-      <p class="error" v-if="errors.maxDiscount">{{ errors.maxDiscount }}</p>
+      <input type="number" v-model.number="form.maxDiscount" @input="validateField('maxDiscount')" />
+      <div class="error">{{ errors.maxDiscount }}</div>
     </div>
 
-    <div>
+    <div class="form-group">
       <label>可否交易</label>
-      <input type="checkbox" v-model="form.tradeable" @blur="validateField('tradeable')" />
-      <p class="error" v-if="errors.tradeable">{{ errors.tradeable }}</p>
+      <input type="checkbox" v-model="form.tradeable" @change="validateField('tradeable')" />
     </div>
 
-    <div>
+    <div class="form-group">
       <label>開始時間</label>
-      <input type="datetime-local" v-model="form.startTime" @blur="validateField('startTime')" />
-      <p class="error" v-if="errors.startTime">{{ errors.startTime }}</p>
+      <input type="datetime-local" v-model="form.startTime" @input="validateField('startTime')" />
+      <div class="error">{{ errors.startTime }}</div>
     </div>
 
-    <div>
+    <div class="form-group">
       <label>到期時間</label>
-      <input type="datetime-local" v-model="form.endTime" @blur="validateField('endTime')" />
-      <p class="error" v-if="errors.endTime">{{ errors.endTime }}</p>
+      <input type="datetime-local" v-model="form.endTime" @input="validateField('endTime')" />
+      <div class="error">{{ errors.endTime }}</div>
     </div>
 
     <button type="submit">建立優惠券模板</button>
-
-    <p v-if="formError" class="error">{{ formError }}</p>
-    <p v-if="success" class="success">{{ success }}</p>
   </form>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 
 const form = ref({
   applicableType: 'ALL',
   applicableId: null,
-  minSpend: 0,
+  minSpend: 200,
   discountType: 'VALUE',
-  discountValue: 0.01,
+  discountValue: 50,
   maxDiscount: null,
   tradeable: true,
-  startTime: null,
-  endTime: null
+  startTime: '',
+  endTime: ''
 })
 
 const errors = ref({})
-const formError = ref(null)
-const success = ref(null)
-
-// 防抖函數，限制 AJAX 請求頻率
 const debounce = (fn, delay) => {
   let timeout
   return (...args) => {
@@ -97,14 +90,25 @@ const debounce = (fn, delay) => {
   }
 }
 
-// 客戶端驗證邏輯
 const clientValidate = (field) => {
   const value = form.value[field]
   let error = null
+  const now = new Date()
 
   switch (field) {
+    case 'applicableType':
+      if (!value) error = '請選擇適用類型'
+      break
+    case 'applicableId':
+      if (form.value.applicableType !== 'ALL' && (!value || value < 1)) {
+        error = '請輸入有效的 ID'
+      }
+      break
     case 'minSpend':
       if (value < 0) error = '最低消費金額不能為負'
+      break
+    case 'discountType':
+      if (!value) error = '請選擇折扣類型'
       break
     case 'discountValue':
       if (value <= 0) error = '折扣值必須大於 0'
@@ -115,34 +119,26 @@ const clientValidate = (field) => {
       }
       break
     case 'startTime':
-      if (value) {
-        const start = new Date(value)
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        if (start < today) error = '開始時間不能早於今天'
+      if (!value) {
+        error = '請輸入開始時間'
+      } else if (new Date(value) < now) {
+        error = '開始時間不能早於目前時間'
       }
       break
     case 'endTime':
-      if (value && form.value.startTime) {
-        const start = new Date(form.value.startTime)
-        const end = new Date(value)
-        if (end <= start) error = '到期時間必須晚於開始時間'
+      if (!value) {
+        error = '請輸入到期時間'
+      } else if (form.value.startTime && new Date(value) <= new Date(form.value.startTime)) {
+        error = '到期時間必須晚於開始時間'
       }
-      break
-    case 'applicableType':
-      if (!value) error = '請選擇適用類型'
-      break
-    case 'discountType':
-      if (!value) error = '請選擇折扣類型'
       break
   }
 
   return error
 }
 
-// 伺服器端驗證（例如檢查 applicableId 是否有效）
 const serverValidate = async (field) => {
-  if (field === 'applicableId' && form.value.applicableType !== 'ALL' && form.value.applicableId) {
+  if (field === 'applicableId' && form.value.applicableType !== 'ALL') {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/validate/applicableId`, {
         params: {
@@ -158,69 +154,83 @@ const serverValidate = async (field) => {
   return null
 }
 
-// 驗證欄位
 const validateField = debounce(async (field) => {
-  errors.value[field] = null
-
-  // 執行客戶端驗證
   const clientError = clientValidate(field)
   if (clientError) {
     errors.value[field] = clientError
     return
   }
 
-  // 執行伺服器端驗證（如果需要）
   const serverError = await serverValidate(field)
   if (serverError) {
     errors.value[field] = serverError
+  } else {
+    errors.value[field] = null
   }
 }, 300)
 
 const onSubmit = async () => {
   errors.value = {}
-  formError.value = null
-  success.value = null
 
-  // 提交前再次驗證所有欄位
   const fields = Object.keys(form.value)
   for (const field of fields) {
-    const error = clientValidate(field) || (await serverValidate(field))
-    if (error) errors.value[field] = error
+    const err = clientValidate(field) || (await serverValidate(field))
+    if (err) errors.value[field] = err
   }
 
-  if (Object.keys(errors.value).length > 0) {
-    formError.value = '請修正表單中的錯誤'
+  if (Object.values(errors.value).some(e => e)) {
+    Swal.fire({
+      icon: 'error',
+      title: '欄位驗證失敗',
+      text: '請確認所有欄位皆正確填寫'
+    })
     return
   }
 
   try {
     const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/coupons/template`, form.value)
-    success.value = '優惠券模板建立成功，ID：' + res.data.data.id
-  } catch (err) {
-    if (err.response?.data?.errors) {
-      errors.value = err.response.data.errors
-    } else {
-      formError.value = err.response?.data?.message || '發生錯誤，請稍後再試'
+    Swal.fire({
+      icon: 'success',
+      title: '建立成功',
+      text: `優惠券模板 ID：${res.data.data.id}`,
+      confirmButtonText: '確認'
+    })
+
+    // Reset form
+    form.value = {
+      applicableType: 'ALL',
+      applicableId: null,
+      minSpend: 200,
+      discountType: 'VALUE',
+      discountValue: 50,
+      maxDiscount: null,
+      tradeable: true,
+      startTime: '',
+      endTime: ''
     }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: '建立失敗',
+      text: err.response?.data?.message || '發生錯誤，請稍後再試'
+    })
   }
 }
 </script>
 
 <style scoped>
-form {
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.form-group {
+  margin-bottom: 1em;
+}
+input, select {
+  width: 100%;
+  padding: 0.5em;
+}
+button {
+  padding: 0.6em 1.2em;
 }
 .error {
   color: red;
   font-size: 0.85em;
-  margin-top: -8px;
-}
-.success {
-  color: green;
-  font-weight: bold;
 }
 </style>

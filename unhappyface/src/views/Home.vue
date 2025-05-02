@@ -6,10 +6,11 @@
     <!-- <CreateEvent /> -->
     <!-- <NotificationTemplateList /> -->
     <!-- <CouponTemplateList /> -->
-    <!-- <CreateCouponTemplate /> -->
+    <CreateCouponTemplate />
 
     <!-- front -->
-    <SubscribeList />
+     <!-- <UserEventList /> -->
+    <!-- <SubscribeList2 /> -->
     <!-- <CouponList /> -->
     <!-- <NotificationList /> -->
   </main>
@@ -18,7 +19,8 @@
 <script setup>
   import NotificationList from '@/views/pages/ttpp/front/NotificationList.vue'
   import CouponList from '@/views/pages/ttpp/front/CouponList.vue'
-  import SubscribeList from '@/views/pages/ttpp/front/SubscribeList.vue';
+  import SubscribeList2 from '@/views/pages/ttpp/front/SubscribeList2.vue';
+  import UserEventList from '@/views/pages/ttpp/front/EventList.vue';
 
   import CreateCouponTemplate from '@/views/pages/ttpp/back/CreateCouponTemplate.vue';
   import CouponTemplateList from '@/views/pages/ttpp/back/CouponTemplateList.vue';

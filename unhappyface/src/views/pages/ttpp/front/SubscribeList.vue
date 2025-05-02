@@ -15,11 +15,11 @@
             </select>
           </div>
           <div>
-            <label>品牌：</label>
-            <select v-model="filters.brand" class="filter-select">
+            <label>追蹤類型：</label>
+            <select v-model="filters.itemType" class="filter-select">
               <option value="">全部</option>
-              <option v-for="b in brands" :key="b.id" :value="b.id">
-                {{ b.name }}
+              <option v-for="type in itemTypeOptions" :key="type.id" :value="type.id">
+                {{ type.name }}
               </option>
             </select>
           </div>
@@ -83,129 +83,105 @@
   
   <script setup>
   import { ref, onMounted, watch } from 'vue'
-  import axios from 'axios'
-  import Swal from 'sweetalert2'
-  import SubscribeProductCard from '@/components/ttpp/SubscribeProductCard.vue'
-  
-  const filters = ref({
-    userId: 1001,
-    category: '',
-    brand: '',
-    search: ''
-  })
-  
-  const products = ref([])
-  const brands = ref([])
-  const categories = ref([])
-  
-  const fetchSubscriptions = async () => {
-    try {
-      // 查詢追蹤的商品
-      const productRes = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/user/subscriptions/products`,
-        filters.value
-      )
-      products.value = productRes.data.data.productList || []
-  
-      // 查詢追蹤的品牌
-      const brandRes = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/subscriptions/brands`,
-        filters.value
-      )
-      brands.value = brandRes.data.data.brandList || []
-    } catch (err) {
-      Swal.fire('查詢失敗', err.response?.data?.message || '錯誤', 'error')
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import SubscribeProductCard from '@/components/ttpp/SubscribeProductCard.vue'
+
+const filters = ref({
+  userId: 1001,
+  itemType: '',
+  category: '',
+  search: ''
+})
+
+const products = ref([])
+const brands = ref([])
+const categories = ref([])
+const itemTypeOptions = ref([
+  { id: 'PRODUCT', name: '商品' },
+  { id: 'BRAND', name: '品牌' }
+])
+
+const fetchSubscriptions = async () => {
+  try {
+    const queryParams = {
+      userId: filters.value.userId, // 確保後端能正確識別用戶
+      itemType: filters.value.itemType,
+      categoryId: filters.value.category || null, // 送出 null 而非空字串給後端
+      keyword: filters.value.search || null // 送出 null 而非空字串給後端
     }
-  }
-  
-  const fetchCategories = async () => {
-    try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`)
-      categories.value = data
-    } catch (err) {
-      Swal.fire('分類載入失敗', err.response?.data?.message || '錯誤', 'error')
+
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/user/subscribes/query`,
+      queryParams
+    )
+
+    if (res.data.success) {
+      products.value = res.data.data.products || []
+      brands.value = res.data.data.brands || [] // 假設後端會回傳 brands 陣列
+    } else {
+      Swal.fire('查詢追蹤清單失敗', res.data.message || '錯誤', 'error')
+      products.value = []
+      brands.value = []
     }
+  } catch (err) {
+    Swal.fire('查詢追蹤清單發生錯誤', err.response?.data?.message || '網路錯誤', 'error')
+    products.value = []
+    brands.value = []
   }
-  
-  const resetFilters = () => {
-    filters.value.category = ''
-    filters.value.brand = ''
-    filters.value.search = ''
-    fetchSubscriptions()
+}
+
+const fetchCategories = async () => {
+  try {
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/subscribes/categories`)
+    categories.value = data
+  } catch (err) {
+    Swal.fire('分類載入失敗', err.response?.data?.message || '錯誤', 'error')
   }
+}
+
+const resetFilters = () => {
+  filters.value.category = ''
+  filters.value.itemType = ''
+  filters.value.search = ''
+  fetchSubscriptions()
+}
+
+const removeProductSubscription = (productId) => {
+  // 呼叫後端 API 移除商品追蹤
+  console.log('移除商品追蹤:', productId)
+  // ... 你的移除邏輯
+}
+
+const removeBrandSubscription = (brandId) => {
+  // 呼叫後端 API 移除品牌追蹤
+  console.log('移除品牌追蹤:', brandId)
+  // ... 你的移除邏輯
+}
+
+const addToCart = (product) => {
+  // 加入購物車邏輯
+  console.log('加入購物車:', product)
+  // ... 你的加入購物車邏輯
+}
+
+// 監聽篩選條件變化
+watch(filters, fetchSubscriptions, { deep: true })
+
+// 初始化
+onMounted(() => {
+  fetchCategories()
+  fetchSubscriptions()
+})
+</script>
   
-  const removeProductSubscription = async (productId) => {
-    try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/subscriptions/products/${productId}`, {
-        data: { userId: filters.value.userId }
-      })
-      products.value = products.value.filter(p => p.id !== productId)
-      Swal.fire({
-        icon: 'success',
-        title: '已取消追蹤',
-        text: '商品已從追蹤清單移除！',
-        timer: 1500,
-        showConfirmButton: false
-      })
-    } catch (err) {
-      Swal.fire('操作失敗', err.response?.data?.message || '錯誤', 'error')
-    }
-  }
-  
-  const removeBrandSubscription = async (brandId) => {
-    try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/subscriptions/brands/${brandId}`, {
-        data: { userId: filters.value.userId }
-      })
-      brands.value = brands.value.filter(b => b.id !== brandId)
-      Swal.fire({
-        icon: 'success',
-        title: '已取消追蹤',
-        text: '品牌已從追蹤清單移除！',
-        timer: 1500,
-        showConfirmButton: false
-      })
-    } catch (err) {
-      Swal.fire('操作失敗', err.response?.data?.message || '錯誤', 'error')
-    }
-  }
-  
-  const addToCart = async (product) => {
-    try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/cart`, {
-        userId: filters.value.userId,
-        productId: product.id,
-        quantity: 1
-      })
-      Swal.fire({
-        icon: 'success',
-        title: '已加入購物車！',
-        text: `${product.name} 已成功加入購物車！`,
-        timer: 1500,
-        showConfirmButton: false
-      })
-    } catch (err) {
-      Swal.fire('操作失敗', err.response?.data?.message || '錯誤', 'error')
-    }
-  }
-  
-  const getProductImage = (name) => {
-    if (name === '香水 A') return '/images/perfumeA.jpg'
-    if (name === '香水 B') return '/images/perfumeB.jpg'
-    if (name === 'MyPhone  Asc 15 Pro Max') return '/images/phone1.png'
-    if (name === '黑色棉T') return '/images/black_T.png'
-    return 'https://via.placeholder.com/300x180?text=No+Image'
-  }
-  
-  // 監聽篩選條件變化
-  watch(filters, fetchSubscriptions, { deep: true })
-  
-  // 初始化
-  onMounted(() => {
-    fetchCategories()
-    fetchSubscriptions()
-  })
-  </script>
+
+
+
+
+
+
+
   
   <style scoped>
   .container {
