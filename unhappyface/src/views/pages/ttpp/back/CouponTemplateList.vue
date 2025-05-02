@@ -65,6 +65,7 @@
               <th>折扣值</th>
               <th>開始時間</th>
               <th>到期時間</th>
+              <th>圖片</th> <!-- 加這裡 -->
             </tr>
           </thead>
           <tbody>
@@ -75,8 +76,18 @@
               <td>{{ template.discountValue }}</td>
               <td>{{ formatDateTime(template.startTime) }}</td>
               <td>{{ formatDateTime(template.endTime) }}</td>
+              <td>
+                <img
+                  v-if="template.couponMedia?.mediaData"
+                  :src="getImageSrc(template.couponMedia.mediaData)"
+                  alt="template image"
+                  style="width: 60px; height: 60px; object-fit: cover"
+                />
+                <span v-else>-</span>
+              </td>
             </tr>
           </tbody>
+
         </table>
       </div>
   
@@ -86,138 +97,145 @@
   </template>
   
   <script setup>
-  import { ref, watch } from 'vue'
-  import axios from 'axios'
-  
-  // 查詢條件
-  const query = ref({
+import { ref, watch } from 'vue'
+import axios from 'axios'
+
+// 查詢條件
+const query = ref({
+  applicableType: '',
+  startTime: null,
+  endTime: null,
+  minDiscountValue: null,
+  maxDiscountValue: null,
+  discountType: ''
+})
+
+// 狀態管理
+const templates = ref([])
+const loading = ref(false)
+const error = ref(null)
+const errors = ref({})
+
+// 防抖函數
+const debounce = (fn, delay) => {
+  let timeout
+  return (...args) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => fn(...args), delay)
+  }
+}
+
+// 格式化適用類型
+const formatApplicableType = (type) => {
+  const types = {
+    ALL: '全品項適用',
+    PRODUCT: '商品適用',
+    BRAND: '品牌適用'
+  }
+  return types[type] || type
+}
+
+// 格式化日期時間
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return '-'
+  return new Date(dateTime).toLocaleString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+// 處理圖片 base64 字串加上 MIME header（如有需要）
+const getImageSrc = (base64) => {
+  if (!base64) return ''
+  return base64.startsWith('data:') ? base64 : `data:image/png;base64,${base64}`
+}
+
+// 驗證輸入
+const validateQuery = () => {
+  errors.value = {}
+  let valid = true
+
+  if (query.value.minDiscountValue !== null && query.value.minDiscountValue < 0) {
+    errors.value.minDiscountValue = '最小折扣值不能為負'
+    valid = false
+  }
+
+  if (query.value.maxDiscountValue !== null && query.value.maxDiscountValue < 0) {
+    errors.value.maxDiscountValue = '最大折扣值不能為負'
+    valid = false
+  }
+
+  if (
+    query.value.minDiscountValue !== null &&
+    query.value.maxDiscountValue !== null &&
+    query.value.minDiscountValue > query.value.maxDiscountValue
+  ) {
+    errors.value.maxDiscountValue = '最大折扣值必須大於或等於最小折扣值'
+    valid = false
+  }
+
+  return valid
+}
+
+// 查詢優惠券模板
+const fetchTemplates = debounce(async () => {
+  if (!validateQuery()) {
+    error.value = '請修正篩選條件中的錯誤'
+    return
+  }
+
+  loading.value = true
+  error.value = null
+  templates.value = []
+
+  try {
+    const payload = Object.fromEntries(
+      Object.entries(query.value).filter(([_, value]) => value !== '' && value !== null)
+    )
+
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/coupons/templates/findAll`, payload)
+
+    if (res.data.success) {
+      templates.value = res.data.data.templateList
+    } else {
+      error.value = res.data.message || '查詢失敗'
+    }
+  } catch (err) {
+    error.value = err.response?.data?.message || '伺服器錯誤，請稍後再試'
+  } finally {
+    loading.value = false
+  }
+}, 500)
+
+// 監聽 query 變化，自動查詢
+watch(
+  query,
+  () => {
+    fetchTemplates()
+  },
+  { deep: true }
+)
+
+// 重設查詢條件
+const resetQuery = () => {
+  query.value = {
     applicableType: '',
     startTime: null,
     endTime: null,
     minDiscountValue: null,
     maxDiscountValue: null,
     discountType: ''
-  })
-  
-  // 狀態管理
-  const templates = ref([])
-  const loading = ref(false)
-  const error = ref(null)
-  const errors = ref({})
-  
-  // 防抖函數
-  const debounce = (fn, delay) => {
-    let timeout
-    return (...args) => {
-      clearTimeout(timeout)
-      timeout = setTimeout(() => fn(...args), delay)
-    }
   }
-  
-  // 格式化適用類型
-  const formatApplicableType = (type) => {
-    const types = {
-      ALL: '全品項適用',
-      PRODUCT: '商品適用',
-      BRAND: '品牌適用'
-    }
-    return types[type] || type
-  }
-  
-  // 格式化日期時間
-  const formatDateTime = (dateTime) => {
-    if (!dateTime) return '-'
-    return new Date(dateTime).toLocaleString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-  
-  // 驗證輸入
-  const validateQuery = () => {
-    errors.value = {}
-    let valid = true
-  
-    if (query.value.minDiscountValue !== null && query.value.minDiscountValue < 0) {
-      errors.value.minDiscountValue = '最小折扣值不能為負'
-      valid = false
-    }
-  
-    if (query.value.maxDiscountValue !== null && query.value.maxDiscountValue < 0) {
-      errors.value.maxDiscountValue = '最大折扣值不能為負'
-      valid = false
-    }
-  
-    if (
-      query.value.minDiscountValue !== null &&
-      query.value.maxDiscountValue !== null &&
-      query.value.minDiscountValue > query.value.maxDiscountValue
-    ) {
-      errors.value.maxDiscountValue = '最大折扣值必須大於或等於最小折扣值'
-      valid = false
-    }
-  
-    return valid
-  }
-  
-  // 獲取優惠券模板列表（帶防抖）
-  const fetchTemplates = debounce(async () => {
-    if (!validateQuery()) {
-      error.value = '請修正篩選條件中的錯誤'
-      return
-    }
-  
-    loading.value = true
-    error.value = null
-    templates.value = []
-  
-    try {
-      // 清理空的查詢條件
-      const payload = Object.fromEntries(
-        Object.entries(query.value).filter(([_, value]) => value !== '' && value !== null)
-      )
-  
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/coupons/templates/findAll`, payload)
-      if (res.data.success) {
-        templates.value = res.data.data.templateList
-      } else {
-        error.value = res.data.message || '查詢失敗'
-      }
-    } catch (err) {
-      error.value = err.response?.data?.message || '伺服器錯誤，請稍後再試'
-    } finally {
-      loading.value = false
-    }
-  }, 500)
-  
-  // 監聽 query 變化
-  watch(
-    query,
-    () => {
-      fetchTemplates()
-    },
-    { deep: true }
-  )
-  
-  // 重置查詢條件
-  const resetQuery = () => {
-    query.value = {
-      applicableType: '',
-      startTime: null,
-      endTime: null,
-      minDiscountValue: null,
-      maxDiscountValue: null,
-      discountType: ''
-    }
-    errors.value = {}
-  }
-  
-  // 初始化時載入數據
-  fetchTemplates()
-  </script>
+  errors.value = {}
+}
+
+// 初始化查詢
+fetchTemplates()
+</script>
+
   
   <style scoped>
   .container {

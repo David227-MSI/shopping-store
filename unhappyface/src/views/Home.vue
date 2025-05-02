@@ -6,12 +6,13 @@
     <!-- <CreateEvent /> -->
     <!-- <NotificationTemplateList /> -->
     <!-- <CouponTemplateList /> -->
-    <CreateCouponTemplate />
+    <!-- <CreateCouponTemplate /> -->
+    <UploadImg />
 
     <!-- front -->
      <!-- <UserEventList /> -->
     <!-- <SubscribeList2 /> -->
-    <!-- <CouponList /> -->
+    <CouponList />
     <!-- <NotificationList /> -->
   </main>
 </template>
@@ -22,6 +23,7 @@
   import SubscribeList2 from '@/views/pages/ttpp/front/SubscribeList2.vue';
   import UserEventList from '@/views/pages/ttpp/front/EventList.vue';
 
+  import UploadImg from '@/views/pages/ttpp/back/UploadImg.vue';
   import CreateCouponTemplate from '@/views/pages/ttpp/back/CreateCouponTemplate.vue';
   import CouponTemplateList from '@/views/pages/ttpp/back/CouponTemplateList.vue';
   import NotificationTemplateList from '@/views/pages/ttpp/back/NotificationTemplateList.vue';
