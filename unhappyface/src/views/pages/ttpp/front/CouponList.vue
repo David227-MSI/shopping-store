@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>優惠券列表</h1>
+    <h1>我的優惠券列表</h1>
 
     <!-- 搜尋欄位 -->
     <div class="search-bar">
@@ -56,15 +56,17 @@
         v-for="item in coupons"
         :key="item.id"
         :coupon="item"
+        @open-detail="handleDetail"
+        @transfer-coupon="handleTransfer"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import { ref, watch } from 'vue'
+import axios from 'axios'
+import Swal from 'sweetalert2'
 import CouponCard from '@/components/ttpp/CouponCard3.vue'
 
 const filters = ref({
@@ -73,24 +75,53 @@ const filters = ref({
   applicableType: null,
   status: null,
   isUsed: null,
-});
+})
 
-const coupons = ref([]);
+const coupons = ref([])
 
 const search = async () => {
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/coupons/user/query`, filters.value);
-    coupons.value = res.data.data.couponList;
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/coupons/user/query`, filters.value)
+    coupons.value = res.data.data.couponList
   } catch (err) {
-    Swal.fire('查詢失敗', err.response?.data?.message || '錯誤', 'error');
+    Swal.fire('查詢失敗', err.response?.data?.message || '錯誤', 'error')
   }
-};
+}
 
-// 監聽篩選條件變化
-watch(filters, search, { deep: true });
+watch(filters, search, { deep: true })
+search()
 
-// 初始化查詢
-search();
+const handleDetail = (coupon) => {
+  Swal.fire({
+    title: '優惠券詳情',
+    html: `<pre>${JSON.stringify(coupon, null, 2)}</pre>`,
+    width: 600,
+  })
+}
+
+const handleTransfer = async (coupon) => {
+  const { value: email } = await Swal.fire({
+    title: '轉移優惠券',
+    input: 'email',
+    inputLabel: '請輸入受贈者 Email',
+    inputPlaceholder: 'someone@example.com',
+    showCancelButton: true,
+  })
+
+  if (!email) return
+
+  try {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/coupons/transfer`, {
+      couponId: coupon.id,
+      recipientMail: email,
+    })
+
+    Swal.fire('轉移成功', `優惠券已轉移給 ${res.data.data.ownerMail}`, 'success')
+    search()
+  } catch (err) {
+    Swal.fire('轉移失敗', err.response?.data?.message || '錯誤', 'error')
+  }
+}
 </script>
 
 

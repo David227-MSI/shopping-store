@@ -58,8 +58,8 @@
   
   const events = ref([]);
   const loading = ref(false);
-  const userId = 100;
-  const expanded = ref([]); // 追蹤每個活動的展開狀態
+  const userId = 1003;
+  const expanded = ref([]);
   
   const fetchEvents = async () => {
     loading.value = true;
@@ -67,7 +67,7 @@
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/events/query`, {});
       if (res.data?.success) {
         events.value = res.data.data.eventList || [];
-        expanded.value = new Array(events.value.length).fill(false); // 初始化展開狀態
+        expanded.value = new Array(events.value.length).fill(false);
       }
     } catch (err) {
       console.error('載入活動失敗', err);

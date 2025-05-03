@@ -7,8 +7,7 @@
       <span class="notice-type">{{ noticeTypeText(notification.noticeType) }}</span>
       <p class="modal-text">{{ notification.content }}</p>
       <div class="created-at">訊息發送時間：{{ formatDate(notification.createdAt) }}</div>
-      <div v-if="notification.isRead" class="status read">已讀</div>
-      <div v-else class="status unread">未讀</div>
+
     </div>
   </div>
 </template>
@@ -107,23 +106,6 @@ const noticeTypeText = (type) => {
   font-size: 0.85rem;
   color: var(--text-dark);
   margin-bottom: 10px;
-}
-
-.status {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-}
-
-.read {
-  background-color: #ccc;
-  color: #fff;
-}
-
-.unread {
-  background-color: #4CAF50;
-  color: #fff;
 }
 
 @media (max-width: 768px) {

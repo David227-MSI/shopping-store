@@ -7,13 +7,13 @@
     <!-- <NotificationTemplateList /> -->
     <!-- <CouponTemplateList /> -->
     <!-- <CreateCouponTemplate /> -->
-    <UploadImg />
+    <!-- <UploadImg /> -->
 
     <!-- front -->
      <!-- <UserEventList /> -->
     <!-- <SubscribeList2 /> -->
-    <CouponList />
-    <!-- <NotificationList /> -->
+    <!-- <CouponList /> -->
+    <NotificationList />
   </main>
 </template>
 

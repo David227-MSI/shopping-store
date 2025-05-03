@@ -24,13 +24,25 @@
           <strong>有效期限:</strong> {{ formatDateRange }}
         </p>
         <p class="detail-item">
-          <strong>狀態:</strong> {{ coupon?.isUsed ? '已使用' : '未使用' }}
+          <strong>所有權:</strong> {{ coupon?.tradeable ? '可轉移' : '不可轉移' }}
         </p>
       </div>
 
-      <div class="coupon-actions">
-        <button class="action-button" @click="emit('open-detail', coupon)">
-          {{ coupon?.isUsed ? '查看詳情' : '立即使用' }}
+      <div class="coupon-actions" v-if="coupon.isUsed || coupon.tradeable">
+        <button
+          class="action-button"
+          v-if="coupon.isUsed"
+          @click="emit('open-detail', coupon)"
+        >
+          查看詳情
+        </button>
+
+        <button
+          class="action-button"
+          v-else-if="coupon.tradeable"
+          @click="emit('transfer-coupon', coupon)"
+        >
+          轉移優惠券
         </button>
       </div>
     </div>
@@ -38,19 +50,18 @@
 </template>
 
 <script setup>
-import { computed, defineProps, defineEmits } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   coupon: {
     type: Object,
     required: true,
-    default: () => ({})
-  }
+    default: () => ({}),
+  },
 })
 
-const emit = defineEmits(['open-detail'])
+const emit = defineEmits(['open-detail', 'transfer-coupon'])
 
-// 顯示折扣標題
 const formatCouponTitle = computed(() => {
   if (!props.coupon) return '無折扣資訊'
   const { discountType, discountValue, maxDiscount } = props.coupon
@@ -60,56 +71,47 @@ const formatCouponTitle = computed(() => {
   return `${discountValue}% 折扣${maxDiscount ? ` (最高 $${maxDiscount})` : ''}`
 })
 
-// 顯示適用類型
 const formatApplicableType = computed(() => {
   if (!props.coupon) return '未知類型'
   const types = {
     ALL: '全品項適用',
     BRAND: '特定品牌',
     PRODUCT: '特定商品',
-    CATEGORY: '特定類別'
+    CATEGORY: '特定類別',
   }
   return types[props.coupon.applicableType] || props.coupon.applicableType || '未知'
 })
 
-// 格式化日期區間
 const formatDateRange = computed(() => {
   if (!props.coupon) return '無日期'
   const { startTime, endTime } = props.coupon
   return `${formatDate(startTime)} - ${formatDate(endTime)}`
 })
 
-// 日期格式化
 const formatDate = (dateString) => {
   if (!dateString) return '無'
   const date = new Date(dateString)
   return date.toLocaleDateString('zh-TW', {
     year: 'numeric',
     month: '2-digit',
-    day: '2-digit'
+    day: '2-digit',
   })
 }
 
-// 判斷是否即將到期
 const isExpiring = (endTime) => {
-  if (!endTime) return false
   const end = new Date(endTime)
   const now = new Date()
-  const daysUntilExpiry = (end - now) / (1000 * 60 * 60 * 24)
-  return daysUntilExpiry > 0 && daysUntilExpiry <= 7
+  const diffDays = (end - now) / (1000 * 60 * 60 * 24)
+  return diffDays > 0 && diffDays <= 7
 }
 
-// 判斷是否過期
 const isExpired = (endTime) => {
-  if (!endTime) return false
   const end = new Date(endTime)
   const now = new Date()
   return end < now
 }
 
-// 狀態標籤
 const formatStatus = computed(() => {
-  if (!props.coupon) return '未知狀態'
   const { isUsed, endTime, tradeable } = props.coupon
   if (isUsed) return '已使用'
   if (isExpiring(endTime)) return '即將到期'
@@ -117,9 +119,7 @@ const formatStatus = computed(() => {
   return tradeable ? '可交易' : '有效'
 })
 
-// 狀態 class
 const statusClass = computed(() => {
-  if (!props.coupon) return 'status-unknown'
   const { isUsed, endTime } = props.coupon
   if (isUsed) return 'status-used'
   if (isExpiring(endTime)) return 'status-expiring'
@@ -127,12 +127,21 @@ const statusClass = computed(() => {
   return 'status-valid'
 })
 
-// 將 base64 處理成圖片 src
 const getImageSrc = (base64) => {
   if (!base64) return ''
   return base64.startsWith('data:') ? base64 : `data:image/png;base64,${base64}`
 }
 </script>
+
+
+
+
+
+
+
+
+
+
 
 <style scoped>
 .coupon {
