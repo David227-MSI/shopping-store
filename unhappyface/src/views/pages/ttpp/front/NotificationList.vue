@@ -85,7 +85,7 @@ import NotificationCard from '@/components/ttpp/NotificationCard.vue';
 import NotificationModal from '@/components/ttpp/NotificationModal.vue';
 
 const filters = ref({
-  userId: 1002,
+  userId: 1003,
   title: '',
   noticeType: null,
   isRead: null,
@@ -245,9 +245,17 @@ const deleteAll = async () => {
   }
 };
 
-// Mark all as read
 const markAllAsRead = async () => {
-  if (notifications.value.every((n) => n.isRead)) return;
+  // 檢查是否有未讀通知
+  if (notifications.value.every((n) => n.isRead)) {
+    await Swal.fire({
+      icon: 'info',
+      title: '無未讀通知',
+      text: '所有通知已標示為已讀',
+      confirmButtonText: '確定',
+    });
+    return;
+  }
 
   const result = await Swal.fire({
     icon: 'question',
@@ -261,22 +269,30 @@ const markAllAsRead = async () => {
   if (!result.isConfirmed) return;
 
   try {
-    // Placeholder: Assumes a mark-all-as-read endpoint; adjust when implemented
-    await axios.post(`${import.meta.env.VITE_API_URL}/api/user/notifications/mark-all-read`, {
-      userId: filters.value.userId,
-    });
-    notifications.value = notifications.value.map((n) => ({ ...n, isRead: true }));
-    await Swal.fire({
-      icon: 'success',
-      title: '操作成功',
-      text: '所有通知已標示為已讀',
-      confirmButtonText: '確定',
-    });
+    const userId = filters.value.userId;
+    if (!userId || isNaN(userId)) {
+      throw new Error('用戶 ID 無效');
+    }
+
+    const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/user/notifications/markAllAsRead/${userId}`);
+    
+    if (response.data.success) {
+      
+      notifications.value = notifications.value.map((n) => ({ ...n, isRead: true }));
+      await Swal.fire({
+        icon: 'success',
+        title: '操作成功',
+        text: `已將 ${response.data.data.updatedCount} 則通知標示為已讀`,
+        confirmButtonText: '確定',
+      });
+    } else {
+      throw new Error(response.data.message || '無未讀通知需要更新');
+    }
   } catch (err) {
     await Swal.fire({
       icon: 'error',
       title: '操作失敗',
-      text: err.response?.data?.message || '伺服器錯誤，請稍後再試',
+      text: err.message || err.response?.data?.message || '伺服器錯誤，請稍後再試',
       confirmButtonText: '確定',
     });
   }
@@ -285,7 +301,7 @@ const markAllAsRead = async () => {
 // Reset filters
 const resetFilters = () => {
   filters.value = {
-    userId: 1002,
+    userId: 1003,
     title: '',
     noticeType: null,
     isRead: null,
