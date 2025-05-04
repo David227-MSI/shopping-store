@@ -9,7 +9,19 @@ const instance = axios.create({
   },
 });
 
-// 設定 response 攔截器
+// 攔截器：自動附加 user token
+instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// 回應攔截器：統一錯誤處理
 instance.interceptors.response.use(
   (response) => {
     return response.data; // 正常回傳直接拿資料
