@@ -11,6 +11,7 @@ import CartPage from '@/views/order/CartPage.vue'
 import CheckoutPage from '@/views/order/CheckoutPage.vue'
 import OrderCompletePage from '@/views/order/OrderCompletePage.vue'
 import OrdersPage from '@/views/order/OrdersPage.vue'
+import LoginPage from '@/views/order/LoginPage.vue'
 
 // 設定頁面參數
 // path:網址, name:頁面名稱, component:元件名
@@ -26,7 +27,8 @@ const routes = [
   { path: '/cart', name: 'cart', component: CartPage },
   { path: '/checkout', name: 'checkout', component: CheckoutPage },
   { path: '/order/complete/:orderId', name: 'order-complete', component: OrderCompletePage },
-  { path: '/member/orders', name: 'orders', component: OrdersPage }
+  { path: '/member/orders', name: 'orders', component: OrdersPage },
+  { path: '/login', name: 'login', component: LoginPage },
 
 ]
 // 註冊頁面給Router管理
