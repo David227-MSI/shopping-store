@@ -6,9 +6,11 @@ import Home from '@/views/Home.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
-// 商品評論頁面
-import ProductReviewPage from '@/views/pages/ra/ProductReviewPage.vue';
-import ReviewPage from '@/views/pages/ra/ReviewPage.vue'
+// 商品詳情頁面
+import ProductDetail from '@/views/pages/ProductDetail.vue'
+
+// 假的訂單詳情頁面
+import OrderDetailDemo from '@/views/pages/OrderDetailDemo.vue'
 
 
 // 設定頁面參數 
@@ -16,19 +18,19 @@ import ReviewPage from '@/views/pages/ra/ReviewPage.vue'
 const routes = [
   // 一般頁面
   { path: '/', name: 'home', component: Home},
-  // { path: '/', name: '', component:  },
 
+  // 商品詳情含評論頁面
+  { path: '/products/:id', component: ProductDetail },
+
+  // 假的訂單詳情頁面
+  { path: '/demo/order', component: OrderDetailDemo },
+  
   // 錯誤顯示頁面
-  { path: "/:pathMatch(.*)", component: NotFound, name: "notfound-link" },
   { path: "/403", component: Forbidden, name: "forbidden-link" },
+  { path: "/:pathMatch(.*)", component: NotFound, name: "notfound-link" },
 
-  // 商品評論頁面
-  // { path: '/product/:pid/reviews', name: 'ProductReviews', component: ProductReviewPage, props: true },
-  {
-    path: '/reviews',   // <--- 使用者輸入 http://localhost:5173/reviews 就會跳到這頁
-    name: 'ReviewPage',
-    component: ReviewPage
-  },
+
+
 ]
 
 // 註冊頁面給Router管理
