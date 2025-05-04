@@ -37,7 +37,7 @@ const handleLogin = async () => {
 
     // 儲存 token
     localStorage.setItem('token', res.token);
-    cartStore.userId = res.custid;
+    cartStore.userId.value = res.custid;
 
     // 取得會員資料並存入 Pinia
     const memberRes = await axios.get('/ajax/secure/memberinfo');
