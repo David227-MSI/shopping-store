@@ -1,6 +1,12 @@
 <template>
   <div class="order-complete">
-    <h1>訂單完成！🎉</h1>
+    <!-- 成功動畫區 -->
+    <div class="animation-container">
+      <LottiePlayer :animationData="paymentSuccess" :loop="true" />
+    </div>
+
+    <h1 class="gradient-text">付款成功 🎉</h1>
+    <p class="subtitle">感謝您的訂購，我們將盡快為您出貨！</p>
 
     <div class="order-info" v-if="order">
       <p><strong>訂單編號：</strong> {{ order.orderId }}</p>
@@ -40,6 +46,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import axios from '@/services/order/axios';
 import Swal from 'sweetalert2';
+import LottiePlayer from '@/components/LottiePlayer.vue';
+import paymentSuccess from '@/assets/animations/paymentSuccess.json';
 
 const route = useRoute();
 const router = useRouter();
@@ -47,7 +55,6 @@ const order = ref(null);
 const orderDetails = ref([]);
 const isNavigating = ref(false);
 
-// 取得訂單資料
 onMounted(async () => {
   const orderId = route.params.orderId;
   if (!orderId) return;
@@ -61,7 +68,6 @@ onMounted(async () => {
   }
 });
 
-// 返回首頁
 const goHome = async () => {
   if (isNavigating.value) return;
   isNavigating.value = true;
@@ -74,7 +80,6 @@ const goHome = async () => {
   }
 };
 
-// 前往訂單列表
 const goOrders = async () => {
   if (isNavigating.value) return;
   isNavigating.value = true;
@@ -87,7 +92,6 @@ const goOrders = async () => {
   }
 };
 
-// 格式化日期時間
 const formatDate = (datetime) => {
   if (!datetime) return '';
   const date = new Date(datetime);
@@ -99,46 +103,110 @@ const formatDate = (datetime) => {
 
 <style scoped>
 .order-complete {
-  max-width: 800px;
-  margin: 50px auto;
-  padding: 30px;
+  max-width: 960px;
+  margin: 60px auto;
+  padding: 40px 30px;
   text-align: center;
-  background: #fafafa;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fcf7ff, #f3e9ff);
+  box-shadow: 0 10px 40px rgba(126, 59, 146, 0.1);
+  animation: fadeIn 0.7s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animation-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  min-height: 150px;
+}
+
+h1.gradient-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #9c4bcc;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
 }
 
 .order-info {
+  background: #ffffff;
   text-align: left;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   margin-top: 20px;
+  line-height: 1.6;
+}
+
+.order-info p {
+  margin: 8px 0;
 }
 
 .product-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-}
-
-.product-table th,
-.product-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .product-table th {
-  background-color: #f0f0f0;
+  background-color: #f4e3ff;
+  color: #7e3b92;
+  font-weight: bold;
+  padding: 12px;
+}
+
+.product-table td {
+  background-color: #fff;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.product-table tr:nth-child(even) td {
+  background-color: #fdf7ff;
 }
 
 .buttons {
   margin-top: 30px;
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
 
 button {
-  margin: 0 10px;
-  padding: 10px 20px;
+  padding: 12px 30px;
   font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(to right, #9b59b6, #7e3b92);
+  color: white;
+  box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(126, 59, 146, 0.4);
+}
+
+button:disabled {
+  background: #ccc;
+  box-shadow: none;
+  cursor: not-allowed;
 }
 </style>
