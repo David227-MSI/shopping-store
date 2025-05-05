@@ -11,10 +11,10 @@
   </template>
   
   <script setup>
-  import Header from '@/components/Header.vue'
-  import Nav from '@/components/Nav.vue'
-  import Footer from '@/components/Footer.vue'
-  import BackToTop from '@/components/BackToTop.vue'
+  import Header from '@/components/common/Header.vue'
+  import Nav from '@/components/common/Nav.vue'
+  import Footer from '@/components/common/Footer.vue'
+  import BackToTop from '@/components/common/BackToTop.vue'
   </script>
   
   <style scoped>

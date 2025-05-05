@@ -3,7 +3,8 @@
 </template>
 
 <script setup>
-import Main from '@/components/Main.vue'
+import Main from '@/components/common/Main.vue'
+
 </script>
 
 <style scoped>
