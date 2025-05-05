@@ -2,7 +2,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 3000,
   headers: {
     "Content-Type": "application/json",
@@ -24,7 +24,7 @@ instance.interceptors.request.use(
 // 回應攔截器：統一錯誤處理
 instance.interceptors.response.use(
   (response) => {
-    return response.data; // 正常回傳直接拿資料
+    return response.data; // 正常回傳直接.data拿資料
   },
   (error) => {
     if (error.response) {
