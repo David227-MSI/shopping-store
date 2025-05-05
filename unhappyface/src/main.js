@@ -2,7 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 // 路由
-import router from './router'
+import router from './router/index.js'
+
 
 // 狀態管理
 import { createPinia } from 'pinia'
