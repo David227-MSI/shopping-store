@@ -30,7 +30,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(), // ✅ 或用 createWebHashHistory() 看情況
   routes
 })
 

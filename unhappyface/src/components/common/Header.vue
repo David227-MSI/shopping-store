@@ -1,20 +1,29 @@
+<script setup>
+import { defineProps } from 'vue'
+
+const props = defineProps({
+  cartCount: {
+    type: Number,
+    required: false,
+    default: 0
+  }
+})
+</script>
+
 <template>
-    <div class="topbar">
-      <a href="/">🏠 回首頁</a>
-      <a href="#">📱 App下載</a>
-      <a href="#">💎 點點購</a>
-      <a href="#">📚 書店</a>
-      <a href="#">🔑 登入</a>
-      <a href="#">🆕 註冊</a>
-      <a href="#">👤 會員中心</a>
-      <a href="#">📦 查訂單</a>
-      <a href="#">⭐️ 追蹤清單</a>
-    </div>
-  </template>
-  
-  <script setup>
-  // 無需 script
-  </script>
+  <div class="topbar">
+    <a href="/">🏠 回首頁</a>
+    <a href="#">📱 App下載</a>
+    <a href="#">💎 點點購</a>
+    <a href="#">📚 書店</a>
+    <a href="#">🔑 登入</a>
+    <a href="#">🆕 註冊</a>
+    <a href="#">👤 會員中心</a>
+    <a href="#">📦 查訂單</a>
+    <a href="#">⭐️ 追蹤清單</a>
+    <a href="#">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
+  </div>
+</template>
   
   <style scoped>
   .topbar {
