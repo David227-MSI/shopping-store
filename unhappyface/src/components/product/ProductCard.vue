@@ -2,12 +2,12 @@
     <div class="product">
       <img :src="getProductImage(product.name)" alt="商品圖片">
       <h3>{{ product.name }}</h3>
-      <p>{{ product.unitPrice }} 元</p>
+      <p class="price">{{ product.unitPrice }} 元</p>
       
       <!-- 查看、加入購物車、收藏 三個按鈕統一樣式 -->
       <div style="margin-top: 8px;">
         <a class="action-button" :href="`/products/${product.id}`">🔍 查看</a>
-        <a href="#" class="action-button" @click.prevent="$emit('add-to-cart', product)">🛒</a>
+        <a class="action-button" @click="$emit('add-to-cart', product, $event)">🛒</a>
         <a href="#" class="action-button" @click.prevent="$emit('toggle-wishlist', product)">
           <span v-if="product.isWishlisted">❤️</span>
           <span v-else>🤍</span>
@@ -29,4 +29,8 @@
     return 'https://via.placeholder.com/300x180?text=No+Image'
   }
   </script>
-  
+  <style scoped>
+  .product {
+    text-align: center; /* ✅ 讓所有文字、按鈕置中 */
+  }
+  </style>

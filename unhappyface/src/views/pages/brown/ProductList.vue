@@ -9,9 +9,10 @@
     <div class="layout">
       <!-- 側邊分類欄 -->
       <CategorySidebar
-        :categories="sideCategories"
-        @filter-by-category="filterByCategory"
-      />
+  :sideCategories="sideCategories"
+  @filter-category="filterByCategory"
+  @toggle-sub="toggleSubCategory"
+/>
 
       <div class="main-content">
         <div class="container">
@@ -41,7 +42,6 @@
       </div>
     </div>
 
-    <Footer />
   </div>
 </template>
 
@@ -52,7 +52,7 @@ import Swal from 'sweetalert2'
 
 import Header from '@/components/common/Header.vue'
 import Footer from '@/components/common/Footer.vue'
-import BannerSwiper from '@/components/common/BannerSwiper.vue'
+ /* import BannerSwiper from '@/components/common/BannerSwiper.vue' */
 import CategorySidebar from '@/components/common/CategorySidebar.vue'
 import ProductSearchBar from '@/components/product/ProductSearchBar.vue'
 import ProductCard from '@/components/product/ProductCard.vue'
@@ -143,7 +143,9 @@ const toggleWishlist = (product) => {
     showConfirmButton: false
   })
 }
-
+const toggleSubCategory = (category) => {
+  category.show = !category.show
+}
 onMounted(() => {
   fetchCategories()
   fetchBrands()

@@ -17,10 +17,10 @@
   🛒 加入購物車
 </a>
         <a href="/" class="action-button">🔙 返回商品列表</a>
-        <a href="#" class="action-button" @click.prevent="$emit('toggle-wishlist')">
-          <span v-if="isWishlisted">❤️ 已收藏</span>
-          <span v-else>🤍 加入收藏</span>
-        </a>
+        <a href="#" class="action-button" @click.prevent="$emit('toggle-wishlist', product)">
+  <span v-if="isWishlisted">❤️ 已收藏</span>
+  <span v-else>🤍 加入收藏</span>
+</a>
       </div>
     </div>
     <div v-else>

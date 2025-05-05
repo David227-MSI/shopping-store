@@ -7,7 +7,7 @@
   v-for="item in products"
   :key="item.id"
   :product="item"
-  @add-to-cart="$emit('add-to-cart', $event)"
+  @add-to-cart="(product, event) => $emit('add-to-cart', product, event)"
   @toggle-wishlist="$emit('toggle-wishlist', $event)"
 />
       </div>

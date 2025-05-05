@@ -5,13 +5,13 @@
         <li><a href="#">香水</a></li>
         <li><a href="#">衣服</a></li>
         <li><a href="#">3C</a></li>
-        <!-- 更多分類 -->
+        
       </ul>
     </aside>
   </template>
   
   <script setup>
-  // 無需 script
+ 
   </script>
   
   <style scoped>

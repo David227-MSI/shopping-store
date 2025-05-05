@@ -18,7 +18,7 @@
       <ProductInfo
         :product="product"
         :quantity="quantity"
-        :isWishlisted="isWishlisted"
+        :isWishlisted="product?.isWishlisted ?? false"
         @increase="increaseQuantity"
         @decrease="decreaseQuantity"
         @add-to-cart="addToCart"
@@ -31,9 +31,10 @@
 
     <RecommendList
   :products="recommended"
-  @add-to-cart="addToCart"
+  @add-to-cart="(product, event) => addToCart(product, event)"
   @toggle-wishlist="toggleWishlist"
 />
+
 
     <BackToTop v-show="showBackToTop" @scrollToTop="scrollToTopAnimated" />
   </div>
@@ -124,12 +125,13 @@ const triggerQuantityShake = () => {
     input.classList.add('shake')
   }
 }
-const toggleWishlist = (product) => {
-  product.isWishlisted = !product.isWishlisted
+const toggleWishlist = (item) => {
+  if (!item) return
+  item.isWishlisted = !item.isWishlisted
   Swal.fire({
-    icon: product.isWishlisted ? 'success' : 'info',
-    title: product.isWishlisted ? '已加入收藏！' : '已取消收藏！',
-    text: product.name,
+    icon: item.isWishlisted ? 'success' : 'info',
+    title: item.isWishlisted ? '已加入收藏！' : '已取消收藏！',
+    text: item.name,
     timer: 1200,
     showConfirmButton: false
   })
@@ -185,11 +187,21 @@ const fetchRecommended = async () => {
   }
 }
 
-const addToCart = (event) => {
-  if (!product.value) return
+const addToCart = (targetProductOrEvent, optionalEvent) => {
+  let item = product.value
+  let event = targetProductOrEvent
+
+  // 如果是從推薦商品來的，第一參數是 product，第二是 event
+  if (optionalEvent && targetProductOrEvent?.id) {
+    item = targetProductOrEvent
+    event = optionalEvent
+  }
+
+  if (!item || !event) return
+
   for (let i = 0; i < quantity.value; i++) {
     const img = document.createElement('img')
-    img.src = productImage.value || '/images/default.png'
+    img.src = getProductImage(item.name)
     img.style.position = 'fixed'
     img.style.left = `${event.clientX}px`
     img.style.top = `${event.clientY}px`
@@ -209,9 +221,18 @@ const addToCart = (event) => {
     }, 10 + i * 100)
     setTimeout(() => document.body.removeChild(img), 1000 + i * 100)
   }
+
   cartCount.value += quantity.value
-  Swal.fire({ icon: 'success', title: '已加入購物車！', text: `${product.value.name} 已成功加入購物車（${quantity.value} 件）！`, timer: 1500, showConfirmButton: false })
+  Swal.fire({
+    icon: 'success',
+    title: '已加入購物車！',
+    text: `${item.name} 已成功加入購物車（${quantity.value} 件）！`,
+    timer: 1500,
+    showConfirmButton: false
+  })
 }
+
+
 
 const getProductImage = (name) => {
   if (name === '香水 A') return '/images/perfumeA.jpg'
