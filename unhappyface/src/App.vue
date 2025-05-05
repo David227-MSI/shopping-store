@@ -1,14 +1,11 @@
 <template>
-
-  <RouterView />
-
+  <Main />
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-
+import Main from '@/components/Main.vue'
 </script>
 
-
 <style scoped>
+/* 可加全局樣式調整 */
 </style>
