@@ -15,7 +15,7 @@ import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import axios from '@/services/order/axios';
 import { useCartStore } from '@/stores/cart/cartStore';
-import { useUserStore } from '@/stores/cart/userStrore.js';
+import { useUserStore } from '@/stores/cart/userStore.js';
 
 const email = ref('');
 const password = ref('');

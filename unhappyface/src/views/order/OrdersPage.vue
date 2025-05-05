@@ -45,7 +45,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '@/stores/cart/userStrore';
+import { useUserStore } from '@/stores/cart/userStore.js';
 import axios from '@/services/order/axios';
 import OrderDetailModal from '@/components/OrderDetailModal.vue';
 

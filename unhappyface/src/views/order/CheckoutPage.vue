@@ -78,7 +78,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cart/cartStore.js';
-import { useUserStore } from '@/stores/cart/userStrore.js';
+import { useUserStore } from '@/stores/cart/userStore.js';
 import axios from '@/services/order/axios';
 import Swal from 'sweetalert2';
 import AddressDialog from '@/components/AddressDialog.vue';
