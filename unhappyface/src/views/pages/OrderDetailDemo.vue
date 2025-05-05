@@ -30,8 +30,7 @@ import ReviewEntry from '@/components/ra/review/ReviewEntry.vue' // 正確路徑
 // 模擬訂單資料（實際應從後端 API 或 props 取得）
 const orderItems = ref([
   { id: 1, userId: 1005, productName: '商品 A', status: 'completed' },
-  { id: 2, userId: 1005, productName: '商品 B', status: 'completed' },
-  { id: 3, userId: 1005, productName: '商品 C', status: 'pending' }
+  { id: 2, userId: 1005, productName: '商品 C', status: 'pending' }
 ])
 const loading = ref(false)
 

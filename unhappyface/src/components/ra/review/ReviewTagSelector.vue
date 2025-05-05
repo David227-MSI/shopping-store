@@ -1,30 +1,28 @@
 <template>
   <div class="tag-selector">
-    <el-checkbox-group v-model="selectedTags" @change="updateTags">
+    <el-checkbox-group v-model="selectedTags" :max="3">
       <el-checkbox
-        v-for="tag in tagOptions"
+        v-for="tag in availableTags"
         :key="tag.value"
-        :value="tag.label"
-        :disabled="selectedTags.length >= 3 && !selectedTags.includes(tag.label)"
-      >
-        {{ tag.label }}
-      </el-checkbox>
+        :label="tag.label"
+      />
     </el-checkbox-group>
-    <small>最多選擇 3 個標籤</small>
-    <small v-if="selectedTags.length >= 3" style="color: red;">已達標籤上限 (3 個)</small>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, watch } from 'vue'
-import { ElCheckboxGroup, ElCheckbox } from 'element-plus'
 
-const props = defineProps<{
-  modelValue: string[]
-}>()
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    default: () => []
+  }
+})
+
 const emit = defineEmits(['update:modelValue'])
 
-const tagOptions = [
+const availableTags = [
   { value: 'FAST', label: '出貨快' },
   { value: 'QUALITY', label: '品質好' },
   { value: 'VALUE', label: 'CP值高' },
@@ -33,43 +31,24 @@ const tagOptions = [
   { value: 'REPURCHASE', label: '回購意願' },
   { value: 'SERVICE', label: '客服親切' }
 ]
-const selectedTags = ref<string[]>(props.modelValue)
 
-watch(() => props.modelValue, (newVal) => {
-  selectedTags.value = newVal
-  console.log('標籤更新 (來自父組件):', newVal)
-})
+const selectedTags = ref([...props.modelValue])
 
-watch(() => selectedTags.value, (newVal) => {
-  console.log('selectedTags 變化:', newVal)
-})
+watch(selectedTags, (newTags) => {
+  emit('update:modelValue', [...newTags])
+}, { deep: true })
 
-function updateTags(tags: string[]) {
-  if (tags.length > 3) {
-    tags = tags.slice(0, 3)
+watch(() => props.modelValue, (newValue) => {
+  if (JSON.stringify(newValue) !== JSON.stringify(selectedTags.value)) {
+    selectedTags.value = [...newValue]
   }
-  selectedTags.value = tags
-  emit('update:modelValue', tags)
-  console.log('標籤選擇:', tags)
-}
+}, { deep: true })
 </script>
 
 <style scoped>
 .tag-selector {
-  margin-bottom: 12px;
-}
-.el-checkbox-group {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-.el-checkbox {
-  margin-right: 12px;
-}
-small {
-  display: block;
-  color: #777;
-  font-size: 0.75rem;
-  margin-top: 4px;
 }
 </style>

@@ -1,342 +1,251 @@
 <template>
-  <div v-if="show" class="overlay">
-    <div class="modal">
-      <h3>{{ isEditing ? '編輯我的評論' : '撰寫商品評論' }}</h3>
-
-      <!-- ⭐ 評分 -->
-      <div class="stars">
-        <ScoreItem label="商品品質" v-model="form.scoreQuality" :disabled="isEditing" />
-        <ScoreItem label="商品描述" v-model="form.scoreDescription" :disabled="isEditing" />
-        <ScoreItem label="出貨速度" v-model="form.scoreDelivery" :disabled="isEditing" />
+  <el-dialog
+    :model-value="show"
+    title="撰寫評論"
+    width="500px"
+    append-to-body
+    @close="$emit('close')"
+  >
+    <div class="review-form">
+      <div class="score-section">
+        <p>商品品質</p>
+        <ScoreItem v-model="form.qualityScore" />
+        <p>描述相符</p>
+        <ScoreItem v-model="form.descriptionScore" />
+        <p>出貨速度</p>
+        <ScoreItem v-model="form.shippingScore" />
       </div>
-
-      <!-- ⭐ 標籤 -->
-      <div class="tag-section">
-        <label>選擇標籤</label>
+      <div class="tags-section">
+        <p>標籤（最多 3 個）</p>
         <ReviewTagSelector v-model="form.tags" />
       </div>
-
-      <!-- ⭐ 評論文字 -->
-      <textarea v-model="form.reviewText" rows="4" placeholder="填寫評論 (最多 1000 字)"></textarea>
-
-      <!-- ⭐ 上傳圖片 (最多 3) -->
-      <div class="upload-area" v-if="!isEditing">
-        <input type="file" multiple accept="image/*" @change="handleFiles" :disabled="images.length>=3" />
-        <small>最多 3 張，單張 ≤ 3 MB</small>
-
-        <div class="thumbs">
-          <div v-for="(img,i) in images" :key="img.url" class="thumb">
-            <img :src="img.url" />
-            <button @click="removeImg(i)">×</button>
-          </div>
-        </div>
+      <div class="comment-section">
+        <p>評論（最多 1000 字）</p>
+        <el-input
+          v-model="form.reviewText"
+          type="textarea"
+          :rows="4"
+          maxlength="1000"
+          show-word-limit
+        />
       </div>
-      <div class="existing-images" v-else>
-        <div v-for="(url,i) in form.images" :key="url" class="thumb">
-          <img :src="url" />
-        </div>
+      <div v-if="!isEditMode" class="upload-section">
+        <p>上傳圖片（最多 3 張，每張 ≤ 3MB）</p>
+        <el-upload
+          v-model:file-list="form.images"
+          action=""
+          multiple
+          :limit="3"
+          :auto-upload="false"
+          accept="image/jpeg,image/png"
+          :before-upload="beforeUpload"
+          :on-exceed="handleExceed"
+        >
+          <el-button type="primary">選擇圖片</el-button>
+        </el-upload>
       </div>
-
-      <!-- ⭐ 進度條 -->
-      <el-progress v-if="submitting" :percentage="uploadProgress" status="success" style="margin-top: 12px;" />
-
-      <!-- ⭐ Buttons -->
+      <div v-if="uploadProgress > 0 && uploadProgress < 100" class="progress-section">
+        <el-progress :percentage="uploadProgress" />
+      </div>
       <div class="actions">
-        <button @click="submit" :disabled="submitting">{{ isEditing ? '儲存變更' : '送出評論' }}</button>
-        <button class="cancel" @click="$emit('close')" :disabled="submitting">取消</button>
+        <el-button @click="$emit('close')">取消</el-button>
+        <el-button type="primary" :disabled="submitting" @click="submitForm">
+          {{ submitting ? '提交中...' : '提交' }}
+        </el-button>
       </div>
     </div>
-  </div>
+  </el-dialog>
 </template>
 
-<script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+<script setup>
+import { ref, watch, computed } from 'vue'
 import axios from 'axios'
-import Swal from 'sweetalert2'
-import { ElProgress } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import ReviewTagSelector from './ReviewTagSelector.vue'
 import ScoreItem from './ScoreItem.vue'
 
-/* ===== Props / Emit ===== */
-const props = defineProps<{
-  show: boolean
-  orderItemId: number
-  userId: number
-}>()
+const props = defineProps({
+  show: Boolean,
+  orderItemId: Number,
+  userId: Number
+})
+
 const emit = defineEmits(['close', 'submitted'])
 
-/* ===== 表單 Model ===== */
-const form = reactive({
-  scoreQuality: 5,
-  scoreDescription: 5,
-  scoreDelivery: 5,
+const form = ref({
+  qualityScore: 0,
+  descriptionScore: 0,
+  shippingScore: 0,
+  tags: [],
   reviewText: '',
-  tags: [] as string[], // 確保初始化為空陣列
-  images: [] as string[] // 儲存現有圖片 URL
+  images: []
 })
-const images = ref<{ file: File, url: string }[]>([]) // 新增圖片
-const submitting = ref(false)
-const isEditing = ref(false)
-const reviewId = ref<number | null>(null)
-const uploadProgress = ref(0) // 進度條百分比
 
-/* ===== 標籤映射 ===== */
-const TAG_MAP = {
-  FAST: '出貨快', QUALITY: '品質好', VALUE: 'CP值高',
-  PACKAGING: '包裝完整', MATCHING: '描述相符',
-  REPURCHASE: '回購意願', SERVICE: '客服親切'
+const isEditMode = ref(false)
+const reviewId = ref(null)
+const submitting = ref(false)
+const uploadProgress = ref(0)
+
+// 可用標籤，用於驗證和映射
+const tagMap = {
+  'FAST': '出貨快',
+  'QUALITY': '品質好',
+  'VALUE': 'CP值高',
+  'PACKAGING': '包裝完整',
+  'MATCHING': '描述相符',
+  'REPURCHASE': '回購意願',
+  'SERVICE': '客服親切'
+}
+const availableTagLabels = Object.values(tagMap)
+
+const averageScore = computed(() => {
+  const { qualityScore, descriptionScore, shippingScore } = form.value
+  const total = qualityScore + descriptionScore + shippingScore
+  return total ? (total / 3).toFixed(1) : 0
+})
+
+// 檢查檔案大小（≤ 3MB）和空檔案
+function beforeUpload(file) {
+  if (file.size === 0) {
+    ElMessage.error('不能上傳空檔案')
+    return false
+  }
+  const isLt3MB = file.size / 1024 / 1024 < 3
+  if (!isLt3MB) {
+    ElMessage.error('圖片大小不得超過 3MB')
+  }
+  return isLt3MB
 }
 
-/* ===== 檢查現有評論 ===== */
-async function fetchReview() {
+// 處理圖片上傳超限
+function handleExceed(files, fileList) {
+  ElMessage.error('最多只能上傳 3 張圖片')
+}
+
+// 檢查是否已有評論
+async function checkReview() {
   try {
     const response = await axios.get(`/api/reviews/${props.orderItemId}/exists?userId=${props.userId}`)
-    console.log(`檢查評論是否存在 (orderItemId=${props.orderItemId}):`, response.data)
     if (response.data.data.exists) {
-      isEditing.value = true
-      reviewId.value = response.data.data.reviewId
-      // 獲取評論詳情
-      const detail = await axios.get(`/api/reviews/${reviewId.value}`)
-      console.log(`獲取評論詳情 (reviewId=${reviewId.value}):`, detail.data)
-      const review = detail.data.data
-      form.scoreQuality = review.scoreQuality
-      form.scoreDescription = review.scoreDescription
-      form.scoreDelivery = review.scoreDelivery
-      form.reviewText = review.reviewText || ''
-      form.tags = review.tags ? review.tags.map((tag: string) => TAG_MAP[tag] || tag) : []
-      form.images = review.reviewImages || []
-      console.log(`載入表單:`, { ...form })
+      isEditMode.value = true
+      const reviewResponse = await axios.get(`/api/reviews/${response.data.data.reviewId}`)
+      const review = reviewResponse.data.data
+      // 記錄原始 tags 以診斷
+      console.log('後端返回的原始 tags:', review.tags)
+      // 將英文 value 映射為中文 label
+      const mappedTags = Array.isArray(review.tags)
+        ? review.tags.map(tag => tagMap[tag] || tag).filter(tag => availableTagLabels.includes(tag))
+        : []
+      form.value = {
+        qualityScore: review.scoreQuality || 0,
+        descriptionScore: review.scoreDescription || 0,
+        shippingScore: review.scoreDelivery || 0,
+        tags: mappedTags,
+        reviewText: review.reviewText || '',
+        images: review.reviewImages || []
+      }
+      reviewId.value = review.id
+      console.log('載入評論:', form.value)
     } else {
-      isEditing.value = false
+      isEditMode.value = false
+      form.value = {
+        qualityScore: 0,
+        descriptionScore: 0,
+        shippingScore: 0,
+        tags: [],
+        reviewText: '',
+        images: []
+      }
       reviewId.value = null
-      resetForm()
     }
   } catch (e) {
-    console.error('獲取評論失敗:', e)
-    isEditing.value = false
-    resetForm()
-    Swal.fire('載入失敗', '無法載入評論，請稍後重試', 'error')
+    console.error('載入評論失敗:', e)
+    ElMessage.error('無法載入評論資料')
   }
 }
 
-/* ===== 重置表單 ===== */
-function resetForm() {
-  form.scoreQuality = 5
-  form.scoreDescription = 5
-  form.scoreDelivery = 5
-  form.reviewText = ''
-  form.tags = []
-  form.images = []
-  images.value = []
-  uploadProgress.value = 0
-  console.log('表單已重置')
-}
-
-/* ===== 監聽 show 變化 ===== */
-watch(() => props.show, (newVal) => {
-  if (newVal) {
-    console.log('模態框顯示，載入評論')
-    fetchReview()
-  }
-})
-
-/* ===== 監聽標籤變化 ===== */
-watch(() => form.tags, (newTags) => {
-  console.log('標籤已變更:', newTags)
-})
-
-/* ===== 處理圖片選擇 ===== */
-function handleFiles(e: Event) {
-  const files = (e.target as HTMLInputElement).files
-  if (!files) return
-
-  for (const f of files) {
-    if (images.value.length >= 3) break
-    if (f.size > 3 * 1024 * 1024) {
-      Swal.fire('檔案過大', '單張需 ≤ 3 MB', 'error')
-      continue
-    }
-    const url = URL.createObjectURL(f)
-    images.value.push({ file: f, url })
-  }
-  (e.target as HTMLInputElement).value = ''
-}
-
-/* ===== 移除圖片 ===== */
-function removeImg(i: number) {
-  URL.revokeObjectURL(images.value[i].url)
-  images.value.splice(i, 1)
-}
-
-/* ===== 送出表單 ===== */
-async function submit() {
-  if (form.tags.length === 0) {
-    Swal.fire('請至少選 1 個標籤', '', 'warning')
+// 提交表單
+async function submitForm() {
+  if (averageScore.value === 0) {
+    ElMessage.error('請至少評分一項')
     return
   }
-  if (submitting.value) return
+  if (form.value.tags.length > 3) {
+    ElMessage.error('標籤不可超過 3 個')
+    return
+  }
   submitting.value = true
   uploadProgress.value = 0
 
   try {
-    if (isEditing.value) {
-      // 編輯模式：更新 reviewText 和 tags
-      console.log('提交編輯:', { reviewText: form.reviewText, tags: form.tags })
-      const response = await axios.put(`/api/reviews/${reviewId.value}`, {
-        reviewText: form.reviewText,
-        tags: form.tags // 發送中文標籤
-      }, {
-        onUploadProgress: (progressEvent) => {
-          uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          console.log(`編輯上傳進度：${uploadProgress.value}%`)
-        }
-      })
-      console.log('編輯響應:', response.data)
-      Swal.fire('已更新！', '您的評論已儲存', 'success')
-    } else {
-      // 新增模式
-      const formData = new FormData()
-      formData.append('userId', String(props.userId))
-      formData.append('orderItemId', String(props.orderItemId))
-      formData.append('reviewText', form.reviewText)
-      formData.append('scoreQuality', String(form.scoreQuality))
-      formData.append('scoreDescription', String(form.scoreDescription))
-      formData.append('scoreDelivery', String(form.scoreDelivery))
-      formData.append('tags', JSON.stringify(form.tags)) // 發送中文標籤
-
-      images.value.forEach((img, index) => {
-        formData.append('images', img.file)
-        console.log(`附加圖片 ${index}:`, img.file.name, img.file.size)
-      })
-
-      for (const [key, value] of formData.entries()) {
-        console.log(`FormData: ${key}=${value}`)
+    let response
+    if (isEditMode.value) {
+      const payload = {
+        reviewText: form.value.reviewText,
+        tags: form.value.tags
       }
-
-      const response = await axios.post(`/api/reviews/${props.orderItemId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (progressEvent) => {
-          uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          console.log(`新增上傳進度：${uploadProgress.value}%`)
+      console.log('PUT 請求 payload:', payload)
+      response = await axios.put(`/api/reviews/${reviewId.value}?userId=${props.userId}`, payload)
+    } else {
+      const formData = new FormData()
+      formData.append('scoreQuality', form.value.qualityScore.toString())
+      formData.append('scoreDescription', form.value.descriptionScore.toString())
+      formData.append('scoreDelivery', form.value.shippingScore.toString())
+      formData.append('reviewText', form.value.reviewText)
+      formData.append('tags', JSON.stringify(form.value.tags))
+      form.value.images.forEach((file, index) => {
+        if (file.raw) {
+          formData.append(`images`, file.raw)
         }
       })
-      console.log('新增響應:', response.data)
-      Swal.fire('已送出！', '感謝您的評論', 'success')
+      console.log('FormData:', Object.fromEntries(formData))
+      response = await axios.post(`/api/reviews/${props.orderItemId}?userId=${props.userId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress(progressEvent) {
+          if (progressEvent.total && progressEvent.total > 0) {
+            uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            console.log(`上傳進度：${uploadProgress.value}%`)
+          } else {
+            uploadProgress.value = 0
+            console.log('無法計算上傳進度：total 無效')
+          }
+        }
+      })
     }
-    emit('submitted')
+    ElMessage.success(isEditMode.value ? '評論已更新' : '評論已提交')
+    emit('submitted', { orderItemId: props.orderItemId, reviewId: response.data.data?.id || reviewId.value })
     emit('close')
-  } catch (e: any) {
-    console.error('送出錯誤:', e)
-    console.error('錯誤詳情:', e.response?.data, e.response?.status)
-    Swal.fire('操作失敗', e.response?.data?.message || '請稍後再試', 'error')
+  } catch (e) {
+    console.error('提交失敗:', e)
+    ElMessage.error(`提交失敗：${e.response?.data?.message || '伺服器錯誤'}`)
   } finally {
     submitting.value = false
     uploadProgress.value = 0
   }
 }
+
+// 當 show 變化時載入評論，防止重複請求
+const isChecking = ref(false)
+watch(() => props.show, async (newVal) => {
+  if (newVal && !isChecking.value) {
+    isChecking.value = true
+    try {
+      await checkReview()
+    } finally {
+      isChecking.value = false
+    }
+  }
+})
 </script>
 
 <style scoped>
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, .5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000
+.review-form {
+  padding: 16px;
 }
-.modal {
-  background: #fff;
-  padding: 24px;
-  border-radius: 8px;
-  width: 480px;
-  max-width: 92vw;
-  max-height: 90vh;
-  overflow-y: auto
-}
-h3 {
-  margin-top: 0;
-  text-align: center
-}
-.stars {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px
-}
-.tag-section {
-  margin-bottom: 12px;
-}
-.tag-section label {
-  display: block;
-  font-size: 0.9rem;
-  margin-bottom: 4px;
-  color: #333;
-}
-textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin: 8px 0 12px
-}
-.upload-area small, .existing-images small {
-  color: #777;
-  font-size: .75rem
-}
-.thumbs, .existing-images {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px
-}
-.thumb {
-  position: relative
-}
-.thumb img {
-  width: 72px;
-  height: 72px;
-  object-fit: cover;
-  border-radius: 6px
-}
-.thumb button {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  border: none;
-  background: #000a;
-  color: #fff;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: .75rem;
-  cursor: pointer
+.score-section, .tags-section, .comment-section, .upload-section, .progress-section {
+  margin-bottom: 16px;
 }
 .actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 16px
-}
-.actions button {
-  padding: 6px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer
-}
-.actions button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed
-}
-.actions .cancel {
-  background: #eee;
-  color: #555
-}
-.actions button:not(.cancel) {
-  background: var(--primary, #5C4033);
-  color: #fff
-}
-.actions button:not(:disabled):hover {
-  opacity: .9
+  text-align: right;
 }
 </style>
