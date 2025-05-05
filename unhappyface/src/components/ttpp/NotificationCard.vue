@@ -55,6 +55,8 @@ const formatNoticeType = computed(() => {
   const types = {
     ORDER: '訂單通知',
     PROMOTION: '促銷通知',
+    WISHLIST: '追蹤通知',
+    SUBSCRIPTION: '訂閱通知',
   };
   return types[props.notification?.noticeType] || '未知類型';
 });

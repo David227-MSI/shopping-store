@@ -21,6 +21,8 @@
             <option :value="null">全部種類</option>
             <option value="ORDER">訂單通知</option>
             <option value="PROMOTION">促銷通知</option>
+            <option value="WISHLIST">追蹤通知</option>
+            <option value="SUBSCRIPTION">訂閱通知</option>
           </select>
         </div>
       </div>
@@ -85,7 +87,7 @@ import NotificationCard from '@/components/ttpp/NotificationCard.vue';
 import NotificationModal from '@/components/ttpp/NotificationModal.vue';
 
 const filters = ref({
-  userId: 1003,
+  userId: 1001,
   title: '',
   noticeType: null,
   isRead: null,
@@ -301,7 +303,7 @@ const markAllAsRead = async () => {
 // Reset filters
 const resetFilters = () => {
   filters.value = {
-    userId: 1003,
+    userId: 1001,
     title: '',
     noticeType: null,
     isRead: null,

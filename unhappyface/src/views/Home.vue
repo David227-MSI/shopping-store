@@ -12,8 +12,8 @@
     <!-- front -->
      <!-- <UserEventList /> -->
     <!-- <SubscribeList2 /> -->
-    <!-- <CouponList /> -->
-    <NotificationList />
+    <CouponList />
+    <!-- <NotificationList /> -->
   </main>
 </template>
 
