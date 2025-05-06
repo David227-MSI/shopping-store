@@ -43,11 +43,11 @@
           </div>
           <div class="summary-item">
             <span>折價券</span>
-            <span class="discount">- 2000 元</span>
+            <span class="discount">- {{ discountAmount }} 元</span>
           </div>
           <div class="summary-total">
             <span>結帳金額</span>
-            <span class="final">{{ totalAmount - 2000 }} 元</span>
+            <span class="final">{{ totalAmount - discountAmount }} 元</span>
           </div>
           <button class="submit-btn" :disabled="isSubmitting" @click="submitOrder">
             {{ isSubmitting ? '送出中...' : '送出訂單並付款' }}
@@ -84,10 +84,14 @@ import Swal from 'sweetalert2';
 import AddressDialog from '@/components/AddressDialog.vue';
 import LottieAnimation from '@/components/LottiePlayer.vue';
 import approved from '@/assets/animations/approved.json';
+import { useCouponStore } from '@/stores/cart/couponStore.js';
 
 const router = useRouter();
 const cartStore = useCartStore();
 const userStore = useUserStore();
+const couponStore = useCouponStore();
+const discountAmount = computed(() => couponStore.discountAmount);
+const selectedCouponId = computed(() => couponStore.selectedCouponId);
 
 const userId = computed(() => cartStore.userId);
 const cartItems = computed(() => cartStore.cartItems);
@@ -134,7 +138,7 @@ const submitOrder = async () => {
     const orderItems = cartItems.value.map(item => ({ productId: item.productId, quantity: item.quantity }));
     const orderRequest = {
       userId: userId.value,
-      couponPublishedId: null,
+      couponPublishedId: selectedCouponId.value,
       recipientName: recipientInfo.value.name,
       recipientPhone: recipientInfo.value.phone,
       recipientAddress: recipientInfo.value.address,
