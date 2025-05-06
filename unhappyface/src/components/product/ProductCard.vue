@@ -43,7 +43,20 @@
 
   </script>
   <style scoped>
-  .product {
-    text-align: center; /* ✅ 讓所有文字、按鈕置中 */
-  }
+.product {
+  text-align: center;
+}
+
+.product img {
+  width: 100%;
+  max-width: 165px;
+  height: auto;
+  border-radius: 16px; /* ✅ 圓角化圖片 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* ✅ 加些柔光陰影 */
+  transition: transform 0.2s ease-in-out;
+}
+
+.product img:hover {
+  transform: scale(1.03); /* ✅ 滑過放大一點點 */
+}
   </style>
