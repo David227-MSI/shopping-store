@@ -87,7 +87,7 @@ import NotificationCard from '@/components/ttpp/NotificationCard.vue';
 import NotificationModal from '@/components/ttpp/NotificationModal.vue';
 
 const filters = ref({
-  userId: 1001,
+  userId: 1003,
   title: '',
   noticeType: null,
   isRead: null,
@@ -153,6 +153,18 @@ const openDetail = async (notification) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/notifications/notification/${notification.id}`);
     selectedNotification.value = res.data.data;
     showModal.value = true;
+
+    // 後端成功標記為已讀後，更新本地列表
+    const index = notifications.value.findIndex(n => n.id === notification.id);
+    if (index !== -1 && !notifications.value[index].isRead) {
+      // 只有在原本是未讀的情況下才更新，避免不必要的重新渲染
+      notifications.value = [
+        ...notifications.value.slice(0, index),
+        { ...notifications.value[index], isRead: true },
+        ...notifications.value.slice(index + 1),
+      ];
+    }
+
   } catch (err) {
     await Swal.fire({
       icon: 'error',
@@ -303,7 +315,7 @@ const markAllAsRead = async () => {
 // Reset filters
 const resetFilters = () => {
   filters.value = {
-    userId: 1001,
+    userId: 1003,
     title: '',
     noticeType: null,
     isRead: null,

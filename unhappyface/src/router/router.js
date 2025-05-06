@@ -7,7 +7,7 @@ import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
 // ttpp
-import NotificationList from '@/views/pages/ttpp/front/NotificationList.vue'
+import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.vue'
 import AddPrizeToEvent from '@/views/pages/ttpp/back/AddPrizeToEvent.vue'
 
 
@@ -24,7 +24,7 @@ const routes = [
   
   // ttpp
   // { path: '/', name: '', component:  },
-  { path: '/notificationList', name: 'NotificationList', component: NotificationList},
+  { path: '/notificationList', name: 'NotificationList', component: UserNotificationList},
   { path: '/events/:eventId/add-prizes', name: 'AddPrizeToEvent', component: AddPrizeToEvent},
 
 

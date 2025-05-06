@@ -18,13 +18,13 @@
 
       <div class="coupon-details">
         <p class="detail-item">
-          <strong>適用:</strong> {{ formatApplicableType }}
+          <strong>適用範圍:</strong> {{ formatApplicableType }}
         </p>
         <p class="detail-item">
-          <strong>有效期限:</strong> {{ formatDateRange }}
+          <strong>適用時間:</strong> {{ formatDateRange }}
         </p>
         <p class="detail-item">
-          <strong>所有權:</strong> {{ coupon?.tradeable ? '可轉移' : '不可轉移' }}
+          <strong>所有權:</strong> {{ coupon?.tradeable ? '可轉贈' : '不可轉贈' }}
         </p>
       </div>
 
@@ -42,7 +42,7 @@
           v-else-if="coupon.tradeable"
           @click="emit('transfer-coupon', coupon)"
         >
-          轉移優惠券
+          轉贈優惠券
         </button>
       </div>
     </div>
@@ -99,6 +99,7 @@ const formatDate = (dateString) => {
 }
 
 const isExpiring = (endTime) => {
+  if (!endTime) return false
   const end = new Date(endTime)
   const now = new Date()
   const diffDays = (end - now) / (1000 * 60 * 60 * 24)
@@ -106,25 +107,45 @@ const isExpiring = (endTime) => {
 }
 
 const isExpired = (endTime) => {
+  if (!endTime) return true
   const end = new Date(endTime)
   const now = new Date()
   return end < now
 }
 
+const isNotStarted = computed(() => {
+  if (!props.coupon?.startTime) return false
+  const start = new Date(props.coupon.startTime)
+  const now = new Date()
+  return start > now
+})
+
+const isValid = computed(() => {
+  if (!props.coupon?.startTime || !props.coupon?.endTime) return false
+  const start = new Date(props.coupon.startTime)
+  const end = new Date(props.coupon.endTime)
+  const now = new Date()
+  return now >= start && now <= end
+})
+
 const formatStatus = computed(() => {
-  const { isUsed, endTime, tradeable } = props.coupon
+  const { isUsed, endTime } = props.coupon
   if (isUsed) return '已使用'
-  if (isExpiring(endTime)) return '即將到期'
+  if (isNotStarted.value) return '未開始'
   if (isExpired(endTime)) return '已過期'
-  return tradeable ? '可交易' : '有效'
+  if (isExpiring(endTime)) return '即將到期'
+  if (isValid.value) return '可使用'
+  return '未知'
 })
 
 const statusClass = computed(() => {
   const { isUsed, endTime } = props.coupon
   if (isUsed) return 'status-used'
-  if (isExpiring(endTime)) return 'status-expiring'
+  if (isNotStarted.value) return 'status-not-started'
   if (isExpired(endTime)) return 'status-expired'
-  return 'status-valid'
+  if (isExpiring(endTime)) return 'status-expiring'
+  if (isValid.value) return 'status-valid'
+  return 'status-unknown'
 })
 
 const getImageSrc = (base64) => {
@@ -225,8 +246,12 @@ const getImageSrc = (base64) => {
   background-color: #6b7280;
 }
 
+.status-not-started {
+  background-color: #1e88e5; /* 藍色 (你可以選擇其他顏色) */
+}
+
 .status-unknown {
-  background-color: #6b7280;
+  background-color: #9e9e9e; /* 深灰色 */
 }
 
 .coupon-details {

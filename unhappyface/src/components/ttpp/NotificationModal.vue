@@ -31,6 +31,10 @@ const noticeTypeText = (type) => {
       return '下單通知'
     case 'PROMOTION':
       return '促銷通知'
+    case 'WISHLIST':
+      return '追蹤通知'
+    case 'SUBSCRIPTION':
+      return '訂閱通知'
     default:
       return type
   }

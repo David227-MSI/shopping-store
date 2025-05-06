@@ -23,7 +23,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-import EventCard from '@/components/ttpp/EventCard.vue'
+import EventCard from '@/components/ttpp/AdminEventCard.vue'
 
 const search = ref('')
 const statusFilter = ref('')

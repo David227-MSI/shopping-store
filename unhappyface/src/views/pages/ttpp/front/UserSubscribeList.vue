@@ -69,7 +69,7 @@
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import SubscribeProductCard from '@/components/ttpp/SubscribeProductCard.vue'
+import SubscribeProductCard from '@/components/ttpp/UserSubscribeProductCard.vue'
 
 const filters = ref({
   userId: 1001, // 這裡應該從你的用戶驗證/狀態管理中獲取
