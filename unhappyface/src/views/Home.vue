@@ -2,11 +2,11 @@
   <main>
     <h2>這是首頁</h2>
     <!-- back -->
-    <AdminCreateCouponTemplate />
+    <!-- <AdminCreateCouponTemplate /> -->
     <!-- <AdminCreateEvent /> -->
     <!-- <AdminEventList /> -->
     <!-- <NotificationTemplateList /> -->
-    <CouponTemplateList />
+    <!-- <CouponTemplateList /> -->
     <!-- <UploadImg /> -->
 
     <!-- front -->
@@ -14,6 +14,11 @@
     <!-- <UserSubscribeList /> -->
     <!-- <UserCouponList /> -->
     <!-- <UserNotificationList /> -->
+
+    <!-- fake -->
+    <!-- <UserLogin /> -->
+    <!-- <UserModify /> -->
+    <UserRegister />
 
 
   </main>
@@ -31,7 +36,9 @@
   import AdminCreateEvent from '@/views/pages/ttpp/back/AdminCreateEvent.vue';
   import AdminEventList from '@/views/pages/ttpp/back/AdminEventList.vue';
 
-
+  import UserLogin from '@/views/pages/ttpp/_fake/UserLogin.vue'
+  import UserModify from '@/views/pages/ttpp/_fake/UserModify.vue'
+  import UserRegister from '@/views/pages/ttpp/_fake/UserRegister.vue'
 
 
 

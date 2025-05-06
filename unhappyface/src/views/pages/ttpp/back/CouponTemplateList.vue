@@ -203,7 +203,7 @@ const handleDelete = async (id) => {
           '優惠券模板已成功刪除。',
           'success'
         );
-        fetchTemplates(); // 重新載入列表
+        fetchTemplates();
       } else {
         Swal.fire(
           '刪除失敗！',

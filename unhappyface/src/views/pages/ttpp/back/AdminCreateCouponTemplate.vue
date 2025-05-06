@@ -11,8 +11,14 @@
             <div class="upload-box" @click="triggerFileUpload">
               <div v-if="!imgURL" class="add">+</div>
               <img v-if="imgURL" :src="imgURL" style="width: 100%; height: 100%; object-fit: contain" />
-              <input type="file" class="theFile" @change="fileChange" accept="image/*" ref="fileInput" />
             </div>
+            <input
+              type="file"
+              class="theFile"
+              @change="fileChange"
+              accept="image/*"
+              ref="fileInput"
+              style="display: none;" />
             <p v-if="errors.mediaData" class="error">{{ errors.mediaData }}</p>
           </div>
         </div>
