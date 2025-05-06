@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <label class="score-row">
       {{ label }}
       <select v-model.number="localValue">
@@ -37,4 +37,4 @@
     border-radius:4px;
   }
   </style>
-  
+   -->

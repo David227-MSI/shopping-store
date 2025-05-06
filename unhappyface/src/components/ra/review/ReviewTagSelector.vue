@@ -1,11 +1,11 @@
 <template>
   <div class="tag-selector">
-    <el-checkbox-group v-model="selectedTags" :max="3">
+    <el-checkbox-group v-model="selectedTags"   :max="3">
       <el-checkbox
         v-for="tag in availableTags"
         :key="tag.value"
         :label="tag.label"
-      />
+        :value="tag.value"  />
     </el-checkbox-group>
   </div>
 </template>

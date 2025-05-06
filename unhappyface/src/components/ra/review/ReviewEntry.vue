@@ -1,7 +1,7 @@
 <template>
   <div class="review-entry">
     <button v-if="loading" disabled>載入中...</button>
-    <button v-else-if="hasReview" @click="showModal = true">編輯我的評論</button>
+    <button v-else-if="hasReview" @click="showModal = true">我的評論</button>
     <button v-else @click="showModal = true">撰寫評論</button>
     <ReviewFormModal
       :show="showModal"

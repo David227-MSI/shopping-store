@@ -201,62 +201,7 @@ function openPreview(list, current) {
 
   Swal.fire({
     html: `
-      <style>
-        .pv-box {
-          position: relative;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-          background: #f8f9fa;
-          border-radius: 12px;
-        }
-        #pv-img {
-          max-width: 70vw;
-          max-height: 70vh;
-          border-radius: 12px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-          transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-        #pv-img:hover {
-          transform: scale(1.02);
-          opacity: 0.95;
-        }
-        .arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          background: linear-gradient(135deg, #6b7280, #4b5563);
-          border: none;
-          border-radius: 50%;
-          color: #ffffff;
-          width: 48px;
-          height: 48px;
-          font-size: 1.8rem;
-          cursor: pointer;
-          user-select: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-          transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-        }
-        #prev {
-          left: 20px;
-        }
-        #next {
-          right: 20px;
-        }
-        .arrow:hover {
-          background: linear-gradient(135deg, #9ca3af, #6b7280);
-          transform: translateY(-50%) scale(1.1);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
-        .arrow:active {
-          transform: translateY(-50%) scale(0.95);
-        }
-      </style>
-      <div class="pv-box">
+            <div class="pv-box">
         <img id="pv-img" src="${current}">
         <button id="prev" class="arrow">&lt;</button>
         <button id="next" class="arrow">&gt;</button>
@@ -265,11 +210,25 @@ function openPreview(list, current) {
     showCloseButton: true,
     width: '70%',
     didOpen: () => {
-      const $ = (q) => Swal.getHtmlContainer().querySelector(q);
+      const htmlContainer = Swal.getHtmlContainer();
+
+      if (!htmlContainer) {
+        console.error('無法獲取 SweetAlert2 HTML 容器'); // 加一個錯誤檢查
+        return; // 如果獲取不到，就退出，避免報錯
+      }
+
+      // 現在可以在有效的 htmlContainer 上呼叫 querySelector
+      const $ = (q) => htmlContainer.querySelector(q);
+
       const img = $('#pv-img');
       const prev = $('#prev');
       const next = $('#next');
 
+      // 檢查元素是否存在
+      if (!img || !prev || !next) {
+          console.error('未能在 SweetAlert2 Modal 中找到圖片或箭頭元素');
+          return;
+      }
       const update = () => {
         img.src = list[idx];
       };
@@ -322,4 +281,60 @@ onMounted(()=>{
 
 .more{margin:14px auto 0;display:block;padding:6px 18px;border:none;border-radius:6px;background:var(--primary,#5C4033);color:#fff}
 .loading{text-align:center;margin:14px 0}
+
+:global(.swal2-popup .pv-box) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  position: relative; /* arrow 定位需要 */
+  width: 100%; /* 讓容器寬度滿 SweetAlert2 的內容區 */
+}
+
+:global(.swal2-popup #pv-img) {
+  max-width: 70vw;
+  max-height: 70vh;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+:global(.swal2-popup .arrow) {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
+  width: 48px;
+  height: 48px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  z-index: 10; /* 確保箭頭在圖片上方 */
+}
+
+:global(.swal2-popup #prev) {
+  left: 20px;
+}
+
+:global(.swal2-popup #next) {
+  right: 20px;
+}
+
+:global(.swal2-popup .arrow:hover) {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+:global(.swal2-popup .arrow:active) {
+  transform: translateY(-50%) scale(0.95);
+}
 </style>
