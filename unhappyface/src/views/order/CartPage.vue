@@ -50,11 +50,11 @@
           </div>
           <div class="summary-item">
             <span>折價券</span>
-            <span class="discount">- $2000</span>
+            <span class="discount">- ${{ discountAmount }}</span>
           </div>
           <div class="summary-total">
             <span>結帳金額</span>
-            <span>${{ totalAmount - 2000 }}</span>
+            <span>${{ totalAmount - discountAmount }}</span>
           </div>
           <button @click="goToCheckout" :disabled="isLoading || cartItems.length === 0" class="checkout-btn">
             {{ isLoading ? '處理中...' : '結帳' }}
@@ -66,11 +66,24 @@
 
         <div class="coupon-card">
           <h3>折價券</h3>
-          <p>已使用 1 張折價券 / 折抵 $2000</p>
-          <button disabled class="coupon-btn">選擇優惠券</button>
+          <p v-if="selectedCoupon">已選擇：{{ selectedCoupon.discountType === 'VALUE'
+              ? `折抵 $${selectedCoupon.discountValue}`
+              : `打 ${selectedCoupon.discountValue} 折（最多折 $${selectedCoupon.maxDiscount ?? '無'})` }}</p>
+          <p v-else>尚未選擇折價券</p>
+          <button @click="openCouponModal" class="coupon-btn">選擇優惠券</button>
         </div>
       </div>
     </div>
+    <teleport to="body">
+      <CouponDialog
+          v-if="showCouponDialog"
+          :couponList="couponStore.couponList"
+          :selectedId="couponStore.selectedCouponId"
+          @close="showCouponDialog = false"
+          @confirm="applyCoupon"
+      />
+    </teleport>
+
   </div>
 </template>
 
@@ -79,15 +92,34 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from '@/services/order/axios';
 import { useCartStore } from '@/stores/cart/cartStore.js';
+import { useCouponStore } from '@/stores/cart/couponStore.js';
 import Swal from 'sweetalert2';
 import LottieAnimation from '@/components/LottiePlayer.vue';
+import CouponDialog from '@/components/CouponDialog.vue';
 import cartAnimation from '@/assets/animations/cartAnimation.json';
 
 const router = useRouter();
 const cartStore = useCartStore();
+const couponStore = useCouponStore();
+
 const userId = computed(() => cartStore.userId);
 const cartItems = computed(() => cartStore.cartItems);
+const totalAmount = computed(() => cartStore.totalAmount);
+const selectedCoupon = computed(() => couponStore.selectedCoupon);
+const discountAmount = computed(() => couponStore.discountAmount);
+
 const isLoading = ref(false);
+const showCouponDialog = ref(false);
+
+const openCouponModal = () => {
+  console.log('優惠券清單：', couponStore.couponList);
+  showCouponDialog.value = true;
+};
+
+const applyCoupon = (couponId) => {
+  couponStore.selectedCouponId = couponId;
+  showCouponDialog.value = false;
+};
 
 const loadCart = async () => {
   try {
@@ -178,10 +210,6 @@ const clearCart = async () => {
   }
 };
 
-const totalAmount = computed(() => {
-  return cartItems.value.reduce((sum, item) => sum + item.subtotal, 0);
-});
-
 const goToCheckout = async () => {
   if (cartItems.value.length === 0) {
     await Swal.fire({
@@ -245,6 +273,25 @@ const getImageUrl = (productName) => {
   color: #7e3b92;
   border-bottom: 2px solid #7e3b92;
   padding-bottom: 4px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+.actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #7e3b92;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+.actions button:hover {
+  background: #a95fd1;
 }
 
 .cart-main {
@@ -392,6 +439,27 @@ const getImageUrl = (productName) => {
 .discount {
   color: #e53935;
 }
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.dialog {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
 
 .checkout-btn {
   width: 100%;
@@ -429,10 +497,13 @@ const getImageUrl = (productName) => {
 .coupon-btn {
   padding: 8px 16px;
   border-radius: 8px;
-  background: #eee;
-  color: #999;
+  background: #7e3b92;
+  color: white;
   border: none;
-  cursor: not-allowed;
+  cursor: pointer;
+}
+.coupon-btn:hover {
+  background: #a85fd1;
 }
 
 .empty-cart {
