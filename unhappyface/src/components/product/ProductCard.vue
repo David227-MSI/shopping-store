@@ -22,12 +22,25 @@
   })
   
   const getProductImage = (name) => {
-    if (name === '香水 A') return '/images/perfumeA.jpg'
-    if (name === '香水 B') return '/images/perfumeB.jpg'
-    if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png'
-    if (name === '黑色棉T') return '/images/black_T.png'
-    return 'https://via.placeholder.com/300x180?text=No+Image'
-  }
+  if (name === '香水 A') return '/images/perfumeA.jpg'
+  if (name === '香水 B') return '/images/perfumeB.jpg'
+  if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png'
+  if (name === '黑色棉T') return '/images/black_T.png'
+  if (name === '夏日晨露淡香水') return '/images/grass.png'
+  if (name === '雲彩男款輕薄外套') return '/images/jacket_men.jpg'
+  if (name === '雲彩女款休閒洋裝') return '/images/dress_women.jpg'
+  if (name === 'StarPhone X9') return '/images/phone2.png'
+  if (name === '竹風防滑拖鞋組') return '/images/slippers.jpg'
+  if (name === '極光連帽機能外套') return '/images/jacket_aurora.jpg'
+  if (name === 'Threelight Edge S5') return '/images/phone3.png'
+  if (name === '木田可堆疊收納箱') return '/images/storage_box.jpg'
+  if (name === '木田天然洗碗精') return '/images/dish_soap.jpg'
+  if (name === '映月氣質長裙') return '/images/skirt.png'
+  if (name === '聆香月光花語香水') return '/images/moon.png'
+  if (name === 'QF-Smart X Ultra') return '/images/phone4.png'
+  return 'https://via.placeholder.com/300x180?text=No+Image'
+}
+
   </script>
   <style scoped>
   .product {

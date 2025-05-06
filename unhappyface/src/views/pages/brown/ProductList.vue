@@ -64,16 +64,52 @@ const banners = [
 ]
 
 const sideCategories = ref([
-  { id: 1, name: '美妝', icon: '💄', show: false, subs: [
-    { id: 2, name: '香水' }, { id: 3, name: '女香' }, { id: 4, name: '男香' }
-  ]},
-  { id: 2, name: '3C', icon: '📱', show: false, subs: [
-    { id: 6, name: '手機' }, { id: 7, name: '筆電' }, { id: 8, name: '耳機' }
-  ]},
-  { id: 3, name: '服飾', icon: '👗', show: false, subs: [
-    { id: 10, name: '男裝' }, { id: 11, name: '女裝' }
-  ]}
+  {
+    id: 1,
+    name: '美妝',
+    icon: '💄',
+    show: false,
+    subs: [
+      { id: 2, name: '香水' },
+      { id: 3, name: '女香' },
+      { id: 4, name: '男香' }
+    ]
+  },
+  {
+    id: 5,
+    name: '3C',
+    icon: '📱',
+    show: false,
+    subs: [
+      { id: 6, name: '手機' },
+      { id: 7, name: '筆電' },
+      { id: 8, name: '耳機' }
+    ]
+  },
+  {
+    id: 9,
+    name: '服飾',
+    icon: '👗',
+    show: false,
+    subs: [
+      { id: 10, name: '男裝' },
+      { id: 11, name: '女裝' }
+    ]
+  },
+  {
+    id: 12,
+    name: '生活用品',
+    icon: '🧻',
+    show: false,
+    subs: [
+      { id: 13, name: '廚房用品' },
+      { id: 14, name: '居家清潔' },
+      { id: 15, name: '收納用品' },
+      { id: 16, name: '盥洗用品' }
+    ]
+  }
 ])
+
 
 const products = ref([])
 const categories = ref([])
