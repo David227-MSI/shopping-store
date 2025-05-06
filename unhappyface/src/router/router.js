@@ -6,8 +6,9 @@ import Home from '@/views/Home.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
-// 商品詳情頁面
+// 商品頁面
 import ProductDetail from '@/views/pages/ProductDetail.vue'
+import ProductList from '@/views/pages/ProductList.vue'
 
 // 假的訂單詳情頁面
 import OrderDetailDemo from '@/views/pages/OrderDetailDemo.vue'
@@ -17,7 +18,7 @@ import OrderDetailDemo from '@/views/pages/OrderDetailDemo.vue'
 // path:網址, name:頁面名稱, component:元件名
 const routes = [
   // 一般頁面
-  { path: '/', name: 'home', component: Home},
+  { path: '/', name: 'home', component: ProductList},
 
   // 商品詳情含評論頁面
   { path: '/products/:id', component: ProductDetail },
