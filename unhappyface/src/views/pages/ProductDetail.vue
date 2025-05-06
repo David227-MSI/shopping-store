@@ -2,6 +2,7 @@
     <div>
        <!-- ✅ 補上 Header，這樣購物車才會出現 -->
    <Header :cartCount="cartCount" />
+   <div class="product-page-content">
    <div class="detail-layout">
         <!-- 左邊圖片 -->
         <ZoomImage
@@ -32,8 +33,10 @@
           class="thumbnail"
           :class="{ 'is-selected': image === selectedMainImage }"
           @click="selectMainImage(image)"
+          loading="lazy"
         />
       </div>
+    </div>
 
       <div class="review-section">
         <h2 >💬 使用者評論</h2>
@@ -87,8 +90,8 @@
   const showBackToTop = ref(false)
   const isWishlisted = ref(false)
   
-  const selectedMainImage = ref(''); // 儲存當前顯示的主圖 URL
-  const productImages = ref([]); // 儲存所有圖片的 URL 列表
+  const selectedMainImage = ref('');
+  const productImages = ref([]);
   
   const increaseQuantity = () => {
     quantity.value++
@@ -141,51 +144,42 @@
   }
   
   const fetchProductDetail = async () => {
+    console.log('--- fetchProductDetail function called (combined API) ---');
     try {
-      const { data } = await axios.get(`/api/products/${route.params.id}`)
-      if (data && data.id) {
-        product.value = data
-      } else {
-        router.push('/')
-      }
-    } catch (err) {
-      console.error('獲取產品詳細資料失敗:', err)
-      if (axios.isAxiosError(err) && err.response?.status === 404) {
-         router.push('/404'); // 假設您有一個 404 頁面
-      } else {
-         router.push('/'); // 其他錯誤導向首頁
-      }
-    }
-  };
+      const response = await axios.get(`/api/products/${route.params.id}`);
 
-// 新增一個函式來單獨獲取產品圖片列表
-const fetchProductImages = async () => {
-  try {
-    const response = await axios.get(`/api/media/product/${route.params.id}`);
-    const apiResponse = response.data;
+      const apiResponse = response.data;
+      const productData = apiResponse.data;
+      if (apiResponse.success === true && productData && productData.id) {
+        product.value = productData;
+        console.log('獲取到的 ProductDTO 數據:', productData);
 
-    if (apiResponse.success === true && apiResponse.data && Array.isArray(apiResponse.data) && apiResponse.data.length > 0) {
-      console.log('API responded successfully with data.');
-      console.log('Raw API data for images:', apiResponse.data);
-
-      productImages.value = apiResponse.data.map(mediaDto => mediaDto.mediaUrl);
-      selectedMainImage.value = productImages.value[0];
-
-      console.log('productImages ref after mapping:', productImages.value);
-      console.log('selectedMainImage ref after setting:', selectedMainImage.value);
+        if (productData.images && Array.isArray(productData.images) && productData.images.length > 0) {
+          productImages.value = productData.images.map(mediaDto => mediaDto.mediaUrl);
+          selectedMainImage.value = productImages.value[0];
+          console.log('圖片列表從產品詳細 API 獲取成功:', productImages.value);
+          console.log('Selected main image:', selectedMainImage.value);
+        } else {
+          productImages.value = [];
+          selectedMainImage.value = getProductImage(productData.name || '');
+          console.log('產品詳細 API 返回的圖片列表為空或不存在，使用備用圖片。');
+        }
     } else {
-      console.log('API response indicates failure or data is empty/invalid (based on success field).');
-      productImages.value = [];
-      selectedMainImage.value = getProductImage(product.value?.name || '');
+      console.error('獲取產品詳細資料失敗：API 返回失敗狀態或無效數據', apiResponse);
+      router.push('/');
     }
   } catch (err) {
-    console.error('獲取產品圖片失敗:', err);
-    productImages.value = [];
-    selectedMainImage.value = getProductImage(product.value?.name || '');
+    console.error('獲取產品詳細資料失敗:', err);
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+        console.error('產品不存在 (404)');
+        router.push('/404');
+    } else {
+        console.error('其他 API 錯誤');
+        router.push('/');
+    }
   }
 };
 
-  // 新增方法：點擊縮略圖時，更新 selectedMainImage 的值
   const selectMainImage = (imageUrl) => {
   selectedMainImage.value = imageUrl;
   // 如果需要，點擊縮略圖時可以讓主圖區域也捲動到頂部
@@ -285,25 +279,15 @@ const fetchProductImages = async () => {
   });
   
   const handleScroll = () => showBackToTop.value = window.scrollY > 200
+
   onMounted(() => {
-    fetchProductDetail()
-    fetchReviews()
-    fetchRecommended()
+    console.log('--- ProductDetail Component Mounted ---');
+    console.log('Route params ID:', route.params.id);
+    fetchProductDetail();
+    fetchReviews();
+    fetchRecommended();
+    console.log('--- onMounted finished initiating fetches ---');
     window.addEventListener('scroll', handleScroll)
-  })
-
-  onMounted(() => {
-  console.log('--- ProductDetail Component Mounted ---');
-  console.log('Route params ID:', route.params.id);
-
-  fetchProductDetail(); // 獲取產品基本資料
-  fetchProductImages(); // *** 正確：在 mounted 時呼叫獲取圖片的函式 ***
-  fetchReviews(); // 獲取評論
-  fetchRecommended(); // 獲取推薦商品
-
-  console.log('--- onMounted finished initiating fetches ---');
-
-  window.addEventListener('scroll', handleScroll);
   })
 
   onUnmounted(() => window.removeEventListener('scroll', handleScroll))
@@ -322,32 +306,39 @@ const fetchProductImages = async () => {
     padding: 40px;
   }
 
-    /* *** 添加縮略圖區塊和縮略圖的樣式 *** */
+  .product-page-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
   .thumbnail-gallery {
-    display: flex; /* 讓縮略圖並排顯示 */
-    justify-content: center; /* 讓縮略圖區塊在父容器中置中 */
-    margin-top: 20px; /* 在主圖區域下方添加間距 */
-    gap: 10px; /* 縮略圖之間的間距 */
-    flex-wrap: wrap; /* 如果圖片太多，允許換行 */
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 5px;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 0 40px;
+    margin-bottom: 20px;
   }
 
   .thumbnail {
-    width: 60px; /* 縮略圖寬度，您可以調整大小 */
-    height: 60px; /* 縮略圖高度 */
-    object-fit: cover; /* 圖片裁切以填充容器，保持圖片不變形 */
-    border: 2px solid transparent; /* 預設邊框透明 */
-    border-radius: 4px; /* 可選：圓角 */
-    cursor: pointer; /* 滑鼠懸停時顯示手形光標 */
-    transition: border-color 0.2s, transform 0.2s; /* 邊框顏色和大小變化的過渡效果 */
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
   }
 
   .thumbnail:hover {
-    border-color: #a47551; /* 懸停時邊框變色 (使用輔色調) */
-    transform: scale(1.05); /* 懸停時稍微放大 */
+    border-color: #a47551;
+    transform: scale(1.05);
   }
 
   .thumbnail.is-selected {
-     border-color: #5C4033; /* 選中時邊框變色 (使用主色調) */
-    box-shadow: 0 0 5px rgba(92, 64, 51, 0.5); /* 可選：選中時添加陰影 */
+    border-color: #5C4033;
+    box-shadow: 0 0 5px rgba(92, 64, 51, 0.5);
   }
   </style>
