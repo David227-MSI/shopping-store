@@ -13,7 +13,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
-import axios from '@/services/order/orderAxios.js';
+import axios from '@/services/order/axiosRaw.js';
 import { useCartStore } from '@/stores/cart/cartStore';
 import { useUserStore } from '@/stores/cart/userStore.js';
 
@@ -25,25 +25,27 @@ const userStore = useUserStore();
 
 const handleLogin = async () => {
   try {
-    const res = await axios.post('/ajax/secure/login', {
+    const res = await axios.post('/api/user/secure/login', {
       email: email.value,
       password: password.value
     });
 
-    if (!res.success) {
-      Swal.fire('登入失敗', res.message || '請檢查帳號密碼', 'error');
+    const result = res.data;
+
+    if (!result.success) {
+      Swal.fire('登入失敗', result.message || '請檢查帳號密碼', 'error');
       return;
     }
 
-    // 儲存 token
-    localStorage.setItem('token', res.token);
-    cartStore.userId = res.custid;
+    // 從後端回傳資料中解構出會員資訊
+    const { token, userId, username, email: userEmail, phone, address } = result.data;
 
-    // 取得會員資料並存入 Pinia
-    const memberRes = await axios.get('/ajax/secure/memberinfo');
-    if (memberRes.success) {
-      userStore.setUser(memberRes.data);
-    }
+    // 儲存 token，設定 userId
+    localStorage.setItem('token', token);
+    cartStore.userId = userId;
+
+    // 存入 Pinia
+    userStore.setUser({ userId, username, email: userEmail, phone, address });
 
     // 檢查是否有訪客購物車需要合併
     if (cartStore.cartItems.length > 0) {
@@ -55,7 +57,7 @@ const handleLogin = async () => {
       });
 
       if (confirmResult.isConfirmed) {
-        await cartStore.loginAndMerge(res.custid);
+        await cartStore.loginAndMerge(userId);
         Swal.fire('合併成功', '', 'success');
       } else {
         cartStore.clearCart();
