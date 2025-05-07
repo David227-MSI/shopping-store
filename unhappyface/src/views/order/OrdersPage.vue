@@ -2,7 +2,10 @@
   <div class="orders-page">
     <h1 class="page-title">訂單列表</h1>
 
-    <div v-if="orders.length === 0" class="empty-text">尚未有訂單記錄。</div>
+    <!-- 加上 isLoading 判斷，避免尚未載入時顯示空 -->
+    <div v-if="orders.length === 0 && !isLoading" class="empty-text">
+      尚未有訂單記錄。
+    </div>
 
     <div v-for="order in orders" :key="order.orderId" class="order-card">
       <div class="order-header">
@@ -44,8 +47,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useUserStore } from '@/stores/cart/userStore.js';
+import {ref, watch} from 'vue';
+import {useUserStore} from '@/stores/cart/userStore.js';
 import axios from '@/services/order/orderAxios.js';
 import OrderDetailModal from '@/components/order/OrderDetailModal.vue';
 
@@ -53,18 +56,24 @@ const orders = ref([]);
 const showModal = ref(false);
 const selectedOrderId = ref(null);
 const userStore = useUserStore();
+const isLoading = ref(false); // ✅ 加入 loading 狀態
 
-// 載入訂單
-onMounted(async () => {
-  const userId = userStore.user?.id;
-  if (!userId) return;
-  try {
-    const res = await axios.get(`/api/orders/user/${userId}`);
-    orders.value = res;
-  } catch (err) {
-    console.error('無法取得訂單清單', err);
-  }
-});
+watch(
+    () => userStore.user?.userId,
+    async (userId) => {
+      if (!userId) return;
+      try {
+        isLoading.value = true;
+        const res = await axios.get(`/api/orders/user/${userId}`);
+        orders.value = res;
+      } catch (err) {
+        console.error('無法取得訂單清單', err);
+      } finally {
+        isLoading.value = false;
+      }
+    },
+    {immediate: true}
+);
 
 // 查看明細並抓資料
 const openOrderDetail = (orderId) => {
@@ -108,7 +117,6 @@ const formatDate = (datetime) => {
   font-size: 1.1rem;
 }
 
-/* 卡片 */
 .order-card {
   background: #fefaff;
   border: 1px solid #e5d5f5;
@@ -118,6 +126,7 @@ const formatDate = (datetime) => {
   box-shadow: 0 2px 8px rgba(126, 59, 146, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .order-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(126, 59, 146, 0.15);
@@ -142,6 +151,7 @@ const formatDate = (datetime) => {
   margin-top: 16px;
   text-align: right;
 }
+
 .order-footer button {
   background: linear-gradient(135deg, #a855f7, #7e3b92);
   border: none;
@@ -152,15 +162,18 @@ const formatDate = (datetime) => {
   font-weight: 600;
   transition: all 0.2s ease;
 }
+
 .order-footer button:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(126, 59, 146, 0.2);
 }
 
-/* loading 動畫 */
 .loading-overlay {
   position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(255, 255, 255, 0.6);
   z-index: 9998;
   display: flex;
@@ -176,8 +189,10 @@ const formatDate = (datetime) => {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>
