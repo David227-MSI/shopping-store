@@ -22,8 +22,8 @@
   })
   
   const getProductImage = (name) => {
-  if (name === '香水 A') return '/images/perfumeA.jpg'
-  if (name === '香水 B') return '/images/perfumeB.jpg'
+  if (name === 'Bvantgardey') return '/images/perfumeA.jpg'
+  if (name === 'Whitepink') return '/images/perfumeB.jpg'
   if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png'
   if (name === '黑色棉T') return '/images/black_T.png'
   if (name === '夏日晨露淡香水') return '/images/grass.png'
