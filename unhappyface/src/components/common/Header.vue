@@ -1,20 +1,35 @@
 <template>
-    <header class="topbar">
-      <a href="/">🏠 回首頁</a>
-      <a href="#">📱 App下載</a>
-      <a href="#">💎 點點購</a>
-      <a href="#">📚 書店</a>
-      <a href="#">🔑 登入</a>
+  <header class="topbar">
+    <a href="/">🏠 回首頁</a>
+    <a href="#">📱 App下載</a>
+    <a href="#">💎 點點購</a>
+    <a href="#">📚 書店</a>
+
+    <template v-if="!userStore.isLoggedIn">
+      <a href="/secure/login">🔑 登入</a>
       <a href="#">🆕 註冊</a>
+    </template>
+    <template v-else>
       <a href="#">👤 會員中心</a>
-      <a href="#">📦 查訂單</a>
-      <a href="#">⭐️ 追蹤清單</a>
-      <a href="#">🎫 折價券</a>
-      <a href="#">🛒 購物車(<span>{{ cartCount }}</span>)</a>
-    </header>
+      <a href="#" @click.prevent="logout">🚪 登出</a>
+    </template>
+
+    <a href="#">📦 查訂單</a>
+    <a href="/pages/user-subscribe-list">⭐️ 追蹤清單</a>
+    <a href="/pages/user-coupon-list">🎫 折價券</a>
+    <a href="#">🛒 購物車(<span>{{ cartCount }}</span>)</a>
+  </header>
 </template>
 
 <script setup>
+import { useAuth } from '@/services/logout';
+import { useUserStore } from '@/stores/userStore';
+import { computed } from 'vue';
+
+const { logout } = useAuth();
+const userStore = useUserStore();
+
+const cartCount = computed(() => 0); // 需要根據實際情況計算
 </script>
 
 <style scoped>

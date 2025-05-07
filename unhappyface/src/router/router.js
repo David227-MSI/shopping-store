@@ -7,8 +7,15 @@ import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
 // ttpp
+import UserCouponList from '@/views/pages/ttpp/front/UserCouponList.vue'
+import UserSubscribeList from '@/views/pages/ttpp/front/UserSubscribeList.vue';
+
 import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.vue'
 import AddPrizeToEvent from '@/views/pages/ttpp/back/AddPrizeToEvent.vue'
+
+import UserLogin from '@/views/pages/ttpp/_fake/UserLogin.vue'
+import UserModify from '@/views/pages/ttpp/_fake/UserModify.vue'
+import UserRegister from '@/views/pages/ttpp/_fake/UserRegister.vue'
 
 
 // 設定頁面參數 
@@ -23,9 +30,49 @@ const routes = [
   
   
   // ttpp
-  // { path: '/', name: '', component:  },
-  { path: '/notificationList', name: 'NotificationList', component: UserNotificationList},
+
+  // 會員相關
+  { path: '/secure/register', name: 'UserRegister', component: UserRegister},
+  { path: '/secure/login', name: 'UserLogin', component: UserLogin},
+  { 
+    path: '/secure/modify', 
+    name: 'UserModify', 
+    component: UserModify,
+    meta: { requiresAuth: true },
+  },
+  
+  
+  
+  
+  
+  
+  {
+    path: '/pages/user-coupon-list',
+    name: 'UserCouponList',
+    component: UserCouponList,
+    meta: { requiresAuth: true }, // 標記此路由需要身份驗證
+  },
+  {
+    path: '/pages/user-notification-list',
+    name: 'UserNotificationList',
+    component: UserNotificationList,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/pages/user-subscribe-list',
+    name: 'UserSubscribeList',
+    component: UserSubscribeList,
+    meta: { requiresAuth: true },
+  },
+
+
   { path: '/events/:eventId/add-prizes', name: 'AddPrizeToEvent', component: AddPrizeToEvent},
+
+
+
+
+
+
 
 
 

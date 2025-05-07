@@ -44,13 +44,19 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import CouponCard from '@/components/ttpp/UserCouponCard.vue';
 
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
+
+const userStore = useUserStore();
+const router = useRouter();
+
 const filters = ref({
-  userId: 1002,
+  userId: userStore.userId, // 從 userStore 取得 userId
   isUsed: false,
   applicableType: null,
   discountType: null,
@@ -61,15 +67,36 @@ const coupons = ref([]);
 
 const search = async () => {
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/coupons/user/query`, filters.value);
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/coupons/query`, filters.value);
     coupons.value = res.data.data.couponList;
+    console.log('res: ' + res);
+
   } catch (err) {
     Swal.fire('查詢失敗', err.response?.data?.message || '錯誤', 'error');
   }
 };
 
 watch(filters, search, { deep: true });
-search();
+
+onMounted(() => {
+  if (!userStore.token) {
+    Swal.fire({
+      icon: 'warning',
+      title: '請先登入',
+      text: '需要登入才能查看您的優惠券。',
+      confirmButtonText: '前往登入',
+    }).then(() => {
+      router.push('/secure/login'); // 導向你的登入頁面
+    });
+  } else if (!userStore.userId) {
+    // 如果有 token 但沒有 userId，可能需要重新獲取使用者資訊或處理這種異常情況
+    console.warn('已登入但 userStore 中沒有 userId');
+    // 你可以選擇在這裡導向錯誤頁面或執行其他處理
+  } else {
+    // 如果有 Token 且有 userId，則執行查詢
+    search();
+  }
+});
 
 const filteredCoupons = computed(() => {
   return coupons.value.filter(coupon => {
@@ -136,7 +163,6 @@ const handleTransfer = async (coupon) => {
 </script>
 
 <style scoped>
-/* ... (你的樣式保持不變) ... */
 .container {
   animation: float-in 0.5s ease-out;
 }

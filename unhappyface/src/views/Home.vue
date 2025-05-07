@@ -10,15 +10,15 @@
     <!-- <UploadImg /> -->
 
     <!-- front -->
-    <!-- <UserEventList /> -->
-    <!-- <UserSubscribeList /> -->
-    <!-- <UserCouponList /> -->
-    <!-- <UserNotificationList /> -->
+    <UserEventList />
+    <UserSubscribeList />
+    <UserCouponList />
+    <UserNotificationList />
 
     <!-- fake -->
     <!-- <UserLogin /> -->
     <!-- <UserModify /> -->
-    <UserRegister />
+    <!-- <UserRegister /> -->
 
 
   </main>
@@ -26,7 +26,7 @@
 
 <script setup>
   import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.vue'
-  import UserCouponList from '@/views/pages/ttpp/front/UserCouponList.vue'
+  
   import UserSubscribeList from '@/views/pages/ttpp/front/UserSubscribeList.vue';
   import UserEventList from '@/views/pages/ttpp/front/UserEventList.vue';
 
