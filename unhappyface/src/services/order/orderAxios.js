@@ -13,9 +13,12 @@ const instance = axios.create({
 instance.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem("token");
-      if (token) {
+
+      // 如果不是登入請求才加 token
+      if (token && !config.url.includes('/login')) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+
       return config;
     },
     (error) => Promise.reject(error)
