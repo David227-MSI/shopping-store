@@ -32,7 +32,14 @@
       </div>
 
       <div class="actions">
-        <button class="confirm-btn" @click="confirm">確認使用</button>
+        <button
+            class="confirm-btn"
+            :disabled="couponList.length === 0"
+            :class="{ disabled: couponList.length === 0 }"
+            @click="confirm"
+        >
+          確認使用
+        </button>
         <button class="cancel-btn" @click="close">取消</button>
       </div>
     </div>
@@ -75,6 +82,13 @@ const formatDate = (dateStr) => {
 </script>
 
 <style scoped>
+
+.confirm-btn.disabled {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
