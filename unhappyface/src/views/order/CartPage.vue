@@ -90,12 +90,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from '@/services/order/axios';
+import axios from '@/services/order/orderAxios.js';
 import { useCartStore } from '@/stores/cart/cartStore.js';
 import { useCouponStore } from '@/stores/cart/couponStore.js';
 import Swal from 'sweetalert2';
-import LottieAnimation from '@/components/LottiePlayer.vue';
-import CouponDialog from '@/components/CouponDialog.vue';
+import LottieAnimation from '@/components/order/LottiePlayer.vue';
+import CouponDialog from '@/components/order/CouponDialog.vue';
 import cartAnimation from '@/assets/animations/cartAnimation.json';
 
 const router = useRouter();

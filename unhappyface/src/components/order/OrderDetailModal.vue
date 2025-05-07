@@ -46,7 +46,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import axios from '@/services/order/axios';
+import axios from '@/services/order/orderAxios.js';
 
 const props = defineProps({
   visible: Boolean,

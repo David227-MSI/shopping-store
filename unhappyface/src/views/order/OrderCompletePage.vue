@@ -44,9 +44,9 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
-import axios from '@/services/order/axios';
+import axios from '@/services/order/orderAxios.js';
 import Swal from 'sweetalert2';
-import LottiePlayer from '@/components/LottiePlayer.vue';
+import LottiePlayer from '@/components/order/LottiePlayer.vue';
 import paymentSuccess from '@/assets/animations/paymentSuccess.json';
 
 const route = useRoute();

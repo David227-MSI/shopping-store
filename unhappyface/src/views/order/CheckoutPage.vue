@@ -79,10 +79,10 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cart/cartStore.js';
 import { useUserStore } from '@/stores/cart/userStore.js';
-import axios from '@/services/order/axios';
+import axios from '@/services/order/orderAxios.js';
 import Swal from 'sweetalert2';
-import AddressDialog from '@/components/AddressDialog.vue';
-import LottieAnimation from '@/components/LottiePlayer.vue';
+import AddressDialog from '@/components/order/AddressDialog.vue';
+import LottieAnimation from '@/components/order/LottiePlayer.vue';
 import approved from '@/assets/animations/approved.json';
 import { useCouponStore } from '@/stores/cart/couponStore.js';
 

@@ -13,7 +13,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
-import axios from '@/services/order/axios';
+import axios from '@/services/order/orderAxios.js';
 import { useCartStore } from '@/stores/cart/cartStore';
 import { useUserStore } from '@/stores/cart/userStore.js';
 

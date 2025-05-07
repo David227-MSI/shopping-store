@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import axios from '@/services/order/axios';
+import axios from '@/services/order/orderAxios.js';
 
 export const useUserStore = defineStore('user', () => {
     const user = ref({});        // 會員基本資料 (address, phone, name...)
