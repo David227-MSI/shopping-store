@@ -40,7 +40,7 @@
   
   <script setup>
   import { defineProps, defineEmits, ref, computed } from 'vue';
-  import PrizeCard from '@/components/ttpp/PrizeCard.vue'; // 確保路徑正確
+  import PrizeCard from '@/components/ttpp/PrizeCard.vue';
   
   const props = defineProps({
     event: {

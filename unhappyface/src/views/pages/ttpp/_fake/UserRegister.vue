@@ -44,7 +44,7 @@
         </div>
   
         <div v-if="step === 2">
-          <h2>完善您的個人資料 (可選)</h2>
+          <h2>完善您的個人資料</h2>
   
           <div class="form-group">
             <label for="birthday">生日</label>
@@ -81,7 +81,7 @@
   import { ref, reactive, computed } from 'vue';
   import { useRouter, RouterLink } from 'vue-router';
   
-  const step = ref(1); // 1: 基本資訊, 2: 可選資訊
+  const step = ref(1); // 1: 基本資訊, 2: 進階資訊
   const registrationData = reactive({
     email: '',
     username: '',

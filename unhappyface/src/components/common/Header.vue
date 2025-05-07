@@ -7,10 +7,10 @@
 
     <template v-if="!userStore.isLoggedIn">
       <a href="/secure/login">🔑 登入</a>
-      <a href="#">🆕 註冊</a>
+      <a href="/secure/register">🆕 註冊</a>
     </template>
     <template v-else>
-      <a href="#">👤 會員中心</a>
+      <a href="/secure/member-center">👤 會員中心</a>
       <a href="#" @click.prevent="logout">🚪 登出</a>
     </template>
 

@@ -14,6 +14,7 @@ import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.
 import AddPrizeToEvent from '@/views/pages/ttpp/back/AddPrizeToEvent.vue'
 
 import UserLogin from '@/views/pages/ttpp/_fake/UserLogin.vue'
+import UserMemberCenter from '@/views/pages/ttpp/_fake/UserMemberCenter.vue'
 import UserModify from '@/views/pages/ttpp/_fake/UserModify.vue'
 import UserRegister from '@/views/pages/ttpp/_fake/UserRegister.vue'
 
@@ -38,6 +39,12 @@ const routes = [
     path: '/secure/modify', 
     name: 'UserModify', 
     component: UserModify,
+    meta: { requiresAuth: true },
+  },
+  { 
+    path: '/secure/member-center', 
+    name: 'UserMemberCenter', 
+    component: UserMemberCenter,
     meta: { requiresAuth: true },
   },
   
