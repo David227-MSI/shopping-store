@@ -42,12 +42,14 @@ const handleLogin = async () => {
 
     // 儲存 token，設定 userId
     localStorage.setItem('token', token);
-    cartStore.userId = userId;
 
-    // 存入 Pinia
+    // 重新指派 cartStore.userId 為 ref（保證正確型別）
+    cartStore.userId = ref(userId);
+
+    // 存入使用者資料
     userStore.setUser({ userId, username, email: userEmail, phone, address });
 
-    // 檢查是否有訪客購物車需要合併
+    // 判斷是否合併訪客購物車
     if (cartStore.cartItems.length > 0) {
       const confirmResult = await Swal.fire({
         title: '是否合併訪客購物車？',
@@ -75,6 +77,7 @@ const handleLogin = async () => {
   }
 };
 </script>
+
 
 <style scoped>
 .login-container {
