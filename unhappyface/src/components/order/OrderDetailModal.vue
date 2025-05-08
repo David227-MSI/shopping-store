@@ -90,19 +90,19 @@ watch(
   z-index: 9999;
 }
 .modal-content {
-  background: #fef6ff;
+  background: #fffaf4;
   padding: 30px;
   border-radius: 16px;
   width: 92%;
   max-width: 720px;
-  box-shadow: 0 6px 20px rgba(126, 59, 146, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   animation: fadeInUp 0.4s ease;
 }
 .modal-title {
   font-size: 1.6rem;
   font-weight: bold;
   text-align: center;
-  color: #7e3b92;
+  color: var(--primary);
   margin-bottom: 20px;
 }
 .product-table {
@@ -110,19 +110,31 @@ watch(
   border-collapse: collapse;
   margin-top: 10px;
   font-size: 0.95rem;
-}
-.product-table th,
-.product-table td {
-  padding: 12px;
-  text-align: center;
-  border: 1px solid #e0cce9;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .product-table th {
-  background-color: #f8e6ff;
-  color: #6a1b9a;
+  background-color: #f4ede1;
+  color: #5b3a29;
+  padding: 12px;
+  text-align: center;
+}
+.product-table td {
+  background-color: #fffefb;
+  color: #3e2c23;
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #f0e8da;
+  transition: background-color 0.3s ease;
+}
+.product-table tr:nth-child(even) td {
+  background-color: #fdf7ef;
+}
+.product-table tbody tr:hover td {
+  background-color: #f3ede4;
 }
 .product-link {
-  color: #7e3b92;
+  color: var(--primary);
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -131,7 +143,7 @@ watch(
   color: #9b59b6;
 }
 .discount {
-  color: #c0392b;
+  color: #e53935 !important;
   font-weight: bold;
 }
 .total-label {
@@ -142,6 +154,7 @@ watch(
 .total-value {
   font-weight: bold;
   background: #fff0f6;
+  color: #333;
 }
 .empty-text {
   text-align: center;
@@ -156,15 +169,15 @@ watch(
   font-size: 1rem;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  background: var(--primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+  box-shadow: 0 4px 12px rgba(126, 59, 146, 0.3);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 .close-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(155, 89, 182, 0.6);
+  box-shadow: 0 6px 20px rgba(126, 59, 146, 0.4);
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s;
