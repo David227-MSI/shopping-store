@@ -3,6 +3,18 @@
     <div class="dialog">
       <h2 class="title">選擇優惠券</h2>
 
+      <label class="coupon-item">
+        <input
+            type="radio"
+            name="coupon"
+            :value="null"
+            v-model="tempSelectedId"
+        />
+        <div class="content">
+          <p class="discount">不使用優惠券</p>
+        </div>
+      </label>
+
       <div v-if="couponList.length > 0" class="coupon-list">
         <label
             v-for="coupon in couponList"
@@ -19,7 +31,13 @@
             <p class="discount">
               {{ coupon.discountType === 'VALUE'
                 ? `折抵 $${coupon.discountValue}`
-                : `打 ${coupon.discountValue} 折（最多折 $${coupon.maxDiscount ?? '無'})` }}
+                : `${coupon.discountValue}% 折扣（最多折 $${coupon.maxDiscount ?? '無'})` }}
+            </p>
+            <p class="scope">
+              適用範圍：{{ formatScope(coupon.applicableType, coupon.applicableId) }}
+            </p>
+            <p class="min-spend" v-if="coupon.minSpend > 0">
+              最低消費：滿 ${{ coupon.minSpend }} 元可使用
             </p>
             <p class="date">
               有效期間：{{ formatDate(coupon.startTime) }} ～ {{ formatDate(coupon.endTime) }}
@@ -34,8 +52,6 @@
       <div class="actions">
         <button
             class="confirm-btn"
-            :disabled="couponList.length === 0"
-            :class="{ disabled: couponList.length === 0 }"
             @click="confirm"
         >
           確認使用
@@ -48,6 +64,14 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+
+const formatScope = (type, id) => {
+  if (type === 'ALL') return '全站商品';
+  if (type === 'BRAND') return `品牌（ID：${id}）`;
+  if (type === 'CATEGORY') return `分類（ID：${id}）`;
+  if (type === 'PRODUCT') return `指定商品（ID：${id}）`;
+  return '未知';
+};
 
 const props = defineProps({
   couponList: Array,
@@ -65,8 +89,10 @@ watch(
 );
 
 const confirm = () => {
+  console.log('確認送出的優惠券 ID：', tempSelectedId.value);
   emits('confirm', tempSelectedId.value);
 };
+
 const close = () => {
   emits('close');
 };
@@ -82,6 +108,17 @@ const formatDate = (dateStr) => {
 </script>
 
 <style scoped>
+
+.scope {
+  font-size: 14px;
+  color: #5a4632;
+  margin-top: 4px;
+}
+.min-spend {
+  font-size: 14px;
+  color: #8b4513;
+  margin-top: 4px;
+}
 
 .confirm-btn.disabled {
   background: #ccc;
@@ -111,7 +148,7 @@ const formatDate = (dateStr) => {
 .title {
   font-size: 22px;
   font-weight: bold;
-  color: #333;
+  color: var(--primary);
   margin-bottom: 20px;
 }
 
@@ -120,22 +157,27 @@ const formatDate = (dateStr) => {
   gap: 14px;
   align-items: flex-start;
   padding: 16px;
-  border: 2px solid #d6bce6;
+  border: 2px solid #e2cfc0;
   margin-bottom: 16px;
   border-radius: 10px;
-  background: #fcf8ff;
+  background: #fdfaf5;
   transition: 0.3s;
   cursor: pointer;
 }
 .coupon-item:hover {
-  border-color: #a275c8;
-  background: #f7f0ff;
+  border-color: var(--primary);
+  background: #f5ede5;
 }
 
 .coupon-item input {
   margin-top: 6px;
   transform: scale(1.2);
-  accent-color: #7e3b92;
+  accent-color: var(--primary);
+}
+
+.coupon-item input[type="radio"] {
+  width: 18px;
+  height: 18px;
 }
 
 .content {
@@ -144,7 +186,7 @@ const formatDate = (dateStr) => {
 .discount {
   font-size: 18px;
   font-weight: bold;
-  color: #4a1d5d;
+  color: var(--primary);
 }
 .date {
   font-size: 14px;
@@ -168,11 +210,11 @@ const formatDate = (dateStr) => {
   transition: 0.3s;
 }
 .confirm-btn {
-  background: #7e3b92;
+  background: var(--primary);
   color: white;
 }
 .confirm-btn:hover {
-  background: #9d50c3;
+  background-color: #40291d;
 }
 .cancel-btn {
   background: #eee;
@@ -181,4 +223,5 @@ const formatDate = (dateStr) => {
 .cancel-btn:hover {
   background: #ddd;
 }
+
 </style>
