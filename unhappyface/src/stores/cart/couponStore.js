@@ -34,9 +34,23 @@ export const useCouponStore = defineStore('coupon', () => {
         return 0;
     });
 
+    function setSelectedCoupon(id) {
+        selectedCouponId.value = id;
+    }
+
     // 載入符合條件的優惠券
     async function fetchValidCoupons() {
         if (!cartStore.isLoggedIn()) return;
+
+        const hasProducts = productIds.value.length > 0;
+        const total = cartStore.totalAmount;
+
+        // 購物車為空，不送出請求，並清空優惠券資料
+        if (!hasProducts || total === 0) {
+            couponList.value = [];
+            selectedCouponId.value = null;
+            return;
+        }
 
         try {
             const res = await axios.post('/api/admin/coupons/getValidCoupon', {
@@ -63,5 +77,6 @@ export const useCouponStore = defineStore('coupon', () => {
         selectedCoupon,
         discountAmount,
         fetchValidCoupons,
+        setSelectedCoupon,
     };
 });
