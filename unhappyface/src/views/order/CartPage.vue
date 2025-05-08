@@ -23,6 +23,8 @@
             </div>
             <div class="item-info">
               <div class="product-name">{{ item.productName }}</div>
+              <div class="product-brand">品牌：{{ item.brandName }}</div>
+              <div class="product-category">分類：{{ item.categoryName }}</div>
               <div class="product-detail">單價: {{ item.price }} 元</div>
               <div class="item-actions">
                 <button @click="updateQuantity(item.productId, item.quantity - 1)" :disabled="isLoading || item.quantity <= 1">-</button>
@@ -34,9 +36,14 @@
             </div>
           </li>
         </ul>
+        <div class="cart-list-footer">
+          <button @click="clearCart" :disabled="isLoading || cartItems.length === 0" class="clear-btn">
+            清空購物車
+          </button>
+        </div>
       </div>
 
-      <!-- 右邊 結帳資訊 / 優惠捲只幫忙放位置 (無功能) -->
+      <!-- 右邊 結帳資訊 -->
       <div class="checkout-summary">
         <div class="summary-card">
           <!-- 插入動畫 -->
@@ -59,16 +66,16 @@
           <button @click="goToCheckout" :disabled="isLoading || cartItems.length === 0" class="checkout-btn">
             {{ isLoading ? '處理中...' : '結帳' }}
           </button>
-          <button @click="clearCart" :disabled="isLoading || cartItems.length === 0" class="clear-btn">
-            清空購物車
-          </button>
         </div>
 
         <div class="coupon-card">
           <h3>折價券</h3>
-          <p v-if="selectedCoupon">已選擇：{{ selectedCoupon.discountType === 'VALUE'
+          <p v-if="selectedCoupon">
+            已選擇：
+            {{ selectedCoupon.discountType === 'VALUE'
               ? `折抵 $${selectedCoupon.discountValue}`
-              : `打 ${selectedCoupon.discountValue} 折（最多折 $${selectedCoupon.maxDiscount ?? '無'})` }}</p>
+              : `${selectedCoupon.discountValue}% 折扣（最多折 $${selectedCoupon.maxDiscount ?? '無'})` }}
+          </p>
           <p v-else>尚未選擇折價券</p>
           <button @click="openCouponModal" class="coupon-btn">選擇優惠券</button>
         </div>
@@ -117,7 +124,7 @@ const openCouponModal = () => {
 };
 
 const applyCoupon = (couponId) => {
-  couponStore.selectedCouponId = couponId;
+  couponStore.setSelectedCoupon(couponId);
   showCouponDialog.value = false;
 };
 
@@ -243,157 +250,120 @@ const getImageUrl = (productName) => {
 </script>
 
 <style scoped>
+
+.product-brand,
+.product-category {
+  font-size: 0.95rem;
+  color: #5c4328;
+  margin: 4px 0;
+}
+
 .cart-container {
-  max-width: 1200px;
-  margin: 60px auto;
-  padding: 30px;
-  background: #fff;
+  background-color: var(--background);
+  padding: 40px 20px;
+  color: var(--text-dark);
 }
 
 .page-title {
   text-align: center;
-  font-size: 32px;
+  color: var(--primary);
+  font-size: 2.5rem;
   font-weight: bold;
-  color: #7e3b92;
   margin-bottom: 30px;
 }
 
 .step-bar {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
-  font-size: 18px;
-  margin-bottom: 40px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 .step {
-  color: #bbb;
   font-weight: bold;
+  color: #aaa;
 }
 .step.active {
-  color: #7e3b92;
-  border-bottom: 2px solid #7e3b92;
-  padding-bottom: 4px;
+  color: var(--primary);
 }
 
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
-}
-.actions button {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #7e3b92;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-.actions button:hover {
-  background: #a95fd1;
+.empty-cart {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 50px 0;
 }
 
 .cart-main {
   display: flex;
-  gap: 40px;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 20px;
 }
 
 .cart-list {
   flex: 2;
 }
-
-.cart-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.cart-list-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
 }
-
 .cart-item {
   display: flex;
-  align-items: center;
-  background: #f9f6fc;
+  gap: 20px;
   padding: 20px;
   margin-bottom: 20px;
-  border: 1px solid #eee;
+  background: #fff;
   border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
-
-.item-image {
-  width: 100px;
-  height: 100px;
-  margin-right: 24px;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f0f0f0;
-  flex-shrink: 0;
-}
-
 .item-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
 }
-
 .item-info {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
-
 .product-name {
+  font-size: 1.2rem;
   font-weight: bold;
-  font-size: 18px;
-  margin-bottom: 6px;
-  color: #4a1d5d;
+  color: var(--primary);
 }
-
 .product-detail {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 12px;
+  margin: 8px 0;
 }
-
 .item-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
-
 .item-actions button {
-  padding: 6px 14px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  background: white;
-  color: #333;
+  padding: 6px 12px;
+  border: none;
   border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s;
 }
-.item-actions button:hover {
-  background: #f1e6f5;
+.item-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-.item-actions .delete-btn {
-  border-color: #e53935;
-  color: #e53935;
-}
-.item-actions .delete-btn:hover {
-  background: #e53935;
-  color: #fff;
-}
-.watch-button {
-  border-color: #7e3b92;
-  color: #7e3b92;
-}
-.watch-button:hover {
-  background: #7e3b92;
+.delete-btn {
+  background-color: #e57373;
   color: white;
 }
-
-.quantity {
-  min-width: 30px;
-  text-align: center;
+.watch-button {
+  background-color: #d8c7b0;
+  color: var(--text-dark);
+  font-weight: bold;
+  padding: 6px 12px;
+  border: 1px solid #a88b6a;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.watch-button:hover {
+  background-color: #f0e6d5;
 }
 
 .checkout-summary {
@@ -402,126 +372,91 @@ const getImageUrl = (productName) => {
   flex-direction: column;
   gap: 20px;
 }
-
-.summary-card,
-.coupon-card {
-  padding: 20px;
-  background: #fefaff;
+.summary-card {
+  background: #fffaf4;
   border-radius: 12px;
-  border: 1px solid #e2d4ee;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
-
-.summary-card h2,
-.coupon-card h3 {
-  margin-bottom: 20px;
-  font-size: 22px;
-  font-weight: bold;
-  color: #7e3b92;
+.cart-animation-wrapper {
+  width: 100%;
+  height: 150px;
+  margin-bottom: 10px;
 }
-
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  font-size: 17px;
-  color: #555;
+.summary-card h2 {
+  color: var(--primary);
+  margin-bottom: 15px;
 }
-
+.summary-item,
 .summary-total {
   display: flex;
   justify-content: space-between;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 20px 0;
-  color: #333;
+  margin: 8px 0;
 }
-
+.summary-total {
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-top: 1px solid #ccc;
+  padding-top: 8px;
+}
 .discount {
-  color: #e53935;
+  color: #e57373;
 }
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.dialog {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
 .checkout-btn {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(to right, #a951d2, #7e3b92);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.checkout-btn:hover {
-  opacity: 0.95;
-  transform: scale(1.02);
-}
-
-.clear-btn {
-  margin-top: 12px;
-  width: 100%;
-  padding: 12px;
-  background: #fff;
-  border: 2px solid #7e3b92;
-  border-radius: 10px;
-  color: #7e3b92;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.clear-btn:hover {
-  background: #f5ecfa;
-}
-
-.coupon-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: #7e3b92;
+  background-color: var(--primary);
   color: white;
   border: none;
+  padding: 18px 40px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border-radius: 16px;
   cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  margin-top: 24px;
+}
+.checkout-btn:hover {
+  background-color: #40291d;
+  transform: translateY(-2px);
+}
+.clear-btn {
+  background-color: #c0a674;
+  color: var(--text-dark);
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.clear-btn:hover {
+  background-color: #b0935c;
+}
+
+.coupon-card {
+  margin-top: 30px;
+  padding: 20px;
+  background: #fffaf4;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.coupon-card h3 {
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.coupon-btn {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 15px;
 }
 .coupon-btn:hover {
-  background: #a85fd1;
+  background-color: #40291d;
 }
-
-.empty-cart {
-  text-align: center;
-  font-size: 20px;
-  color: #888;
-  padding: 80px 0;
-}
-
-.lottie-animation-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.lottie-animation-wrapper .lottie-player {
-  width: 100px;
-  height: 100px;
-}
-
 </style>
