@@ -48,7 +48,7 @@
               :class="{ error: errors.customPhone }"
               @input="clearError('customPhone')"
           />
-          <p v-if="errors.customPhone" class="error-msg">電話為必填</p>
+          <p v-if="errors.customPhone" class="error-msg">請輸入正確的手機或市話格式</p>
         </div>
 
         <div>
@@ -79,8 +79,8 @@
       </div>
 
       <div class="dialog-actions">
-        <button class="cancel-btn" @click="onCancel">取消</button>
         <button class="confirm-btn" @click="submit">確定</button>
+        <button class="cancel-btn" @click="onCancel">取消</button>
       </div>
     </div>
   </div>
@@ -116,6 +116,13 @@ const districtOptions = computed(() => addressData[selectedCity.value] || []);
 const maskPhone = (phone) =>
     phone ? phone.replace(/(\d{2})(\d{4})(\d{4})/, '$1••••$3') : '';
 
+const isValidPhone = (phone) => {
+  const clean = phone.replace(/-/g, '');
+  const isMobile = /^09\d{8}$/.test(clean);             // 手機：09開頭共10碼
+  const isLandline = /^0\d{1,2}\d{7,8}$/.test(clean);   // 市話：0開頭，區碼+號碼共至少9碼
+  return isMobile || isLandline;
+};
+
 const clearError = (field) => {
   if (errors.value[field]) {
     errors.value[field] = false;
@@ -125,7 +132,9 @@ const clearError = (field) => {
 const validateFields = () => {
   const e = {};
   if (!customName.value) e.customName = true;
-  if (!customPhone.value) e.customPhone = true;
+  if (!customPhone.value || !isValidPhone(customPhone.value)) {
+    e.customPhone = true;
+  }
   if (!selectedCity.value) e.selectedCity = true;
   if (!selectedDistrict.value) e.selectedDistrict = true;
   if (!customDetail.value) e.customDetail = true;
@@ -185,38 +194,27 @@ const onCancel = () => emit('close');
   justify-content: center;
   z-index: 1000;
 }
-
 .dialog {
-  background: white;
+  background: #fffaf4;
   padding: 20px;
   width: 90%;
   max-width: 400px;
-  border: 1px solid #aaa;
+  border: 1px solid #e2cfc0;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, opacity 0.3s ease;
   opacity: 1;
 }
-
 .fade-in-down {
   animation: fadeInDown 0.35s ease-out;
 }
-
 @keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 .shake {
   animation: shake 0.4s ease;
 }
-
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-6px); }
@@ -224,34 +222,29 @@ const onCancel = () => emit('close');
   75% { transform: translateX(-6px); }
   100% { transform: translateX(0); }
 }
-
 .radio-group {
   display: flex;
   gap: 10px;
   margin-bottom: 16px;
 }
-
 .radio-btn {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #bfa88b;
   background: white;
   font-weight: 600;
   cursor: pointer;
   border-radius: 6px;
   transition: background-color 0.3s;
 }
-
 .radio-btn:hover {
-  background: #f2e8f6;
+  background: #f2e8dc;
 }
-
 .radio-btn.active {
-  background: #7e3b92;
+  background: var(--primary);
   color: white;
-  border-color: #7e3b92;
+  border-color: var(--primary);
 }
-
 input,
 select {
   width: 100%;
@@ -263,33 +256,28 @@ select {
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-
 input:focus,
 select:focus {
   outline: none;
-  border-color: #7e3b92;
-  box-shadow: 0 0 0 2px rgba(126, 59, 146, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(107, 66, 38, 0.2);
 }
-
 input.error,
 select.error {
   border-color: red;
 }
-
 .error-msg {
   color: red;
   font-size: 12px;
   margin-top: -6px;
   margin-bottom: 8px;
 }
-
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 16px;
 }
-
 button {
   padding: 6px 12px;
   font-size: 14px;
@@ -298,30 +286,25 @@ button {
   border: 1px solid #bbb;
   transition: all 0.3s ease;
 }
-
 .cancel-btn {
   background: white;
-  color: #7e3b92;
-  border: 1.5px solid #7e3b92;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
 }
-
 .cancel-btn:hover {
-  background: #f6ecfa;
+  background: #f4ece3;
 }
-
 .confirm-btn {
-  background: linear-gradient(to right, #a944e1, #7e3b92);
+  background: var(--primary);
   color: white;
   border: none;
-  box-shadow: 0 2px 8px rgba(126, 59, 146, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-weight: bold;
 }
-
 .confirm-btn:hover {
   transform: scale(1.03);
-  box-shadow: 0 4px 14px rgba(126, 59, 146, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
-
 .member-info {
   background: #f9f9f9;
   padding: 10px;
