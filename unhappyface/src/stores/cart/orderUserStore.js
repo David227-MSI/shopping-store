@@ -24,5 +24,5 @@ export const useUserStore = defineStore('user', () => {
         clearUser,
     };
 }, {
-    paths: ['user'],
+    persist: true,
 });
