@@ -3,20 +3,14 @@
     <h2>這是首頁</h2>
     <!-- back -->
     <!-- <AdminCreateCouponTemplate /> -->
-    <!-- <AdminCreateEvent /> -->
+    <!-- <AdminCouponTemplateList /> -->
     <!-- <AdminEventList /> -->
-    <!-- <NotificationTemplateList /> -->
-    <!-- <CouponTemplateList /> -->
-    <!-- <UploadImg /> -->
+    <AdminNotificationTemplateList />
+    <!-- <AdminAddPrizeToEvent /> -->
+    <!-- <AdminCreateEvent /> -->
 
     <!-- front -->
     <UserEventList2 />
-
-    <!-- fake -->
-    <!-- <UserLogin /> -->
-    <!-- <UserModify /> -->
-    <!-- <UserRegister /> -->
-
 
   </main>
 </template>
@@ -25,16 +19,17 @@
   
   import UserEventList2 from '@/views/pages/ttpp/front/UserEventList2.vue';
 
+
+  // back create
   import AdminCreateCouponTemplate from '@/views/pages/ttpp/back/AdminCreateCouponTemplate.vue';
-  import CouponTemplateList from '@/views/pages/ttpp/back/CouponTemplateList.vue';
-  import NotificationTemplateList from '@/views/pages/ttpp/back/NotificationTemplateList.vue';
   import AdminCreateEvent from '@/views/pages/ttpp/back/AdminCreateEvent.vue';
+  import AdminAddPrizeToEvent from '@/views/pages/ttpp/back/AdminAddPrizeToEvent.vue';
+  
+  // back list
+  import AdminCouponTemplateList from '@/views/pages/ttpp/back/AdminCouponTemplateList.vue';
   import AdminEventList from '@/views/pages/ttpp/back/AdminEventList.vue';
-
-  import UserLogin from '@/views/pages/ttpp/_fake/UserLogin.vue'
-  import UserModify from '@/views/pages/ttpp/_fake/UserModify.vue'
-  import UserRegister from '@/views/pages/ttpp/_fake/UserRegister.vue'
-
+  
+  import AdminNotificationTemplateList from '@/views/pages/ttpp/back/AdminNotificationTemplateList.vue';
 
 
 </script>

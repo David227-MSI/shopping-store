@@ -11,13 +11,16 @@ import UserCouponList from '@/views/pages/ttpp/front/UserCouponList.vue'
 import UserSubscribeList from '@/views/pages/ttpp/front/UserSubscribeList.vue';
 
 import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.vue'
-import AddPrizeToEvent from '@/views/pages/ttpp/back/AddPrizeToEvent.vue'
 
 import UserLogin from '@/views/pages/ttpp/_fake/UserLogin.vue'
 import UserMemberCenter from '@/views/pages/ttpp/_fake/UserMemberCenter.vue'
 import UserModify from '@/views/pages/ttpp/_fake/UserModify.vue'
 import UserRegister from '@/views/pages/ttpp/_fake/UserRegister.vue'
 
+
+
+// back
+import AdminAddPrizeToEvent from '@/views/pages/ttpp/back/AdminAddPrizeToEvent.vue'
 
 // 設定頁面參數 
 // path:網址, name:頁面名稱, component:元件名
@@ -72,8 +75,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
 
-
-  { path: '/events/:eventId/add-prizes', name: 'AddPrizeToEvent', component: AddPrizeToEvent},
+  // back
+  { 
+    path: '/events/:eventId/add-prizes', 
+    name: 'AdminAddPrizeToEvent', 
+    component: AdminAddPrizeToEvent
+  },
 
 
 

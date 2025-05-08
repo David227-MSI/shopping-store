@@ -1,8 +1,10 @@
 <template>
   <div class="container">
+    <h2>優惠券模板管理</h2>
+
     <div class="filter-form">
       <div class="form-group">
-        <label>適用類型</label>
+        <label>適用範圍</label>
         <select v-model="query.applicableType">
           <option value="">全部</option>
           <option value="ALL">全品項適用</option>
@@ -37,7 +39,7 @@
         <label>折扣類型</label>
         <select v-model="query.discountType">
           <option value="">全部</option>
-          <option value="VALUE">金額折扣</option>
+          <option value="VALUE">面額折扣</option>
           <option value="PERCENTAGE">百分比折扣</option>
         </select>
       </div>
@@ -51,14 +53,47 @@
 
     <p v-if="loading" class="loading">載入中...</p>
 
-    <div v-if="!loading && templates.length > 0" class="template-list">
-      <TemplateCard
-        v-for="template in templates"
-        :key="template.id"
-        :template="template"
-        @edit="handleEdit"
-        @delete="handleDelete"
-      />
+    <div class="template-table-container" v-if="!loading && templates.length > 0">
+      <table class="template-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>適用範圍</th>
+            <th>適用 ID</th>
+            <th>折扣類型</th>
+            <th>折扣值</th>
+            <th>最大折扣</th>
+            <th>可交易</th>
+            <th>開始時間</th>
+            <th>到期時間</th>
+            <th>建立時間</th>
+            <th>更新時間</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="template in templates" :key="template.id">
+            <td>{{ template.id }}</td>
+            <td>{{ formatApplicableType(template.applicableType) }}</td>
+            <td>{{ template.applicableId || '-' }}</td>
+            <td>{{ formatDiscountType(template.discountType) }}</td>
+            <td>
+              <span v-if="template.discountType === 'VALUE'">{{ template.discountValue }}</span>
+              <span v-else-if="template.discountType === 'PERCENTAGE'">{{ template.discountValue }}%</span>
+            </td>
+            <td>{{ template.maxDiscount ? `${template.maxDiscount}` : '-' }}</td>
+            <td>{{ template.tradeable ? '是' : '否' }}</td>
+            <td>{{ formatDateTime(template.startTime) }}</td>
+            <td>{{ formatDateTime(template.endTime) }}</td>
+            <td>{{ formatDateTime(template.createdAt) }}</td>
+            <td>{{ formatDateTime(template.updatedAt) }}</td>
+            <td>
+              <button @click="handleEdit(template.id)">編輯</button>
+              <button @click="handleDelete(template.id)">刪除</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <p v-if="!loading && templates.length === 0" class="no-data">無符合條件的優惠券模板</p>
@@ -69,7 +104,6 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import TemplateCard from '@/components/ttpp/back/AdminCouponTemplateCard.vue'; // 引入 TemplateCard 元件
 
 // 查詢條件 (保持不變)
 const query = ref({
@@ -175,6 +209,38 @@ const resetQuery = () => {
   errors.value = {};
 };
 
+// 格式化適用類型
+const formatApplicableType = (type) => {
+  const types = {
+    ALL: '全品項',
+    PRODUCT: '特定商品',
+    BRAND: '特定品牌',
+    CATEGORY: '特定種類'
+  };
+  return types[type] || type;
+};
+
+// 格式化折扣類型
+const formatDiscountType = (type) => {
+  const types = {
+    VALUE: '面額折扣',
+    PERCENTAGE: '百分比折扣'
+  };
+  return types[type] || type;
+};
+
+// 格式化日期時間
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return '-';
+  return new Date(dateTime).toLocaleString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 // 處理編輯功能
 const handleEdit = (id) => {
   console.log(`編輯模板 ID: ${id}`);
@@ -221,13 +287,13 @@ const handleDelete = async (id) => {
   }
 };
 
-// 初始化查詢 (保持不變)
+// 初始化查詢
 fetchTemplates();
 </script>
 
 <style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 1400px; /* 調整容器寬度以適應更多表格欄位 */
   margin: 0 auto;
   padding: 20px;
 }
@@ -295,15 +361,51 @@ fetchTemplates();
   font-style: italic;
 }
 
-.template-list {
-  display: grid;
-  grid-template-columns: 1fr; /* 根據需要調整欄數 */
-  gap: 16px;
+.template-table-container {
+  overflow-x: auto;
 }
 
-@media (min-width: 768px) {
-  .template-list {
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* 在較大螢幕上顯示多欄 */
-  }
+.template-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.template-table th,
+.template-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+  white-space: nowrap; /* 防止文字在單元格內換行 */
+}
+
+.template-table th {
+  background-color: #f8f8f8;
+  font-weight: bold;
+}
+
+.template-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.template-table tbody tr:hover {
+  background-color: #e0e0e0;
+}
+
+.template-table td button {
+  padding: 6px 10px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.template-table td button:hover {
+  background-color: #f0f0f0;
+}
+
+.template-table td button:last-child {
+  margin-right: 0;
 }
 </style>

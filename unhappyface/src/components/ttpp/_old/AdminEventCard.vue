@@ -40,7 +40,7 @@ const toggleExpand = () => {
 }
 
 const goToAddPrize = () => {
-  router.push({ name: 'AddPrizeToEvent', params: { eventId: props.event.id } })
+  router.push({ name: 'AdminAddPrizeToEvent', params: { eventId: props.event.id } })
 }
 
 const formatDate = (dateStr) => {
