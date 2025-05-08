@@ -43,7 +43,7 @@ const handleLogin = async () => {
     // 儲存 token，設定 userId
     localStorage.setItem('token', token);
 
-    // 重新指派 cartStore.userId 為 ref（保證正確型別）
+    // 重新指派 cartStore.userId 為 ref（保證正確型別） ※特別重要
     cartStore.userId = ref(userId);
 
     // 存入使用者資料
