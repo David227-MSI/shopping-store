@@ -27,6 +27,7 @@
       </div>
 
       <div class="order-footer">
+        <button class="reorder-btn" @click="reorder(order.orderId)">再次購買</button>
         <button @click="openOrderDetail(order.orderId)">查看明細</button>
       </div>
     </div>
@@ -49,6 +50,8 @@
 <script setup>
 import {ref, watch} from 'vue';
 import {useUserStore} from '@/stores/cart/orderUserStore.js';
+import {useCartStore} from '@/stores/cart/cartStore.js';
+import Swal from 'sweetalert2';
 import axios from '@/services/order/orderAxios.js';
 import OrderDetailModal from '@/components/order/OrderDetailModal.vue';
 
@@ -56,6 +59,7 @@ const orders = ref([]);
 const showModal = ref(false);
 const selectedOrderId = ref(null);
 const userStore = useUserStore();
+const cartStore = useCartStore();
 const isLoading = ref(false); // ✅ 加入 loading 狀態
 
 watch(
@@ -91,20 +95,69 @@ const formatDate = (datetime) => {
       .toString().padStart(2, '0')}:${date.getMinutes()
       .toString().padStart(2, '0')}`;
 };
+
+const reorder = async (orderId) => {
+  try {
+    const res = await axios.get(`/api/orders/${orderId}`);
+    const items = res.orderDetails;
+
+    if (!items || items.length === 0) {
+      return Swal.fire('無法再次購買', '此訂單沒有商品', 'warning');
+    }
+
+    for (const item of items) {
+      const product = { id: item.productId };
+
+      if (cartStore.isLoggedIn()) {
+        await axios.post('/api/cart', {
+          userId: cartStore.userId,
+          productId: item.productId,
+          quantity: item.quantity,
+        });
+      } else {
+        const guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
+        const existing = guestCart.find(p => p.productId === item.productId);
+        if (existing) {
+          existing.quantity += item.quantity;
+        } else {
+          guestCart.push({ productId: item.productId, quantity: item.quantity });
+        }
+        localStorage.setItem('guestCart', JSON.stringify(guestCart));
+      }
+    }
+
+    if (cartStore.isLoggedIn()) {
+      await cartStore.fetchCart();
+    } else {
+      cartStore.loadGuestCart();
+    }
+
+    Swal.fire('已加入購物車', '該筆訂單商品已加入購物車', 'success');
+  } catch (err) {
+    console.error('再次購買失敗', err);
+    Swal.fire('錯誤', '加入失敗，請稍後再試', 'error');
+  }
+};
+
 </script>
 
 <style scoped>
+
+.order-footer button + button {
+  margin-left: 12px;
+}
+
 .orders-page {
   max-width: 880px;
   margin: 40px auto;
   padding: 20px;
-  background: linear-gradient(to bottom right, #f9f0ff, #ffffff);
+  background: #fffaf4;
 }
 
 .page-title {
   font-size: 2rem;
   font-weight: bold;
-  color: #7e3b92;
+  color: var(--primary);
   text-align: center;
   margin-bottom: 30px;
   position: relative;
@@ -118,18 +171,18 @@ const formatDate = (datetime) => {
 }
 
 .order-card {
-  background: #fefaff;
-  border: 1px solid #e5d5f5;
+  background: #ffffff;
+  border: 1px solid #e2cfc0;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(126, 59, 146, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .order-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(126, 59, 146, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .order-header {
@@ -137,14 +190,19 @@ const formatDate = (datetime) => {
   justify-content: space-between;
   margin-bottom: 14px;
   font-weight: bold;
-  color: #6a1b9a;
+  color: var(--primary);
   font-size: 1.05rem;
 }
 
 .order-body p {
   margin: 5px 0;
-  color: #4a1d5d;
+  color: #3e2f28;
   font-size: 0.95rem;
+}
+
+.order-body .discount {
+  color: #e53935;
+  font-weight: bold;
 }
 
 .order-footer {
@@ -153,7 +211,7 @@ const formatDate = (datetime) => {
 }
 
 .order-footer button {
-  background: linear-gradient(135deg, #a855f7, #7e3b92);
+  background: var(--primary);
   border: none;
   color: white;
   padding: 10px 18px;
@@ -185,7 +243,7 @@ const formatDate = (datetime) => {
   width: 60px;
   height: 60px;
   border: 6px solid #ccc;
-  border-top-color: #7e3b92;
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
