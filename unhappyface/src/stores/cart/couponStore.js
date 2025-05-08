@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import axios from '@/services/order/orderAxios.js';
 import { useCartStore } from '@/stores/cart/cartStore.js';
-import { useUserStore } from '@/stores/cart/userStore.js';
+import { useUserStore } from '@/stores/cart/orderUserStore.js';
 
 export const useCouponStore = defineStore('coupon', () => {
     const couponList = ref([]);

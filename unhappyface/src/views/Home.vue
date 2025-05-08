@@ -10,7 +10,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/cart/userStore.js';
+import { useUserStore } from '@/stores/cart/orderUserStore.js';
 import { useCartStore } from '@/stores/cart/cartStore.js';
 import Swal from 'sweetalert2';
 

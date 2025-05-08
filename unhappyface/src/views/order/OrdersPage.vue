@@ -48,7 +48,7 @@
 
 <script setup>
 import {ref, watch} from 'vue';
-import {useUserStore} from '@/stores/cart/userStore.js';
+import {useUserStore} from '@/stores/cart/orderUserStore.js';
 import axios from '@/services/order/orderAxios.js';
 import OrderDetailModal from '@/components/order/OrderDetailModal.vue';
 
