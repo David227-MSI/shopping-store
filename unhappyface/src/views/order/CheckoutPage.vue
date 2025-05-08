@@ -16,7 +16,7 @@
         <div class="info-card">
           <h2>收件人資訊</h2>
           <p><strong>姓名：</strong>{{ recipientInfo.name }}</p>
-          <p><strong>電話：</strong>{{ recipientInfo.phone }}</p>
+          <p><strong>電話：</strong>{{ maskPhone(recipientInfo.phone) }}</p>
           <p><strong>地址：</strong>{{ recipientInfo.address }}</p>
           <button class="edit-btn" @click="showAddressDialog = true">修改收件資訊</button>
         </div>
@@ -26,7 +26,8 @@
           <h2>購物車明細</h2>
           <ul class="item-list">
             <li v-for="item in cartItems" :key="item.productId">
-              {{ item.productName }} × {{ item.quantity }}　｜小計 {{ item.subtotal }} 元
+              <div><strong>{{ item.productName }}</strong> × {{ item.quantity }}</div>
+              <small>品牌：{{ item.brandName }}，分類：{{ item.categoryName }}｜小計 {{ item.subtotal }} 元</small>
             </li>
           </ul>
         </div>
@@ -122,6 +123,11 @@ const handleAddressConfirm = (newInfo) => {
   showAddressDialog.value = false;
 };
 
+const maskPhone = (phone) => {
+  if (!phone) return '';
+  return phone.replace(/(\d{2})(\d{2,4})(\d{4})/, '$1••••$3');
+};
+
 const submitOrder = async () => {
   const confirm = await Swal.fire({
     title: '確認送出訂單？',
@@ -172,12 +178,13 @@ const submitOrder = async () => {
   max-width: 1200px;
   margin: 50px auto;
   padding: 30px;
+  color: var(--text-dark);
 }
 .page-title {
   text-align: center;
   font-size: 2.4rem;
   font-weight: bold;
-  color: #7e3b92;
+  color: var(--primary);
   margin-bottom: 30px;
 }
 .step-bar {
@@ -189,8 +196,8 @@ const submitOrder = async () => {
 }
 .step { color: #bbb; font-weight: bold; }
 .step.active {
-  color: #7e3b92;
-  border-bottom: 2px solid #7e3b92;
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
   padding-bottom: 4px;
 }
 .checkout-main {
@@ -205,16 +212,20 @@ const submitOrder = async () => {
   gap: 20px;
 }
 .info-card {
-  background: #fef6ff;
+  background: #fffaf4;
   border-radius: 12px;
   padding: 24px;
-  border: 1px solid #e0cce9;
-  box-shadow: 0 4px 12px rgba(126, 59, 146, 0.1);
+  border: 1px solid #e2cfc0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 .info-card h2 {
   font-size: 20px;
   margin-bottom: 12px;
-  color: #7e3b92;
+  color: var(--primary);
+}
+.info-card p {
+  font-size: 16px;
+  margin: 4px 0;
 }
 .item-list {
   list-style: none;
@@ -224,7 +235,7 @@ const submitOrder = async () => {
 .edit-btn {
   margin-top: 12px;
   padding: 8px 16px;
-  background: #7e3b92;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -232,7 +243,7 @@ const submitOrder = async () => {
   transition: 0.3s;
 }
 .edit-btn:hover {
-  background: #9b59b6;
+  background: #40291d;
 }
 .summary-item {
   display: flex;
@@ -246,31 +257,40 @@ const submitOrder = async () => {
   justify-content: space-between;
   font-weight: bold;
   margin-top: 16px;
-  font-size: 18px;
+  font-size: 1.25rem;
+  border-top: 1px solid #ccc;
+  padding-top: 12px;
   color: #333;
 }
-.final { font-size: 20px; color: #3c0f61; }
-.discount { color: #e53935; }
+.final {
+  font-size: 1.6rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+.discount {
+  color: #e57373;
+}
 .submit-btn {
   width: 100%;
-  margin-top: 20px;
-  padding: 14px;
-  font-size: 18px;
+  margin-top: 24px;
+  padding: 16px;
+  font-size: 1.25rem;
   border: none;
-  border-radius: 10px;
-  background: linear-gradient(to right, #a951d2, #7e3b92);
+  border-radius: 16px;
+  background-color: var(--primary);
   color: white;
   font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
 }
 .submit-btn:hover {
-  transform: scale(1.02);
+  background-color: #40291d;
+  transform: translateY(-2px);
   opacity: 0.95;
 }
 .note {
   font-size: 14px;
-  color: #888;
-  margin-top: 6px;
+  color: #666;
+  margin-top: 8px;
 }
 </style>
