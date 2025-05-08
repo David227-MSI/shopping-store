@@ -71,7 +71,7 @@
         </div>
   
         <div class="options" v-if="step === 1">
-          <router-link to="/login" class="login-link">已經有帳號了嗎？抱歉我們沒有會員功能喔</router-link>
+          <router-link to="/secure/login" class="login-link">已經有帳號了嗎？前往登入頁面</router-link>
         </div>
       </form>
     </div>

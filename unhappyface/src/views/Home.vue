@@ -10,10 +10,7 @@
     <!-- <UploadImg /> -->
 
     <!-- front -->
-    <UserEventList />
-    <UserSubscribeList />
-    <UserCouponList />
-    <UserNotificationList />
+    <UserEventList2 />
 
     <!-- fake -->
     <!-- <UserLogin /> -->
@@ -25,10 +22,8 @@
 </template>
 
 <script setup>
-  import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.vue'
   
-  import UserSubscribeList from '@/views/pages/ttpp/front/UserSubscribeList.vue';
-  import UserEventList from '@/views/pages/ttpp/front/UserEventList.vue';
+  import UserEventList2 from '@/views/pages/ttpp/front/UserEventList2.vue';
 
   import AdminCreateCouponTemplate from '@/views/pages/ttpp/back/AdminCreateCouponTemplate.vue';
   import CouponTemplateList from '@/views/pages/ttpp/back/CouponTemplateList.vue';

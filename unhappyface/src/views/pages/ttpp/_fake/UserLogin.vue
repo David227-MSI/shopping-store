@@ -23,7 +23,7 @@
         <span v-else>登入</span>
       </button>
       <div class="options">
-        <router-link to="/register" class="register-link">還沒有帳號嗎？立即註冊</router-link>
+        <router-link to="/secure/register" class="register-link">還沒有帳號嗎？立即註冊</router-link>
         <router-link to="/forgot-password" class="forgot-password-link">忘記密碼？</router-link>
       </div>
     </form>

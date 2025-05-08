@@ -80,14 +80,20 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import NotificationCard from '@/components/ttpp/NotificationCard.vue';
 import NotificationModal from '@/components/ttpp/NotificationModal.vue';
 
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
+
+const userStore = useUserStore();
+const router = useRouter();
+
 const filters = ref({
-  userId: 1003,
+  userId: computed(() => userStore.userId), // 從 userStore 取得 userId
   title: '',
   noticeType: null,
   isRead: null,
@@ -98,7 +104,7 @@ const selectedNotification = ref(null);
 const showModal = ref(false);
 const errors = ref({});
 
-// Debounce function
+// Debounce function (您可以將其移至一個 utilities 文件中以便重複使用)
 const debounce = (fn, delay) => {
   let timeout;
   return (...args) => {
@@ -120,7 +126,7 @@ const validateField = debounce((field) => {
   errors.value[field] = clientValidate(field);
 }, 300);
 
-const search = debounce(async () => {
+const search = async () => {
   errors.value = {};
 
   // Validate title
@@ -132,10 +138,11 @@ const search = debounce(async () => {
 
   try {
     const payload = Object.fromEntries(
-      Object.entries(filters.value).filter(([_, value]) => value !== '' && value !== null)
+      Object.entries(filters.value).filter(([key, value]) => key === 'userId' || (value !== '' && value !== null))
     );
     const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/notifications/query`, payload);
     notifications.value = res.data.data.notificationList || [];
+    console.log('notifications data:', res.data.data.notificationList);
   } catch (err) {
     await Swal.fire({
       icon: 'error',
@@ -145,7 +152,7 @@ const search = debounce(async () => {
     });
     notifications.value = [];
   }
-}, 500);
+};
 
 // Open modal
 const openDetail = async (notification) => {
@@ -226,22 +233,15 @@ const deleteAll = async () => {
   if (!result.isConfirmed) return;
 
   try {
-    // 確保 userId 存在且有效
     const userId = filters.value.userId;
     if (!userId) {
       throw new Error('用戶 ID 無效');
     }
-
-    // 修正 API 端點，使用路徑參數傳遞 userId
     await axios.delete(`${import.meta.env.VITE_API_URL}/api/user/notifications/deleteAll/${userId}`);
-
-    // 清空前端通知列表
     notifications.value = [];
     if (showModal.value) {
       showModal.value = false;
     }
-
-    // 顯示成功提示
     await Swal.fire({
       icon: 'success',
       title: '刪除成功',
@@ -249,7 +249,6 @@ const deleteAll = async () => {
       confirmButtonText: '確定',
     });
   } catch (err) {
-    // 處理錯誤
     await Swal.fire({
       icon: 'error',
       title: '刪除失敗',
@@ -260,7 +259,6 @@ const deleteAll = async () => {
 };
 
 const markAllAsRead = async () => {
-  // 檢查是否有未讀通知
   if (notifications.value.every((n) => n.isRead)) {
     await Swal.fire({
       icon: 'info',
@@ -289,9 +287,8 @@ const markAllAsRead = async () => {
     }
 
     const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/user/notifications/markAllAsRead/${userId}`);
-    
+
     if (response.data.success) {
-      
       notifications.value = notifications.value.map((n) => ({ ...n, isRead: true }));
       await Swal.fire({
         icon: 'success',
@@ -315,20 +312,53 @@ const markAllAsRead = async () => {
 // Reset filters
 const resetFilters = () => {
   filters.value = {
-    userId: 1003,
+    userId: userStore.userId,
     title: '',
     noticeType: null,
     isRead: null,
   };
   errors.value = {};
+  search(); // 重置篩選後重新查詢
 };
 
-// Watch filters
-watch(filters, search, { deep: true });
+onMounted(() => {
+  if (!userStore.token) {
+    Swal.fire({
+      icon: 'warning',
+      title: '請先登入',
+      text: '需要登入才能查看您的通知。',
+      confirmButtonText: '前往登入',
+    }).then(() => {
+      router.push('/secure/login'); // 導向您的登入頁面
+    });
+  } else if (!userStore.userId) {
+    console.warn('已登入但 userStore 中沒有 userId');
+    // 你可以選擇在這裡導向錯誤頁面或執行其他處理
+  } else {
+    search(); // 初次載入時執行查詢
+  }
+});
 
-// Initial search
-search();
+// Watch filters，當篩選條件改變時重新查詢
+watch(filters, debounce(search, 500), { deep: true });
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <style scoped>
 .container {

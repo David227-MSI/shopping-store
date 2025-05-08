@@ -9,6 +9,7 @@
             <li><router-link to="/secure/modify" active-class="active">修改個人資料</router-link></li>
             <li><router-link to="#" active-class="active">我的訂單</router-link></li>
             <li><router-link to="/pages/user-coupon-list" active-class="active">我的優惠券</router-link></li>
+            <li><router-link to="/pages/user-notification-list" active-class="active">我的通知訊息</router-link></li>
             <li><router-link to="/pages/user-subscribe-list" active-class="active">我的追蹤清單</router-link></li>
             <li><router-link to="#" active-class="active">收貨地址管理</router-link></li>
             <li><button @click="logout" class="logout-button">登出</button></li>
