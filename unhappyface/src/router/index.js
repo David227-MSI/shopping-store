@@ -4,11 +4,16 @@ import ProductList from '@/views/pages/brown/ProductList.vue'
 import ProductDetail from '@/views/pages/brown/ProductDetail.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
-
+import Home from '@/views/pages/brown/Home.vue'
 const routes = [
   {
     path: '/',
     name: 'Home',
+    component: Home
+  },
+  {
+    path: '/products',
+    name: 'ProductList',
     component: ProductList
   },
   {

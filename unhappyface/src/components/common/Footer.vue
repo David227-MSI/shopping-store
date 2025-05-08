@@ -5,7 +5,7 @@
         <a href="#"><img src="/images/instagram.png" alt="Instagram" /></a>
         <a href="#"><img src="/images/line.png" alt="LINE" /></a>
       </div>
-      <div class="footer-copy">© 2025 麥豹購物網站. All rights reserved.</div>
+      <div class="footer-copy">© 2025 MyGoal購物網站. All rights reserved.</div>
     </footer>
   </template>
   

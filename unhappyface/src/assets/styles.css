@@ -45,13 +45,13 @@ body {
 }
 
 .container {
-  width: 85%;
+  width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0px;
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  margin-top: 70px;
+  margin-top: 50px;
 }
 h1 {
   text-align: center;
@@ -120,6 +120,44 @@ select, input[type="text"] {
 .reset-button {
   background-color: #c0a674;
   color: var(--text-dark);
+}
+.search-bar.keyword-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background-color: #fffaf3;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  justify-content: center;
+}
+
+.search-bar.keyword-with-logo .search-logo {
+  height: 250px;
+  width:500px;
+  object-fit: contain;
+}
+
+.search-bar.keyword-with-logo input {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #d2b48c;
+  font-size: 1rem;
+}
+
+.search-bar.keyword-with-logo .search-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background-color: var(--primary);
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+.search-bar.keyword-with-logo .search-button:hover {
+  background-color: #40291d;
 }
 
 /* 🧭 主要區塊排版 */
@@ -629,4 +667,35 @@ select, input[type="text"] {
 
 .animate-bounce {
   animation: bounce 0.5s;
+}
+
+.top-banner-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1600px;
+  margin: 10px auto;
+  align-items: stretch;
+}
+.promo-image {
+  width: 400px;
+  flex-shrink: 0;
+}
+.promo-image img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+.hot-keywords {
+  font-size: 14px;
+  color: #555;
+  text-align: left;      /* ✅ 改為跟輸入框對齊 */
+}
+.hot-keywords a {
+  color: #a6794a;
+  text-decoration: none;
+  margin: 0 4px;
+}
+.hot-keywords a:hover {
+  text-decoration: underline;
 }
