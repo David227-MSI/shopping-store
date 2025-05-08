@@ -19,13 +19,14 @@
         <ul>
           <li v-for="item in cartItems" :key="item.id" class="cart-item">
             <div class="item-image">
-              <img :src="getImageUrl(item.productName)" alt="商品圖片" />
+              <img :src="getImageByProductName(item.productName)" alt="商品圖片" />
             </div>
             <div class="item-info">
               <div class="product-name">{{ item.productName }}</div>
               <div class="product-brand">品牌：{{ item.brandName }}</div>
               <div class="product-category">分類：{{ item.categoryName }}</div>
               <div class="product-detail">單價: {{ item.price }} 元</div>
+              <div class="product-detail">小計: {{ item.price * item.quantity }} 元</div>
               <div class="item-actions">
                 <button @click="updateQuantity(item.productId, item.quantity - 1)" :disabled="isLoading || item.quantity <= 1">-</button>
                 <span class="quantity">{{ item.quantity }}</span>
@@ -126,6 +127,26 @@ const openCouponModal = () => {
 const applyCoupon = (couponId) => {
   couponStore.setSelectedCoupon(couponId);
   showCouponDialog.value = false;
+};
+
+const getImageByProductName = (name) => {
+  if (name === 'Bvantgardey') return '/images/perfumeA.jpg';
+  if (name === 'Whitepink') return '/images/perfumeB.jpg';
+  if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png';
+  if (name === '黑色棉T') return '/images/black_T.png';
+  if (name === '夏日晨露淡香水') return '/images/grass.png';
+  if (name === '雲彩男款輕薄外套') return '/images/jacket_men.jpg';
+  if (name === '雲彩女款休閒洋裝') return '/images/dress_women.jpg';
+  if (name === 'StarPhone X9') return '/images/phone2.png';
+  if (name === '竹風防滑拖鞋組') return '/images/slippers.jpg';
+  if (name === '極光連帽機能外套') return '/images/jacket_aurora.jpg';
+  if (name === 'Threelight Edge S5') return '/images/phone3.png';
+  if (name === '木田可堆疊收納箱') return '/images/storage_box.jpg';
+  if (name === '木田天然洗碗精') return '/images/dish_soap.jpg';
+  if (name === '映月氣質長裙') return '/images/skirt.png';
+  if (name === '聆香月光花語香水') return '/images/moon.png';
+  if (name === 'QF-Smart X Ultra') return '/images/phone4.png';
+  return '/images/placeholder.png';
 };
 
 const loadCart = async () => {
@@ -238,15 +259,15 @@ onMounted(() => {
   loadCart();
 });
 
-const getImageUrl = (productName) => {
-  if (productName.includes('香水')) {
-    return 'https://www.jomalone.com.tw/media/export/cms/products/1000x1000/jo_sku_L00C01_1000x1000_0.png';
-  }
-  if (productName.toLowerCase().includes('iphone')) {
-    return 'https://d2lfcsub12kx0l.cloudfront.net/tw/product/img/Apple_apple_iphone_plus_0907185907356_360x270.jpg';
-  }
-  return 'https://via.placeholder.com/80?text=No+Image';
-};
+// const getImageUrl = (productName) => {
+//   if (productName.includes('香水')) {
+//     return 'https://www.jomalone.com.tw/media/export/cms/products/1000x1000/jo_sku_L00C01_1000x1000_0.png';
+//   }
+//   if (productName.toLowerCase().includes('iphone')) {
+//     return 'https://d2lfcsub12kx0l.cloudfront.net/tw/product/img/Apple_apple_iphone_plus_0907185907356_360x270.jpg';
+//   }
+//   return 'https://via.placeholder.com/80?text=No+Image';
+// };
 </script>
 
 <style scoped>
@@ -321,7 +342,15 @@ const getImageUrl = (productName) => {
   width: 120px;
   height: 120px;
   object-fit: contain;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.item-image img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
 .item-info {
   flex: 1;
 }
@@ -331,7 +360,8 @@ const getImageUrl = (productName) => {
   color: var(--primary);
 }
 .product-detail {
-  margin: 8px 0;
+  margin: 4px 0;
+  font-size: 0.95rem;
 }
 .item-actions {
   display: flex;
