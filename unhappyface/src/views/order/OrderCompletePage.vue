@@ -5,16 +5,16 @@
       <LottiePlayer :animationData="paymentSuccess" :loop="true" />
     </div>
 
-    <h1 class="gradient-text">付款成功 🎉</h1>
+    <h1 class="title">付款成功 🎉</h1>
     <p class="subtitle">感謝您的訂購，我們將盡快為您出貨！</p>
 
-    <div class="order-info" v-if="order">
+    <div class="info-card" v-if="order">
       <p><strong>訂單編號：</strong> {{ order.orderId }}</p>
       <p><strong>總金額：</strong> {{ order.finalAmount }} 元</p>
       <p><strong>付款狀態：</strong> {{ order.paymentStatusText }}</p>
       <p><strong>訂單建立時間：</strong> {{ formatDate(order.createdAt) }}</p>
 
-      <table class="product-table">
+      <table class="item-table">
         <thead>
         <tr>
           <th>商品名稱</th>
@@ -31,10 +31,26 @@
           <td>{{ item.subtotal }} 元</td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr v-if="order.couponDiscountType === 'VALUE'">
+          <td colspan="3" class="text-right">折價券</td>
+          <td class="text-red">-{{ order.discountAmount }} 元</td>
+        </tr>
+        <tr v-else-if="order.couponDiscountType === 'PERCENTAGE'">
+          <td colspan="3" class="text-right">
+            折價券（{{ parseInt(order.couponDiscountValue) }}%）
+          </td>
+          <td class="text-red">-{{ order.discountAmount }} 元</td>
+        </tr>
+        <tr>
+          <td colspan="3" class="text-right"><strong>總計</strong></td>
+          <td><strong>{{ order.finalAmount }} 元</strong></td>
+        </tr>
+        </tfoot>
       </table>
     </div>
 
-    <div class="buttons">
+    <div class="action-buttons">
       <button @click="goHome" :disabled="isNavigating">🏠 回首頁</button>
       <button @click="goOrders" :disabled="isNavigating">📋 查看訂單列表</button>
     </div>
@@ -106,84 +122,89 @@ const formatDate = (datetime) => {
   max-width: 960px;
   margin: 60px auto;
   padding: 40px 30px;
-  text-align: center;
+  background: #fffaf4;
   border-radius: 16px;
-  background: linear-gradient(135deg, #fcf7ff, #f3e9ff);
-  box-shadow: 0 10px 40px rgba(126, 59, 146, 0.1);
-  animation: fadeIn 0.7s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  box-shadow: 0 10px 40px rgba(126, 59, 146, 0.05);
 }
 
 .animation-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
-  min-height: 150px;
+  margin-bottom: 20px;
+  min-height: 140px;
 }
 
-h1.gradient-text {
-  font-size: 2.5rem;
+.title {
+  font-size: 2.2rem;
   font-weight: bold;
-  margin-bottom: 10px;
+  color: var(--primary);
 }
 
 .subtitle {
-  color: #9c4bcc;
-  font-size: 1.1rem;
-  margin-bottom: 30px;
+  color: #6b4c83;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.order-info {
+.info-card {
   background: #ffffff;
-  text-align: left;
-  padding: 24px;
+  border: 1px solid #e2cfc0;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  padding: 20px;
   margin-top: 20px;
   line-height: 1.6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
-
-.order-info p {
-  margin: 8px 0;
-}
-
-.product-table {
+.item-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   font-size: 0.95rem;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
-.product-table th {
-  background-color: #f4e3ff;
-  color: #7e3b92;
-  font-weight: bold;
-  padding: 12px;
-}
-
-.product-table td {
-  background-color: #fff;
+.item-table th {
+  background: #f4ede1; /* 米白偏淺褐 */
+  color: #5b3a29; /* 深咖色 */
   padding: 10px;
-  border-bottom: 1px solid #eee;
   text-align: center;
 }
 
-.product-table tr:nth-child(even) td {
-  background-color: #fdf7ff;
+.item-table td {
+  background-color: #fffaf4;
+  color: #3e2c23;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #f0e8da;
+  transition: background-color 0.3s ease;
 }
 
-.buttons {
+.item-table tr:nth-child(even) td {
+  background-color: #fdf7ef;
+}
+
+.item-table tbody tr:hover td {
+  background-color: #f0e6db;
+}
+
+.item-table tfoot td {
+  font-weight: bold;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-red {
+  color: #e53935 !important;
+}
+
+.action-buttons {
   margin-top: 30px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
   justify-content: center;
+  gap: 20px;
 }
 
 button {
@@ -191,17 +212,17 @@ button {
   font-size: 1rem;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(to right, #9b59b6, #7e3b92);
+  background: var(--primary);
   color: white;
-  box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
   font-weight: bold;
+  box-shadow: 0 4px 10px rgba(126, 59, 146, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 25px rgba(126, 59, 146, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(126, 59, 146, 0.4);
 }
 
 button:disabled {
