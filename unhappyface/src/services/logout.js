@@ -1,10 +1,12 @@
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
+import { useCartStore } from '@/stores/cart/cartStore';
 
 export function useAuth() {
   const router = useRouter();
   const userStore = useUserStore();
+  const cartStore = useCartStore();
 
   const logout = async () => {
     try {
@@ -23,6 +25,7 @@ export function useAuth() {
 
       // 清除 Pinia store 中的使用者資訊
       userStore.clearUser();
+      cartStore.resetCartLocalState();
 
       router.push('/secure/login');
     }
