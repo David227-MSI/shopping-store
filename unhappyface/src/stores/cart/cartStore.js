@@ -93,6 +93,12 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
+  // 登出後清空購物車
+  function resetCartLocalState() {
+    cartItems.value = [];
+    localStorage.removeItem('guestCart');
+  }
+
   // 登入後合併
   async function loginAndMerge() {
     const guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
@@ -134,6 +140,7 @@ export const useCartStore = defineStore('cart', () => {
     fetchCart,
     loginAndMerge,
     setCartItems,
+    resetCartLocalState,
   };
 }, {
   persist: true,
