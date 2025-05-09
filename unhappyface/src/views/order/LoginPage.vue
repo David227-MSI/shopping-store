@@ -2,20 +2,20 @@
   <div class="login-container">
     <h1>會員登入</h1>
     <form @submit.prevent="handleLogin">
-      <input v-model="email" type="email" placeholder="電子郵件" required />
-      <input v-model="password" type="password" placeholder="密碼" required />
+      <input v-model="email" type="email" placeholder="電子郵件" required/>
+      <input v-model="password" type="password" placeholder="密碼" required/>
       <button type="submit">登入</button>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import {ref} from 'vue';
+import {useRouter} from 'vue-router';
 import Swal from 'sweetalert2';
 import axios from '@/services/order/axiosRaw.js';
-import { useCartStore } from '@/stores/cart/cartStore';
-import { useUserStore } from '@/stores/cart/orderUserStore.js';
+import {useCartStore} from '@/stores/cart/cartStore';
+import {useUserStore} from '@/stores/cart/orderUserStore.js';
 
 const email = ref('');
 const password = ref('');
@@ -38,7 +38,7 @@ const handleLogin = async () => {
     }
 
     // 從後端回傳資料中解構出會員資訊
-    const { token, userId, username, email: userEmail, phone, address } = result.data;
+    const {token, userId, username, email: userEmail, phone, address} = result.data;
 
     // 儲存 token，設定 userId
     localStorage.setItem('token', token);
@@ -47,7 +47,7 @@ const handleLogin = async () => {
     cartStore.userId = ref(userId);
 
     // 存入使用者資料
-    userStore.setUser({ userId, username, email: userEmail, phone, address });
+    userStore.setUser({userId, username, email: userEmail, phone, address});
 
     // 判斷是否合併訪客購物車
     if (cartStore.cartItems.length > 0) {
@@ -89,6 +89,7 @@ const handleLogin = async () => {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
+
 input {
   display: block;
   width: 100%;
@@ -98,6 +99,7 @@ input {
   border: 1px solid #ccc;
   border-radius: 8px;
 }
+
 button {
   width: 100%;
   padding: 12px;
@@ -108,6 +110,7 @@ button {
   border-radius: 8px;
   cursor: pointer;
 }
+
 button:hover {
   background: #125aa0;
 }
