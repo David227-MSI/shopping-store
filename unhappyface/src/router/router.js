@@ -3,9 +3,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 // 引用元件檔案
 // import 元件名 from 檔案位置
 import Home from '@/views/Home.vue'
+import FakeHome from '@/views/order/FakeHome.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
+// 0428 order相關頁面
+import CartPage from '@/views/order/CartPage.vue'
+import CheckoutPage from '@/views/order/CheckoutPage.vue'
+import OrderCompletePage from '@/views/order/OrderCompletePage.vue'
+import OrdersPage from '@/views/order/OrdersPage.vue'
+import LoginPage from '@/views/order/LoginPage.vue'
 // ttpp
 import UserCouponList from '@/views/pages/ttpp/front/UserCouponList.vue'
 import UserSubscribeList from '@/views/pages/ttpp/front/UserSubscribeList.vue';
@@ -22,39 +29,41 @@ import UserRegister from '@/views/pages/ttpp/_fake/UserRegister.vue'
 // back
 import AdminAddPrizeToEvent from '@/views/pages/ttpp/back/AdminAddPrizeToEvent.vue'
 
-// 設定頁面參數 
+// 設定頁面參數
 // path:網址, name:頁面名稱, component:元件名
 const routes = [
   // 一般頁面
   { path: '/', name: 'home', component: Home},
-  
+
+  { path: '/fakehome', name: 'fakehome', component: FakeHome},
+  // { path: '/', name: '', component:  },
   // 錯誤顯示頁面
   { path: "/:pathMatch(.*)", component: NotFound, name: "notfound-link" },
   { path: "/403", component: Forbidden, name: "forbidden-link" },
-  
-  
+
+
   // ttpp
 
   // 會員相關
   { path: '/secure/register', name: 'UserRegister', component: UserRegister},
   { path: '/secure/login', name: 'UserLogin', component: UserLogin},
-  { 
-    path: '/secure/modify', 
-    name: 'UserModify', 
+  {
+    path: '/secure/modify',
+    name: 'UserModify',
     component: UserModify,
     meta: { requiresAuth: true },
   },
-  { 
-    path: '/secure/member-center', 
-    name: 'UserMemberCenter', 
+  {
+    path: '/secure/member-center',
+    name: 'UserMemberCenter',
     component: UserMemberCenter,
     meta: { requiresAuth: true },
   },
-  
-  
-  
-  
-  
+
+
+
+
+
   // 其他頁面
   {
     path: '/pages/user-coupon-list',
@@ -76,9 +85,9 @@ const routes = [
   },
 
   // back
-  { 
-    path: '/events/:eventId/add-prizes', 
-    name: 'AdminAddPrizeToEvent', 
+  {
+    path: '/events/:eventId/add-prizes',
+    name: 'AdminAddPrizeToEvent',
     component: AdminAddPrizeToEvent
   },
 
@@ -89,6 +98,14 @@ const routes = [
 
 
 
+
+
+    // 訂單相關頁面
+  { path: '/cart', name: 'cart', component: CartPage },
+  { path: '/checkout', name: 'checkout', component: CheckoutPage },
+  { path: '/order/complete/:orderId', name: 'order-complete', component: OrderCompletePage },
+  { path: '/member/orders', name: 'orders', component: OrdersPage },
+  { path: '/login', name: 'login', component: LoginPage },
 
 ]
 
