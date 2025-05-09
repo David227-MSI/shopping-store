@@ -27,7 +27,7 @@
       </div>
 
       <div class="order-footer">
-        <button class="reorder-btn" @click="reorder(order.orderId)">再次購買</button>
+        <button class="reorder-btn" @click="reorder(order.orderId)">再次加入購物車</button>
         <button @click="openOrderDetail(order.orderId)">查看明細</button>
       </div>
     </div>
