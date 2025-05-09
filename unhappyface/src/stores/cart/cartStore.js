@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import axios from '@/services/order/orderAxios.js';
+import { useUserStore } from '@/stores/userStore';
 
 export const useCartStore = defineStore('cart', () => {
   const cartItems = ref([]);
-  const userId = ref(null);
+  const userStore = useUserStore();
 
-  const isLoggedIn = () => !!userId.value;
+  const isLoggedIn = () => !!userStore.userId;
 
   const totalAmount = computed(() =>
       cartItems.value.reduce((sum, item) => sum + item.subtotal, 0)
@@ -15,7 +16,7 @@ export const useCartStore = defineStore('cart', () => {
   // 抓會員購物車
   async function fetchCart() {
     if (!isLoggedIn()) return;
-    const response = await axios.get(`/api/cart/${userId.value}`);
+    const response = await axios.get(`/api/cart/${userStore.userId}`);
     cartItems.value = response;
   }
 
@@ -23,7 +24,7 @@ export const useCartStore = defineStore('cart', () => {
   async function addToCart(product) {
     if (isLoggedIn()) {
       await axios.post('/api/cart', {
-        userId: userId.value,
+        userId: userStore.userId,
         productId: product.id,
         quantity: 1,
       });
@@ -58,7 +59,7 @@ export const useCartStore = defineStore('cart', () => {
   // 更新數量
   async function updateQuantity(productId, newQuantity) {
     if (isLoggedIn()) {
-      await axios.put('/api/cart', { userId: userId.value, productId, quantity: newQuantity });
+      await axios.put('/api/cart', { userId: userStore.userId, productId, quantity: newQuantity });
       await fetchCart();
     } else {
       const item = cartItems.value.find(item => item.productId === productId);
@@ -73,7 +74,7 @@ export const useCartStore = defineStore('cart', () => {
   // 刪除商品
   async function removeItem(productId) {
     if (isLoggedIn()) {
-      await axios.delete(`/api/cart/${userId.value}/${productId}`);
+      await axios.delete(`/api/cart/${userStore.userId}/${productId}`);
       await fetchCart();
     } else {
       cartItems.value = cartItems.value.filter(item => item.productId !== productId);
@@ -84,7 +85,7 @@ export const useCartStore = defineStore('cart', () => {
   // 清空
   async function clearCart() {
     if (isLoggedIn()) {
-      await axios.delete(`/api/cart/clear/${userId.value}`);
+      await axios.delete(`/api/cart/clear/${userStore.userId}`);
       await fetchCart();
     } else {
       cartItems.value = [];
@@ -93,17 +94,16 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   // 登入後合併
-  async function loginAndMerge(newUserId) {
+  async function loginAndMerge() {
     const guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
     for (const item of guestCart) {
       await axios.post('/api/cart', {
-        userId: newUserId,
+        userId: userStore.userId,
         productId: item.productId,
         quantity: item.quantity,
       });
     }
     localStorage.removeItem('guestCart');
-    userId.value = newUserId;
     await fetchCart();
   }
 
@@ -123,7 +123,6 @@ export const useCartStore = defineStore('cart', () => {
 
   return {
     cartItems,
-    userId,
     totalAmount,
     isLoggedIn,
     addToCart,
