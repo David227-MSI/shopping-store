@@ -49,7 +49,7 @@
 
 <script setup>
 import {ref, watch} from 'vue';
-import {useUserStore} from '@/stores/cart/orderUserStore.js';
+import {useUserStore} from '@/stores/userStore.js';
 import {useCartStore} from '@/stores/cart/cartStore.js';
 import Swal from 'sweetalert2';
 import axios from '@/services/order/orderAxios.js';
@@ -63,7 +63,7 @@ const cartStore = useCartStore();
 const isLoading = ref(false); // ✅ 加入 loading 狀態
 
 watch(
-    () => userStore.user?.userId,
+    () => userStore.userId,
     async (userId) => {
       if (!userId) return;
       try {
@@ -110,7 +110,7 @@ const reorder = async (orderId) => {
 
       if (cartStore.isLoggedIn()) {
         await axios.post('/api/cart', {
-          userId: cartStore.userId,
+          userId: userStore.userId,
           productId: item.productId,
           quantity: item.quantity,
         });
