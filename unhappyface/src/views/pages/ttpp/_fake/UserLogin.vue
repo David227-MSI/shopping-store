@@ -76,8 +76,10 @@ const login = async () => {
         await cartStore.loginAndMerge();
         Swal.fire('合併成功', '', 'success');
       } else {
-        cartStore.clearCart();
-        await cartStore.fetchCart();
+        cartStore.resetCartLocalState();
+        if (cartStore.isLoggedIn()) {
+          await cartStore.fetchCart();
+        }
       }
     } else {
       await cartStore.fetchCart();
