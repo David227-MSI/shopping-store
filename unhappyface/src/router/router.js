@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // 引用元件檔案
 // import 元件名 from 檔案位置
-import Home from '@/views/Home.vue'
+import FakeHome from '@/views/order/FakeHome.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
@@ -17,7 +17,7 @@ import LoginPage from '@/views/order/LoginPage.vue'
 // path:網址, name:頁面名稱, component:元件名
 const routes = [
   // 一般頁面
-  { path: '/', name: 'home', component: Home},
+  { path: '/fakehome', name: 'fakehome', component: FakeHome},
   // { path: '/', name: '', component:  },
   // 錯誤顯示頁面
   { path: "/:pathMatch(.*)", component: NotFound, name: "notfound-link" },
