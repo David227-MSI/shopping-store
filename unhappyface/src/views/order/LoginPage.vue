@@ -62,7 +62,7 @@ const handleLogin = async () => {
         await cartStore.loginAndMerge(userId);
         Swal.fire('合併成功', '', 'success');
       } else {
-        cartStore.clearCart();
+        cartStore.resetCartLocalState();
         await cartStore.fetchCart();
       }
     } else {
