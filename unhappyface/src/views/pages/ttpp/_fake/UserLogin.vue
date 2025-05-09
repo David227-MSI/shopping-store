@@ -35,6 +35,7 @@ import { ref } from 'vue';
 import { useRouter, RouterLink } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useCartStore } from '@/stores/cart/cartStore';
 import { useUserStore } from '@/stores/userStore'; // 確保路徑正確
 
 const email = ref('');
@@ -43,6 +44,7 @@ const error = ref('');
 const isSubmitting = ref(false);
 const router = useRouter();
 const userStore = useUserStore(); // 取得 userStore 的實例
+const cartStore = useCartStore();
 
 const login = async () => {
   isSubmitting.value = true;
@@ -56,15 +58,37 @@ const login = async () => {
 
     // 登入成功
     isSubmitting.value = false;
+
+    // 儲存 token，設定 userId
+    localStorage.setItem('token', response.data.data.token);
+    userStore.setUser(response.data.data)
+
+    // 判斷是否合併訪客購物車
+    if (cartStore.cartItems.length > 0) {
+      const confirmResult = await Swal.fire({
+        title: '是否合併訪客購物車？',
+        showCancelButton: true,
+        confirmButtonText: '合併',
+        cancelButtonText: '不合併'
+      });
+
+      if (confirmResult.isConfirmed) {
+        await cartStore.loginAndMerge();
+        Swal.fire('合併成功', '', 'success');
+      } else {
+        cartStore.clearCart();
+        await cartStore.fetchCart();
+      }
+    } else {
+      await cartStore.fetchCart();
+    }
+
     Swal.fire({
       icon: 'success',
       title: '登入成功！',
       text: `歡迎回來，${response.data.data.username}`,
       confirmButtonText: '前往首頁',
     }).then(() => {
-      // 將使用者資訊儲存到 Pinia store
-      userStore.setUser(response.data.data);
-
       router.push('/'); // 導向首頁
     });
 
