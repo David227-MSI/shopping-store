@@ -101,6 +101,7 @@ import { useRouter } from 'vue-router';
 import axios from '@/services/order/orderAxios.js';
 import { useCartStore } from '@/stores/cart/cartStore.js';
 import { useCouponStore } from '@/stores/cart/couponStore.js';
+import { useUserStore } from '@/stores/userStore.js';
 import Swal from 'sweetalert2';
 import LottieAnimation from '@/components/order/LottiePlayer.vue';
 import CouponDialog from '@/components/order/CouponDialog.vue';
@@ -108,9 +109,10 @@ import cartAnimation from '@/assets/animations/cartAnimation.json';
 
 const router = useRouter();
 const cartStore = useCartStore();
+const userStore = useUserStore();
 const couponStore = useCouponStore();
 
-const userId = computed(() => cartStore.userId);
+const userId = computed(() => userStore.userId);
 const cartItems = computed(() => cartStore.cartItems);
 const totalAmount = computed(() => cartStore.totalAmount);
 const selectedCoupon = computed(() => couponStore.selectedCoupon);
@@ -152,8 +154,7 @@ const getImageByProductName = (name) => {
 const loadCart = async () => {
   try {
     if (userId.value) {
-      const response = await axios.get(`/api/cart/${userId.value}`);
-      cartStore.setCartItems(response);
+      await cartStore.fetchCart();
     }
   } catch (error) {
     console.error('載入購物車失敗', error);
@@ -170,8 +171,7 @@ const updateQuantity = async (productId, newQuantity) => {
   isLoading.value = true;
   try {
     if (userId.value) {
-      await axios.put('/api/cart', { userId: userId.value, productId, quantity: newQuantity });
-      await loadCart();
+      await cartStore.updateQuantity(productId, newQuantity); // cartStore 自己會處理邏輯
     } else {
       cartStore.updateItemQuantity(productId, newQuantity);
     }
@@ -195,8 +195,7 @@ const removeItem = async (productId) => {
   isLoading.value = true;
   try {
     if (userId.value) {
-      await axios.delete(`/api/cart/${userId.value}/${productId}`);
-      await loadCart();
+      await cartStore.removeItem(productId);
     } else {
       cartStore.removeItem(productId);
     }
@@ -220,8 +219,7 @@ const clearCart = async () => {
   isLoading.value = true;
   try {
     if (userId.value) {
-      await axios.delete(`/api/cart/clear/${userId.value}`);
-      await loadCart();
+      await cartStore.clearCart();
     } else {
       cartStore.clearCart();
     }
