@@ -68,7 +68,11 @@
     <AddressDialog
         v-if="showAddressDialog"
         :show="showAddressDialog"
-        :memberInfo="userStore.user"
+        :memberInfo="{
+          username: userStore.username,
+          phone: userStore.phone,
+          address: userStore.address,
+        }"
         @close="showAddressDialog = false"
         @confirm="handleAddressConfirm"
     />
@@ -79,7 +83,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cart/cartStore.js';
-import { useUserStore } from '@/stores/cart/orderUserStore.js';
+import { useUserStore } from '@/stores/userStore.js';
 import axios from '@/services/order/orderAxios.js';
 import Swal from 'sweetalert2';
 import AddressDialog from '@/components/order/AddressDialog.vue';
@@ -102,12 +106,12 @@ const isSubmitting = ref(false);
 const showAddressDialog = ref(false);
 const recipientInfo = ref({ name: '', phone: '', address: '' });
 
-onMounted(() => {
-  loadCart();
+onMounted(async () => {
+  await cartStore.fetchCart();
   recipientInfo.value = {
-    name: userStore.user?.username || '',
-    phone: userStore.user?.phone || '',
-    address: userStore.user?.address || '',
+    name: userStore.username || '',
+    phone: userStore.phone || '',
+    address: userStore.address || '',
   };
 });
 
@@ -143,7 +147,7 @@ const submitOrder = async () => {
     isSubmitting.value = true;
     const orderItems = cartItems.value.map(item => ({ productId: item.productId, quantity: item.quantity }));
     const orderRequest = {
-      userId: userId.value,
+      userId: userStore.userId,
       couponPublishedId: selectedCouponId.value,
       recipientName: recipientInfo.value.name,
       recipientPhone: recipientInfo.value.phone,
