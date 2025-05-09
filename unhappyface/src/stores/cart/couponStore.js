@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import axios from '@/services/order/orderAxios.js';
 import { useCartStore } from '@/stores/cart/cartStore.js';
-import { useUserStore } from '@/stores/cart/orderUserStore.js';
+import { useUserStore } from '@/stores/userStore';
 
 export const useCouponStore = defineStore('coupon', () => {
     const couponList = ref([]);
@@ -40,7 +40,7 @@ export const useCouponStore = defineStore('coupon', () => {
 
     // 載入符合條件的優惠券
     async function fetchValidCoupons() {
-        if (!cartStore.isLoggedIn()) return;
+        if (!userStore.userId) return;
 
         const hasProducts = productIds.value.length > 0;
         const total = cartStore.totalAmount;
@@ -54,7 +54,7 @@ export const useCouponStore = defineStore('coupon', () => {
 
         try {
             const res = await axios.post('/api/admin/coupons/getValidCoupon', {
-                userId: cartStore.userId,
+                userId: userStore.userId,
                 totalAmount: cartStore.totalAmount,
                 productIds: productIds.value,
             });
