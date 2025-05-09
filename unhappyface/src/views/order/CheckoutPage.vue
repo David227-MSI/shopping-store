@@ -107,6 +107,12 @@ const showAddressDialog = ref(false);
 const recipientInfo = ref({ name: '', phone: '', address: '' });
 
 onMounted(async () => {
+  if (!userStore.userId) {
+    Swal.fire('請先登入', '登入後才能進行結帳', 'info').then(() => {
+      router.push('/secure/login');
+    });
+    return;
+  }
   await cartStore.fetchCart();
   recipientInfo.value = {
     name: userStore.username || '',
