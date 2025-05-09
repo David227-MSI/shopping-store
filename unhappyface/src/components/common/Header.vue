@@ -14,22 +14,26 @@
       <a href="#" @click.prevent="logout">🚪 登出</a>
     </template>
 
-    <a href="#">📦 查訂單</a>
+    <a href="/member/orders">📦 查訂單</a>
     <a href="/pages/user-subscribe-list">⭐️ 追蹤清單</a>
     <a href="/pages/user-coupon-list">🎫 折價券</a>
-    <a href="#">🛒 購物車(<span>{{ cartCount }}</span>)</a>
+    <a href="/cart">🛒 購物車(<span>{{ cartCount }}</span>)</a>
   </header>
 </template>
 
 <script setup>
 import { useAuth } from '@/services/logout';
 import { useUserStore } from '@/stores/userStore';
+import { useCartStore } from '@/stores/cart/cartStore';
 import { computed } from 'vue';
 
 const { logout } = useAuth();
 const userStore = useUserStore();
+const cartStore = useCartStore();
 
-const cartCount = computed(() => 0); // 需要根據實際情況計算
+const cartCount = computed(() => {
+  return cartStore.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+});
 </script>
 
 <style scoped>
