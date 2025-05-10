@@ -388,15 +388,6 @@ import { ref, reactive, computed, watch } from 'vue';
      username: registrationData.username,
     }
    )
-    .then(response => {
-     console.log('驗證信發送成功:', response.data);
-     Swal.fire({
-      icon: 'success',
-      title: '驗證信已發送',
-      text: response.data.message,
-      confirmButtonText: '好的'
-     });
-    })
     .catch(error => {
      console.error('驗證信發送失敗:', error.response ? error.response.data : error.message);
      errors.general = error.response?.data?.message || '驗證信發送失敗，請稍後再試。';
@@ -413,18 +404,16 @@ import { ref, reactive, computed, watch } from 'vue';
  const resendVerificationEmail = async () => {
   isResending.value = true;
   errors.general = '';
+  Swal.fire({
+    icon: 'success',
+    title: '重新發送中...',
+    confirmButtonText: '關閉'
+   });
   try {
    const response = await axios.post(
     `${import.meta.env.VITE_API_URL}/api/user/secure/resendVerifyEmail`, // 假設後端有這個 API
     { email: registrationData.email }
    );
-   console.log('驗證信重新發送成功:', response.data);
-   Swal.fire({
-    icon: 'success',
-    title: '重新發送成功',
-    text: response.data.message,
-    confirmButtonText: '好的'
-   });
   } catch (error) {
    console.error('驗證信重新發送失敗:', error.response ? error.response.data : error.message);
    errors.general = error.response?.data?.message || '重新發送驗證信失敗，請稍後再試。';
