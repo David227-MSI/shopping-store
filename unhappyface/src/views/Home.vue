@@ -5,7 +5,7 @@
     <!-- <AdminCreateCouponTemplate /> -->
     <!-- <AdminCouponTemplateList /> -->
     <!-- <AdminEventList /> -->
-    <AdminNotificationTemplateList />
+    <!-- <AdminNotificationTemplateList /> -->
     <!-- <AdminAddPrizeToEvent /> -->
     <!-- <AdminCreateEvent /> -->
 
