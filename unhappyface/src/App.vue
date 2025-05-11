@@ -20,6 +20,6 @@ import Footer from '@/components/common/Footer.vue'
 
 </script>
 
-
 <style scoped>
+/* 可加全局樣式調整 */
 </style>

@@ -26,9 +26,14 @@
   
   <style scoped>
   .category-sidebar {
-    padding: 1rem;
-    background-color: #f9f9f9;
-  }
+  width: 250px;
+  min-width: 200px;
+  background-color: #fff8f0;
+  padding: 20px 16px 20px 0; /* 左 padding 調小或設 0 */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-left: 0;
+}
   .toggle-btn {
     font-weight: bold;
     cursor: pointer;
