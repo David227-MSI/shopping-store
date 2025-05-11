@@ -1,48 +1,56 @@
+<script setup>
+import { defineProps } from 'vue'
+
+const props = defineProps({
+  cartCount: {
+    type: Number,
+    required: false,
+    default: 0
+  }
+})
+</script>
+
 <template>
-    <aside class="category-sidebar">
-      <h3>分類</h3>
-      <ul>
-        <li><a href="#">香水</a></li>
-        <li><a href="#">衣服</a></li>
-        <li><a href="#">3C</a></li>
-        
-      </ul>
-    </aside>
-  </template>
-  
-  <script setup>
- 
-  </script>
+  <div class="topbar">
+    <a href="/">🏠 回首頁</a>
+    <a href="#">📱 App下載</a>
+    <a href="#">💎 點點購</a>
+    <a href="#">📚 書店</a>
+    <a href="#">🔑 登入</a>
+    <a href="#">🆕 註冊</a>
+    <a href="#">👤 會員中心</a>
+    <a href="#">📦 查訂單</a>
+    <a href="#">⭐️ 追蹤清單</a>
+    <a href="#">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
+  </div>
+</template>
   
   <style scoped>
-  .category-sidebar {
-    width: 220px;
-    background-color: #f9f5f0;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  .topbar {
+    background-color: var(--primary);
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
-  .category-sidebar h3 {
-    font-size: 20px;
-    margin-bottom: 15px;
-    color: #5c4328;
-  }
-  .category-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .category-sidebar li {
-    margin-bottom: 10px;
-  }
-  .category-sidebar a {
-    font-size: 14px;
-    color: #7a5a38;
+  .topbar a {
+    flex: 1;
+    text-align: center;
+    color: var(--text-light);
     text-decoration: none;
-    transition: color 0.3s;
+    font-weight: bold;
+    min-width: 80px;
   }
-  .category-sidebar a:hover {
-    color: #b5854d;
+  .topbar a:hover {
+    text-decoration: underline;
   }
   </style>
   

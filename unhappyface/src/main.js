@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 // 路由
-import router from './router/index.js'
+import router from './router/router.js'
 
 
 // 狀態管理

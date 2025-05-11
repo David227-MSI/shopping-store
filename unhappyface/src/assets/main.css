@@ -7,6 +7,34 @@
   --text-light: #ffffff;
 }
 
+/* 🔝 頂部導覽列 (來自 styles.css) */
+.topbar {
+  background-color: var(--primary);
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.topbar a {
+  flex: 1;
+  text-align: center;
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: bold;
+  min-width: 80px;
+}
+.topbar a:hover {
+  text-decoration: underline;
+}
+
 /* 🧱 全站通用 */
 body {
   font-family: 'Noto Sans TC', sans-serif;
@@ -17,13 +45,14 @@ body {
 }
 
 .container {
-  width: 85%;
+  /* **注意：container 樣式在兩個檔案中不同，以下採用 main.css 的值** */
+  width: 85%; /* styles.css 是 100% */
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px; /* styles.css 是 0px */
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  margin-top: 70px;
+  margin-top: 70px; /* styles.css 是 50px */
 }
 h1 {
   text-align: center;
@@ -44,7 +73,7 @@ h1 {
 .swiper-slide img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* 注意：之前的討論中元件樣式有 object-fit: fill */
 }
 
 /* 🔍 搜尋列 */
@@ -94,16 +123,59 @@ select, input[type="text"] {
   color: var(--text-dark);
 }
 
+/* 搜尋列 - 帶 Logo 版本 (來自 styles.css) */
+.search-bar.keyword-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background-color: #fffaf3;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  justify-content: center;
+}
+
+.search-bar.keyword-with-logo .search-logo {
+  height: 250px;
+  width:500px;
+  object-fit: contain;
+}
+
+.search-bar.keyword-with-logo input {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #d2b48c;
+  font-size: 1rem;
+}
+
+.search-bar.keyword-with-logo .search-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background-color: var(--primary);
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+.search-bar.keyword-with-logo .search-button:hover {
+  background-color: #40291d;
+}
+
+
 /* 🧭 主要區塊排版 */
 .layout {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  width: 85%;
+  width: 85%; /* 兩個檔案中都是 85% */
   margin: 0 auto;
 }
+
+/* 分類側邊欄 - 基礎樣式 */
 .category-sidebar {
-  width: 200px;
+  width: 200px; /* 兩個檔案中都是 200px (基礎定義) */
   padding: 15px;
   background: #fff3e6;
   border-radius: 12px;
@@ -124,6 +196,7 @@ select, input[type="text"] {
 .main-content {
   flex: 1;
 }
+
 
 /* 📦 商品卡片 */
 .product-list {
@@ -178,6 +251,37 @@ select, input[type="text"] {
   color: #fff;
 }
 
+/* 📎 Footer (來自 styles.css) */
+.site-footer {
+  background: var(--primary);
+  color: var(--text-light);
+  padding: 30px 20px;
+  text-align: center;
+}
+.site-footer a {
+  color: var(--text-light);
+  text-decoration: none;
+  margin: 0 10px;
+}
+.footer-copy {
+  margin-top: 10px;
+  color: #ddd;
+}
+.footer-social img {
+  width: 24px;                /* App 大小的 icon */
+  height: 24px;
+  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: middle;
+
+  transition: transform 0.3s ease;
+}
+
+.footer-social img:hover {
+  transform: scale(1.2);
+}
+
 
 /* 📱 響應式 */
 @media (max-width: 768px) {
@@ -185,7 +289,7 @@ select, input[type="text"] {
     flex-direction: column;
   }
   .category-sidebar {
-    width: 100%;
+    width: 100%; /* 在小螢幕下變為 100% */
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
@@ -196,6 +300,7 @@ select, input[type="text"] {
   .product-list {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
+  /* 響應式按鈕樣式 */
   .btn {
     display: inline-block;
     font-size: 1rem;
@@ -207,7 +312,7 @@ select, input[type="text"] {
     transition: all 0.3s ease;
     margin-top: 10px;
   }
-  
+
   .btn-outline-detail {
     color: #8B4513;
     border: 2px solid #8B4513;
@@ -217,7 +322,7 @@ select, input[type="text"] {
     background-color: #8B4513;
     color: #fff;
   }
-  
+
   .btn-add-to-cart {
     background-color: #A0522D;
     color: #fff;
@@ -229,26 +334,22 @@ select, input[type="text"] {
     border-color: #7B3F00;
   }
   .btn,
-.btn:hover,
-.btn:visited,
-.btn:active {
-  text-decoration: none;
+  .btn:hover,
+  .btn:visited,
+  .btn:active {
+    text-decoration: none;
+  }
 }
 
 
-
-}
-
-
-
-
+/* 產品詳情頁樣式 */
 .product-detail {
   display: flex;
   gap: 40px;
   flex-wrap: wrap;
 }
 .detail-image img {
-  width: 500px;
+  width: 500px; /* 在響應式中可能需要調整 */
   height: auto;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -262,6 +363,8 @@ select, input[type="text"] {
   font-size: 1.1rem;
   margin-bottom: 12px;
 }
+
+/* 評論區塊樣式 */
 .review-section {
   margin-top: 40px;
   padding: 20px;
@@ -325,17 +428,19 @@ select, input[type="text"] {
   margin-top: 8px;
   line-height: 1.5;
 }
+
+/* 分類側邊欄 - 詳細樣式 (覆蓋前面的基礎樣式) */
 .category-sidebar {
-  width: 220px;
+  width: 220px; /* 注意：這裡變為 220px，覆蓋了前面的 200px */
   background-color: #f9f5f0;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px; /* 注意：這裡變為 20px，覆蓋了前面的 15px */
+  border-radius: 16px; /* 注意：這裡變為 16px，覆蓋了前面的 12px */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 注意：陰影參數不同 */
 }
 
 .category-sidebar h3 {
-  font-size: 20px;
-  margin-bottom: 15px;
+  font-size: 20px; /* 注意：這裡變為 20px */
+  margin-bottom: 15px; /* 注意：這裡變為 15px */
   color: #5c4328;
 }
 
@@ -387,9 +492,46 @@ select, input[type="text"] {
   color: #b5854d;
 }
 
+/* 回到頂端按鈕樣式 (來自 styles.css 和 main.css 合併) */
+/* **注意：BackToTop 樣式在兩個檔案中略有不同，以下是合併版本** */
+#backToTopBtn:hover { /* 來自 styles.css */
+  background-color: #4B2E1E; /* 深咖啡色 */
+}
 
-/* 初次出現輕輕浮起來 */
-@keyframes float-in {
+.back-to-top-button {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  background-color: #8B4513; /* 按鈕背景咖啡色 */
+  color: #ffffff; /* ← 控制箭頭顏色（SVG會繼承這個） */
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  opacity: 0.8;
+  /* 合併過渡效果：包含 background 0.3s */
+  transition: opacity 0.3s, transform 0.3s, background 0.3s;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 包含 float-in 動畫設定 (需確保 @keyframes float-in 已定義) */
+  animation: float-in 0.6s ease;
+}
+
+.back-to-top-button:hover {
+  opacity: 1;
+  transform: scale(1.2);
+  /* 兩個檔案都有 hover 背景色，保留一個 */
+  background-color: #A0522D; /* hover 時再深一點 */
+}
+
+
+/* 動畫關鍵幀 */
+@keyframes float-in { /* 來自兩個檔案 */
   from {
     transform: translateY(100px);
     opacity: 0;
@@ -400,8 +542,7 @@ select, input[type="text"] {
   }
 }
 
-/* 回頂端後小小抖動 */
-@keyframes shake {
+@keyframes shake { /* 來自兩個檔案，商品詳情中的 Input 也有用到 */
   0% { transform: translateX(0); }
   25% { transform: translateX(-4px); }
   50% { transform: translateX(4px); }
@@ -409,12 +550,15 @@ select, input[type="text"] {
   100% { transform: translateX(0); }
 }
 
-.shake-animation {
+.shake-animation { /* 來自兩個檔案 */
   animation: shake 0.5s;
 }
+
+
+/* 圖片放大鏡樣式 */
 .zoom-container {
   position: relative;
-  width: 500px;
+  width: 500px; /* 在響應式中可能需要調整 */
   height: auto;
   overflow: hidden;
 }
@@ -436,6 +580,7 @@ select, input[type="text"] {
   background-repeat: no-repeat;
   pointer-events: none;
 }
+
 /* 商品規格表 */
 .spec-table {
   margin-top: 20px;
@@ -506,17 +651,14 @@ select, input[type="text"] {
 .detail-info p:last-of-type {
   margin-bottom: 20px;
 }
-.quantity-selector input.shake {
+.quantity-selector input.shake { /* 商品數量輸入框的抖動 */
   animation: shake 0.3s;
 }
 
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
-  100% { transform: translateX(0); }
-}
+/* 注意：@keyframes shake 在前面已經定義過一次，這裡如果只是重複定義則會被前面的覆蓋 */
+/* 如果您希望商品數量輸入框的 shake 動畫不同，需要修改關鍵幀名稱或定義方式 */
+
+
 .button-group {
   display: flex;
   gap: 10px;
@@ -534,7 +676,7 @@ select, input[type="text"] {
 }
 
 /* 彈跳動畫 */
-@keyframes bounce {
+@keyframes bounce { /* 來自兩個檔案 */
   0% { transform: scale(1); }
   30% { transform: scale(1.4); }
   50% { transform: scale(0.9); }
@@ -542,6 +684,39 @@ select, input[type="text"] {
   100% { transform: scale(1); }
 }
 
-.animate-bounce {
+.animate-bounce { /* 來自兩個檔案 */
   animation: bounce 0.5s;
+}
+
+/* 頂部橫幅佈局 (來自 styles.css) */
+.top-banner-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1600px; /* 較大的最大寬度 */
+  margin: 10px auto;
+  align-items: stretch;
+}
+.promo-image {
+  width: 400px; /* 固定寬度 */
+  flex-shrink: 0;
+}
+.promo-image img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+/* 熱門關鍵字 (來自 styles.css) */
+.hot-keywords {
+  font-size: 14px;
+  color: #555;
+  text-align: left;      /* ✅ 改為跟輸入框對齊 */
+}
+.hot-keywords a {
+  color: #a6794a;
+  text-decoration: none;
+  margin: 0 4px;
+}
+.hot-keywords a:hover {
+  text-decoration: underline;
 }

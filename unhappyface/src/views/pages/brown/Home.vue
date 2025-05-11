@@ -6,7 +6,7 @@
 <!-- 🔍 搜尋列整體包裝 -->
 <div class="search-bar keyword-with-logo">
   <!-- 左側 LOGO -->
-  <img src="/images/logo1.png" alt="LOGO" class="search-logo" style="margin-right: 50px;" />
+  <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/logo1.png" alt="LOGO" class="search-logo" style="margin-right: 50px;" />
 
 <!-- 中間搜尋欄區塊 -->
 <div style="flex: 1; display: flex; justify-content: center;">
@@ -37,7 +37,7 @@
 
   <!-- 右側活動圖 -->
   <div class="promo-image" style="margin-left: 20px;">
-    <img src="/images/promo.gif" alt="活動檔期" />
+    <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/promo.gif" alt="活動檔期" />
   </div>
 </div>
 </div>
@@ -100,16 +100,16 @@
   
   import Header from '@/components/common/Header.vue'
   import Footer from '@/components/common/Footer.vue'
-   /* import BannerSwiper from '@/components/common/BannerSwiper.vue' */
+  //import BannerSwiper from '@/components/common/BannerSwiper.vue'
   import CategorySidebar from '@/components/common/CategorySidebar.vue'
   import ProductSearchBar from '@/components/product/ProductSearchBar.vue'
   import ProductCard from '@/components/product/ProductCard.vue'
   import BannerSwiper from '@/components/common/BannerSwiper.vue'
 
   const banners = [
-    '/images/banner1.jpg',
-    '/images/banner2.jpg',
-    '/images/banner3.jpg'
+    'https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/banner1.jpg',
+    'https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/banner2.jpg',
+    'https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/banner3.jpg'
   ]
   
   const sideCategories = ref([
