@@ -151,7 +151,6 @@
   </script>
   
   <style scoped>
-  /* ... (EventList.vue 的樣式，與之前的樣式基本相同，但可能需要調整 filter-bar 的樣式) ... */
   .container {
     padding: 20px;
   }
@@ -171,6 +170,7 @@
     background-color: #f9f5f0;
     padding: 15px;
     border-radius: 8px;
+    
   }
   
   .search-input {
@@ -179,6 +179,7 @@
   }
   
   .search-input label {
+    min-width: 80px;
     margin-right: 10px;
     color: var(--text-dark);
   }
@@ -196,6 +197,7 @@
   }
   
   .filter-select label {
+    min-width: 80px;
     margin-right: 10px;
     color: var(--text-dark);
   }

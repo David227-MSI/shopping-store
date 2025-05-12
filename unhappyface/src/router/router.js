@@ -22,7 +22,7 @@ import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.
 import UserLogin from '@/views/pages/ttpp/_fake/UserLogin.vue'
 import UserMemberCenter from '@/views/pages/ttpp/_fake/UserMemberCenter.vue'
 import UserModify from '@/views/pages/ttpp/_fake/UserModify.vue'
-import UserRegister from '@/views/pages/ttpp/_fake/UserRegister.vue'
+import UserRegister from '@/views/pages/ttpp/_fake/UserRegister2.vue'
 
 
 
