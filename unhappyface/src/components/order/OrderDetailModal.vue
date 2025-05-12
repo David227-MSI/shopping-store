@@ -9,30 +9,47 @@
         <table class="product-table" v-else>
           <thead>
           <tr>
+            <th>產品圖片</th>
             <th>商品名稱</th>
             <th>數量</th>
             <th>單價</th>
             <th>小計</th>
+            <th>評論</th>
           </tr>
           </thead>
           <tbody>
           <tr v-for="item in orderDetails" :key="item.productId">
             <td>
-              <!-- ⚠️ 將來連結到產品頁面替換為 <router-link> 或 <a> -->
-              <a :href="`/product/${item.productId}`" class="product-link" target="_blank">
+              <img
+                  :src="productImageMap[item.productId] || '/images/placeholder.png'"
+                  alt="商品圖片"
+                  class="product-img"
+                  @error="(e) => e.target.src = '/images/placeholder.png'"
+              />
+            </td>
+            <td>
+              <a
+                  :href="`/products/${item.productId}`"
+                  class="product-link"
+                  target="_blank"
+              >
                 {{ item.productName }}
               </a>
             </td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.unitPrice }} 元</td>
             <td>{{ item.subtotal }} 元</td>
+            <!-- 評論欄位 -->
+            <td>
+              <button class="review-btn" type="button" title="撰寫評論" @click="openReview(item.productId)">撰寫評論</button>
+            </td>
           </tr>
           <tr v-if="discountAmount > 0">
-            <td colspan="3" class="text-right">折價券</td>
+            <td colspan="4" class="text-right">折價券</td>
             <td class="discount">-{{ discountAmount }} 元</td>
           </tr>
           <tr>
-            <td colspan="3" class="text-right total-label">總計</td>
+            <td colspan="5" class="text-right total-label">總計</td>
             <td class="total-value">{{ finalAmount }} 元</td>
           </tr>
           </tbody>
@@ -60,7 +77,9 @@ const orderDetails = ref([]);
 const discountAmount = ref(0);
 const finalAmount = ref(0);
 const isLoading = ref(false);
+const productImageMap = ref({});
 
+// 載入訂單明細 + 抓圖片
 watch(
     () => props.orderId,
     async (newId) => {
@@ -71,6 +90,17 @@ watch(
         orderDetails.value = res.orderDetails || [];
         discountAmount.value = res.order.discountAmount || 0;
         finalAmount.value = res.order.finalAmount || 0;
+
+        // 同步抓主圖
+        const tasks = orderDetails.value.map(async (item) => {
+          try {
+            const imgRes = await axios.get(`/api/media/product/${item.productId}/main`);
+            productImageMap.value[item.productId] = imgRes.data?.mediaUrl || '/images/placeholder.png';
+          } catch {
+            productImageMap.value[item.productId] = '/images/placeholder.png';
+          }
+        });
+        await Promise.all(tasks);
       } catch (err) {
         console.error('載入訂單明細失敗', err);
       } finally {
@@ -82,6 +112,33 @@ watch(
 </script>
 
 <style scoped>
+.product-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.2s ease-in-out;
+}
+.product-img:hover {
+  transform: scale(1.08);
+}
+
+.review-btn {
+  background-color: #a07855;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(160, 120, 85, 0.2);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.review-btn:hover {
+  background-color: #8c6242;
+  box-shadow: 0 4px 12px rgba(140, 98, 66, 0.3);
+}
+
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
