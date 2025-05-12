@@ -87,9 +87,11 @@ import NotificationCard from '@/components/ttpp/NotificationCard.vue';
 import NotificationModal from '@/components/ttpp/NotificationModal.vue';
 
 import { useUserStore } from '@/stores/userStore';
+import { useNotificationStore } from '@/stores/ttpp/notificationStore';
 import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const notificationStore = useNotificationStore();
 const router = useRouter();
 
 const filters = ref({
@@ -170,6 +172,8 @@ const openDetail = async (notification) => {
         { ...notifications.value[index], isRead: true },
         ...notifications.value.slice(index + 1),
       ];
+      // 同步更新 Header 的未讀數量
+      notificationStore.fetchNotifications(userStore.userId); // 成功標記為已讀後重新獲取未讀數量
     }
 
   } catch (err) {
@@ -207,6 +211,8 @@ const deleteNotification = async (notification) => {
       text: '通知已刪除',
       confirmButtonText: '確定',
     });
+    // 同步更新 Header 的未讀數量
+    notificationStore.fetchNotifications(userStore.userId); // 成功刪除後重新獲取未讀數量
   } catch (err) {
     await Swal.fire({
       icon: 'error',
@@ -248,6 +254,8 @@ const deleteAll = async () => {
       text: '所有通知已刪除',
       confirmButtonText: '確定',
     });
+    // 同步更新 Header 的未讀數量
+    notificationStore.fetchNotifications(userStore.userId); // 成功刪除後重新獲取未讀數量
   } catch (err) {
     await Swal.fire({
       icon: 'error',
