@@ -14,12 +14,13 @@
       </div>
 
       <div class="order-body">
+        <p><strong>訂單狀態：</strong>{{ order.statusText || '—' }}</p>
         <p><strong>總金額：</strong>{{ order.totalAmount }} 元</p>
         <p><strong>折扣金額：</strong>{{ order.discountAmount }} 元</p>
         <p><strong>付款金額：</strong>{{ order.finalAmount }} 元</p>
-        <p><strong>訂單狀態：</strong>{{ order.statusText || '—' }}</p>
-        <p><strong>付款狀態：</strong>{{ order.paymentStatusText || '—' }}</p>
         <p><strong>付款方式：</strong>{{ order.paymentMethod || '—' }}</p>
+        <p><strong>付款狀態：</strong>{{ order.paymentStatusText || '—' }}</p>
+        <p><strong>付款成功時間：</strong>{{ order.paidAt || '—' }}</p>
         <p><strong>綠界交易編號：</strong>{{ order.transactionNumber || '—' }}</p>
         <p><strong>收件者：</strong>{{ order.recipientName || '—' }}</p>
         <p><strong>收件電話：</strong>{{ order.recipientPhone || '—' }}</p>
