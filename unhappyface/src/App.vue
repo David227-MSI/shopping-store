@@ -1,7 +1,6 @@
 <template>
   <div>
     <Header />
-    <Nav />
     <main class="container">
       <router-view /> <!-- 頁面內容將在此渲染 -->
     </main>
