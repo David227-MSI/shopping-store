@@ -36,7 +36,7 @@ onMounted(() => {
 <style scoped>
 .banner-swiper {
   height: 450px;  /* ✅ 原本可能是 400px，改小一些 */
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 10px auto;
   border-radius: 12px;
   overflow: hidden;

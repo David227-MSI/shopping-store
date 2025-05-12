@@ -168,7 +168,8 @@
   const searchKeyword = ref('')
   const cartCount = ref(0)
   
-  const fetchProducts = async () => {
+const fetchProducts = async () => {
+  try {
     const { data } = await axios.get('/api/products', {
       params: {
         category: selectedCategory.value,
@@ -176,8 +177,21 @@
         search: searchKeyword.value
       }
     })
-    products.value = data
+
+    console.log("⚠️ API 回傳內容：", data)
+
+    // ✅ 修正這裡，改為 data.data
+    if (Array.isArray(data.data)) {
+      products.value = data.data
+    } else {
+      console.error('⚠️ 錯誤資料格式：', data)
+      products.value = []
+    }
+  } catch (error) {
+    console.error('❌ 取得商品失敗：', error)
+    products.value = []
   }
+}
   
   const fetchCategories = async () => {
     const { data } = await axios.get('/api/categories')
@@ -252,16 +266,16 @@
 
 /* 左右側欄 */
 .left-sidebar {
-  width: 150px;                    /* ✅ 左右欄寬一致，對稱 */
+  width: 120px;                    /* ✅ 左右欄寬一致，對稱 */
   flex-shrink: 0;
-  margin-left: 10px;
-  margin-right: 50px; /* ✅ 左推 10px，更靠邊緣一點 */
+  margin-left: 80px;
+  margin-right: 80px; /* ✅ 左推 10px，更靠邊緣一點 */
 }
 .right-placeholder {
-  width: 180px;                    /* ✅ 左右欄寬一致，對稱 */
+  width: 120px;                    /* ✅ 左右欄寬一致，對稱 */
   flex-shrink: 0;
-  margin-left: -50px;
-  margin-right: 50px;
+  margin-left: -70px;
+  margin-right: 80px;
 }
 
 /* 中間橫幅 */
