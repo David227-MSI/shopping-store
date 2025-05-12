@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // 引用元件檔案
 // import 元件名 from 檔案位置
-import Home from '@/views/pages/brown/Home.vue'
+import Home from '@/views/Home.vue'
 import FakeHome from '@/views/order/FakeHome.vue'
 import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
