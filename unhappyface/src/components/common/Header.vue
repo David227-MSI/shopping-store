@@ -17,12 +17,14 @@
      <a href="/member/orders">📦 查訂單</a>
      <a href="/pages/user-subscribe-list">⭐️ 追蹤清單</a>
      <a href="/pages/user-coupon-list">🎫 折價券</a>
-     <a href="/cart">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
+     <a href="#" @click.prevent="handleCartClick">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
    </div>
  </template>
 
 <script setup>
 import { useAuth } from '@/services/logout';
+import Swal from 'sweetalert2';
+import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cart/cartStore';
 import { computed } from 'vue';
@@ -30,6 +32,26 @@ import { computed } from 'vue';
 const { logout } = useAuth();
 const userStore = useUserStore();
 const cartStore = useCartStore();
+const router = useRouter()
+
+const handleCartClick = async () => {
+  if (!userStore.isLoggedIn) {
+    const result = await Swal.fire({
+      title: '請先登入',
+      text: '登入後可查看購物車與結帳功能',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: '前往登入',
+      cancelButtonText: '取消'
+    })
+
+    if (result.isConfirmed) {
+      router.push('/secure/login')
+    }
+  } else {
+    router.push('/cart')
+  }
+}
 
 const cartCount = computed(() => {
   return cartStore.cartItems.reduce((sum, item) => sum + item.quantity, 0);
