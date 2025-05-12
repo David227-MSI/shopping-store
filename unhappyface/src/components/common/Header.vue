@@ -1,19 +1,4 @@
-<template>
-  <div class="topbar">
-    <a href="/">🏠 回首頁</a>
-    <a href="#">📱 App下載</a>
-    <a href="#">💎 點點購</a>
-    <a href="#">📚 書店</a>
-    <a href="#">🔑 登入</a>
-    <a href="#">🆕 註冊</a>
-    <a href="#">👤 會員中心</a>
-    <a href="#">📦 查訂單</a>
-    <a href="#">⭐️ 追蹤清單</a>
-    <a href="#">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
-  </div>
-</template>
-
-  <style scoped>
+ <style scoped>
   .topbar {
     background-color: var(--primary);
     padding: 8px 20px;
@@ -42,42 +27,41 @@
   }
   </style>
 
+ <template>
+   <div class="topbar">
+     <a href="/">🏠 回首頁</a>
+     <a href="#">📱 App下載</a>
+     <a href="#">💎 點點購</a>
+     <a href="#">📚 書店</a>
 
-    <template v-if="!userStore.isLoggedIn">
-      <a href="/secure/login">🔑 登入</a>
-      <a href="/secure/register">🆕 註冊</a>
-    </template>
-    <template v-else>
-      <a href="/secure/member-center">👤 會員中心</a>
-      <a href="#" @click.prevent="logout">🚪 登出</a>
-    </template>
+     <template v-if="!userStore.isLoggedIn">
+       <a href="/secure/login">🔑 登入</a>
+       <a href="/secure/register">🆕 註冊</a>
+     </template>
+     <template v-else>
+       <a href="/secure/member-center">👤 會員中心</a>
+       <a href="#" @click.prevent="logout">🚪 登出</a>
+     </template>
 
-    <a href="/member/orders">📦 查訂單</a>
-    <a href="/pages/user-subscribe-list">⭐️ 追蹤清單</a>
-    <a href="/pages/user-coupon-list">🎫 折價券</a>
-    <a href="/cart">🛒 購物車(<span>{{ cartCount }}</span>)</a>
-  </header>
-</template>
+     <a href="/member/orders">📦 查訂單</a>
+     <a href="/pages/user-subscribe-list">⭐️ 追蹤清單</a>
+     <a href="/pages/user-coupon-list">🎫 折價券</a>
+     <a href="/cart">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
+   </div>
+ </template>
 
 <script setup>
 import { useAuth } from '@/services/logout';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cart/cartStore';
-import { computed, defineProps } from 'vue';
+import { computed } from 'vue';
 
 const { logout } = useAuth();
 const userStore = useUserStore();
 const cartStore = useCartStore();
 
-const props = defineProps({
-  cartCount: {
-    type: Number,
-    required: false,
-    default: 0
-  }
-});
-
 const cartCount = computed(() => {
   return cartStore.cartItems.reduce((sum, item) => sum + item.quantity, 0);
 });
 </script>
+
