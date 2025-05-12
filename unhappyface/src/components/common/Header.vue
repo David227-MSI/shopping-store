@@ -1,32 +1,3 @@
- <style scoped>
-  .topbar {
-    background-color: var(--primary);
-    padding: 8px 20px;
-    font-size: 0.9rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
-  .topbar a {
-    flex: 1;
-    text-align: center;
-    color: var(--text-light);
-    text-decoration: none;
-    font-weight: bold;
-    min-width: 80px;
-  }
-  .topbar a:hover {
-    text-decoration: underline;
-  }
-  </style>
-
  <template>
    <div class="topbar">
      <a href="/">🏠 回首頁</a>
@@ -64,4 +35,34 @@ const cartCount = computed(() => {
   return cartStore.cartItems.reduce((sum, item) => sum + item.quantity, 0);
 });
 </script>
+
+ <style scoped>
+ /* 🔝 頂部導覽列 */
+ .topbar {
+   background-color: var(--primary);
+   padding: 8px 20px;
+   font-size: 0.9rem;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   flex-wrap: wrap;
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   z-index: 999;
+   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+ }
+ .topbar a {
+   flex: 1;
+   text-align: center;
+   color: var(--text-light);
+   text-decoration: none;
+   font-weight: bold;
+   min-width: 80px;
+ }
+ .topbar a:hover {
+   text-decoration: underline;
+ }
+ </style>
 
