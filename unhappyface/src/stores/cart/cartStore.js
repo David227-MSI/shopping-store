@@ -22,15 +22,24 @@ export const useCartStore = defineStore('cart', () => {
 
   // 加入購物車（統一入口）
   async function addToCart(product) {
+    const quantity = product.quantity || 1
     if (isLoggedIn()) {
       await axios.post('/api/cart', {
         userId: userStore.userId,
         productId: product.id,
-        quantity: 1,
-      });
-      await fetchCart();
+        quantity,
+      })
+      await fetchCart()
     } else {
-      addGuestCartItem(product);
+      const guestCart = JSON.parse(localStorage.getItem('guestCart')) || []
+      const existing = guestCart.find(item => item.productId === product.id)
+      if (existing) {
+        existing.quantity += quantity
+      } else {
+        guestCart.push({ productId: product.id, quantity })
+      }
+      localStorage.setItem('guestCart', JSON.stringify(guestCart))
+      loadGuestCart()
     }
   }
 
