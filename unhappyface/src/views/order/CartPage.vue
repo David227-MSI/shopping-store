@@ -17,9 +17,9 @@
       <!-- 左邊 商品列表 / 追蹤未放功能 (只提供按鈕) -->
       <div class="cart-list">
         <ul>
-          <li v-for="item in cartItems" :key="item.id" class="cart-item">
+          <li v-for="item in cartItems" :key="item.productId" class="cart-item">
             <div class="item-image">
-              <img :src="getImageByProductName(item.productName)" alt="商品圖片" />
+              <img :src="productImageMap[item.productId]" alt="商品圖片" />
             </div>
             <div class="item-info">
               <div class="product-name">{{ item.productName }}</div>
@@ -111,6 +111,7 @@ const router = useRouter();
 const cartStore = useCartStore();
 const userStore = useUserStore();
 const couponStore = useCouponStore();
+const productImageMap = ref({});
 
 const userId = computed(() => userStore.userId);
 const cartItems = computed(() => cartStore.cartItems);
@@ -131,31 +132,46 @@ const applyCoupon = (couponId) => {
   showCouponDialog.value = false;
 };
 
-const getImageByProductName = (name) => {
-  if (name === 'Bvantgardey') return '/images/perfumeA.jpg';
-  if (name === 'Whitepink') return '/images/perfumeB.jpg';
-  if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png';
-  if (name === '黑色棉T') return '/images/black_T.png';
-  if (name === '夏日晨露淡香水') return '/images/grass.png';
-  if (name === '雲彩男款輕薄外套') return '/images/jacket_men.jpg';
-  if (name === '雲彩女款休閒洋裝') return '/images/dress_women.jpg';
-  if (name === 'StarPhone X9') return '/images/phone2.png';
-  if (name === '竹風防滑拖鞋組') return '/images/slippers.jpg';
-  if (name === '極光連帽機能外套') return '/images/jacket_aurora.jpg';
-  if (name === 'Threelight Edge S5') return '/images/phone3.png';
-  if (name === '木田可堆疊收納箱') return '/images/storage_box.jpg';
-  if (name === '木田天然洗碗精') return '/images/dish_soap.jpg';
-  if (name === '映月氣質長裙') return '/images/skirt.png';
-  if (name === '聆香月光花語香水') return '/images/moon.png';
-  if (name === 'QF-Smart X Ultra') return '/images/phone4.png';
-  return '/images/placeholder.png';
+// 抓不到 fallback 為 /images/placeholder.png
+const fetchMainImageForCartItems = async () => {
+  const promises = cartItems.value.map(async (item) => {
+    try {
+      const res = await axios.get(`/api/media/product/${item.productId}/main`);
+      const mediaUrl = res.data?.mediaUrl || '/images/placeholder.png';
+      productImageMap.value[item.productId] = mediaUrl;
+    } catch {
+      productImageMap.value[item.productId] = '/images/placeholder.png';
+    }
+  });
+  await Promise.all(promises);
 };
+
+// const getImageByProductName = (name) => {
+//   if (name === 'Bvantgardey') return '/images/perfumeA.jpg';
+//   if (name === 'Whitepink') return '/images/perfumeB.jpg';
+//   if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png';
+//   if (name === '黑色棉T') return '/images/black_T.png';
+//   if (name === '夏日晨露淡香水') return '/images/grass.png';
+//   if (name === '雲彩男款輕薄外套') return '/images/jacket_men.jpg';
+//   if (name === '雲彩女款休閒洋裝') return '/images/dress_women.jpg';
+//   if (name === 'StarPhone X9') return '/images/phone2.png';
+//   if (name === '竹風防滑拖鞋組') return '/images/slippers.jpg';
+//   if (name === '極光連帽機能外套') return '/images/jacket_aurora.jpg';
+//   if (name === 'Threelight Edge S5') return '/images/phone3.png';
+//   if (name === '木田可堆疊收納箱') return '/images/storage_box.jpg';
+//   if (name === '木田天然洗碗精') return '/images/dish_soap.jpg';
+//   if (name === '映月氣質長裙') return '/images/skirt.png';
+//   if (name === '聆香月光花語香水') return '/images/moon.png';
+//   if (name === 'QF-Smart X Ultra') return '/images/phone4.png';
+//   return '/images/placeholder.png';
+// };
 
 const loadCart = async () => {
   try {
     if (userId.value) {
       await cartStore.fetchCart();
     }
+    await fetchMainImageForCartItems();
   } catch (error) {
     console.error('載入購物車失敗', error);
     Swal.fire({
