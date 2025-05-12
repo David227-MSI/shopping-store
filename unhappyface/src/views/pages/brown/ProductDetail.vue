@@ -53,27 +53,21 @@
       <BackToTop v-show="showBackToTop" @scrollToTop="scrollToTopAnimated" />
     </div>
   </template>
-  <style scoped>
-  .detail-layout {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 50px;
-    padding: 40px;
-  }
-  </style>
+
   <script setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios'
   import Swal from 'sweetalert2'
+  import { useCartStore } from '@/stores/cart/cartStore.js'
   import Header from '@/components/common/Header.vue'
   import ZoomImage from '@/components/product/ZoomImage.vue'
   import ProductInfo from '@/components/product/ProductInfo.vue'
   import ReviewList from '@/components/ra/review/ReviewList.vue'
   import RecommendList from '@/components/product/RecommendList.vue'
   import BackToTop from '@/components/common/BackToTop.vue'
-  
+
+  const cartStore = useCartStore()
   // 🛒 購買數量功能
   const quantity = ref(1)
   
@@ -206,7 +200,7 @@
     }
   }
   
-  const addToCart = (targetProductOrEvent, optionalEvent) => {
+  const addToCart = async (targetProductOrEvent, optionalEvent) => {
     let item = product.value
     let event = targetProductOrEvent
   
@@ -217,38 +211,53 @@
     }
   
     if (!item || !event) return
-  
-    for (let i = 0; i < quantity.value; i++) {
-      const img = document.createElement('img')
-      img.src = getProductImage(item.name)
-      img.style.position = 'fixed'
-      img.style.left = `${event.clientX}px`
-      img.style.top = `${event.clientY}px`
-      img.style.width = '80px'
-      img.style.height = '80px'
-      img.style.borderRadius = '50%'
-      img.style.zIndex = 2000
-      img.style.pointerEvents = 'none'
-      img.style.transition = 'all 0.9s cubic-bezier(0.22, 1, 0.36, 1)'
-      document.body.appendChild(img)
-      setTimeout(() => {
-        img.style.left = `calc(92% + ${Math.random() * 100 - 50}px)`
-        img.style.top = `calc(2% + ${Math.random() * 100 - 30}px)`
-        img.style.width = '0px'
-        img.style.height = '0px'
-        img.style.opacity = '0'
-      }, 10 + i * 100)
-      setTimeout(() => document.body.removeChild(img), 1000 + i * 100)
+
+    try {
+      await cartStore.addToCart({
+        ...item,
+        quantity: quantity.value
+      })
+
+      for (let i = 0; i < quantity.value; i++) {
+        const img = document.createElement('img')
+        img.src = getProductImage(item.name)
+        img.style.position = 'fixed'
+        img.style.left = `${event.clientX}px`
+        img.style.top = `${event.clientY}px`
+        img.style.width = '80px'
+        img.style.height = '80px'
+        img.style.borderRadius = '50%'
+        img.style.zIndex = 2000
+        img.style.pointerEvents = 'none'
+        img.style.transition = 'all 0.9s cubic-bezier(0.22, 1, 0.36, 1)'
+        document.body.appendChild(img)
+        setTimeout(() => {
+          img.style.left = `calc(92% + ${Math.random() * 100 - 50}px)`
+          img.style.top = `calc(2% + ${Math.random() * 100 - 30}px)`
+          img.style.width = '0px'
+          img.style.height = '0px'
+          img.style.opacity = '0'
+        }, 10 + i * 100)
+        setTimeout(() => document.body.removeChild(img), 1000 + i * 100)
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: '已加入購物車！',
+        text: `${item.name} 已成功加入購物車（${quantity.value} 件）！`,
+        timer: 1500,
+        showConfirmButton: false
+      })
+    } catch (error) {
+      console.error('加入購物車錯誤', error)
+      Swal.fire({
+        icon: 'error',
+        title: '加入購物車失敗',
+        text: '請稍後再試',
+        timer: 1500,
+        showConfirmButton: false
+      })
     }
-  
-    cartCount.value += quantity.value
-    Swal.fire({
-      icon: 'success',
-      title: '已加入購物車！',
-      text: `${item.name} 已成功加入購物車（${quantity.value} 件）！`,
-      timer: 1500,
-      showConfirmButton: false
-    })
   }
   
   
