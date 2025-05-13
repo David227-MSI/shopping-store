@@ -8,51 +8,52 @@
 
         <table class="product-table" v-else>
           <thead>
-          <tr>
-            <th>產品圖片</th>
-            <th>商品名稱</th>
-            <th>數量</th>
-            <th>單價</th>
-            <th>小計</th>
-            <th>評論</th>
-          </tr>
+            <tr>
+              <th>產品圖片</th>
+              <th>商品名稱</th>
+              <th>數量</th>
+              <th>單價</th>
+              <th>小計</th>
+              <th>評論</th>
+            </tr>
           </thead>
           <tbody>
-          <tr v-for="item in orderDetails" :key="item.productId">
-            <td>
-              <img
+            <tr v-for="item in orderDetails" :key="item.productId">
+              <td>
+                <img
                   :src="productImageMap[item.productId] || '/images/placeholder.png'"
                   alt="商品圖片"
                   class="product-img"
                   @error="(e) => e.target.src = '/images/placeholder.png'"
-              />
-            </td>
-            <td>
-              <a
+                />
+              </td>
+              <td>
+                <a
                   :href="`/products/${item.productId}`"
                   class="product-link"
                   target="_blank"
-              >
-                {{ item.productName }}
-              </a>
-            </td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.unitPrice }} 元</td>
-            <td>{{ item.subtotal }} 元</td>
-            <!-- 評論欄位 -->
-            <td>
-              <button class="review-btn" type="button" title="撰寫評論" @click="openReview(item.productId)">撰寫評論</button>
-            </td>
-          </tr>
-          <tr v-if="discountAmount > 0">
-            <td colspan="5" class="text-right">折價券</td>
-            <td class="discount">-{{ discountAmount }} 元</td>
-          </tr>
-          <tr>
-            <td colspan="5" class="text-right total-label">總計</td>
-            <td class="total-value">{{ finalAmount }} 元</td>
-          </tr>
-          </tbody>
+                >
+                  {{ item.productName }}
+                </a>
+              </td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.unitPrice }} 元</td>
+              <td>{{ item.subtotal }} 元</td>
+              <!-- 評論欄位 -->
+              <td>
+                <ReviewEntry
+                  v-if="userStore.userId && item.orderItemId"
+                  :orderItemId="item.orderItemId"
+                  :userId="userStore.userId"
+                />
+                  <span v-else>無法評論</span>
+              </td>
+            </tr>
+            <tr v-if="discountAmount > 0">
+              <td colspan="4" class="text-right">折價券</td> <td class="discount">-{{ discountAmount }} 元</td>  <td></td> </tr>
+            <tr>
+              <td colspan="4" class="text-right total-label">總計</td> <td class="total-value">{{ finalAmount }} 元</td>  <td></td> </tr>
+            </tbody>
         </table>
 
         <button class="close-btn" @click="close">關閉</button>
@@ -64,6 +65,8 @@
 <script setup>
 import { ref, watch } from 'vue';
 import axios from '@/services/order/orderAxios.js';
+import { useUserStore } from '@/stores/userStore.js';
+import ReviewEntry from '@/components/ra/review/ReviewEntry.vue';
 
 const props = defineProps({
   visible: Boolean,
@@ -79,6 +82,8 @@ const finalAmount = ref(0);
 const isLoading = ref(false);
 const productImageMap = ref({});
 
+const userStore = useUserStore();
+
 // 載入訂單明細 + 抓圖片
 watch(
     () => props.orderId,
@@ -87,28 +92,51 @@ watch(
       isLoading.value = true;
       try {
         const res = await axios.get(`/api/orders/${newId}`);
-        orderDetails.value = res.orderDetails || [];
-        discountAmount.value = res.order.discountAmount || 0;
-        finalAmount.value = res.order.finalAmount || 0;
+        orderDetails.value = res.orderDetails.map(item => ({
+          ...item,
+          orderItemId: item.orderItemId || null
+        })) || [];
+
+        discountAmount.value = res.order?.discountAmount || 0;
+        finalAmount.value = res.order?.finalAmount || 0;
 
         // 同步抓主圖
         const tasks = orderDetails.value.map(async (item) => {
-          try {
-            const imgRes = await axios.get(`/api/media/product/${item.productId}/main`);
-            productImageMap.value[item.productId] = imgRes.data?.mediaUrl || '/images/placeholder.png';
-          } catch {
-            productImageMap.value[item.productId] = '/images/placeholder.png';
+          if (item.productId) {
+            try {
+              const imgRes = await axios.get(`/api/media/product/${item.productId}/main`);
+              productImageMap.value[item.productId] = imgRes.data?.mediaUrl || '/images/placeholder.png';
+            } catch {
+              productImageMap.value[item.productId] = '/images/placeholder.png';
+            }
+          } else {
+              productImageMap.value[item.productId] = '/images/placeholder.png';
           }
         });
         await Promise.all(tasks);
+
       } catch (err) {
         console.error('載入訂單明細失敗', err);
+        orderDetails.value = [];
+        discountAmount.value = 0;
+        finalAmount.value = 0;
+        productImageMap.value = {};
       } finally {
         isLoading.value = false;
       }
     },
     { immediate: true }
 );
+
+watch(() => props.visible, (isVisible) => {
+  if (!isVisible) {
+    orderDetails.value = [];
+    discountAmount.value = 0;
+    finalAmount.value = 0;
+    productImageMap.value = {};
+  }
+});
+
 </script>
 
 <style scoped>
@@ -123,7 +151,7 @@ watch(
   transform: scale(1.08);
 }
 
-.review-btn {
+/* .review-btn {
   background-color: #a07855;
   color: white;
   border: none;
@@ -137,7 +165,7 @@ watch(
 .review-btn:hover {
   background-color: #8c6242;
   box-shadow: 0 4px 12px rgba(140, 98, 66, 0.3);
-}
+} */
 
 .modal-overlay {
   position: fixed;
@@ -154,6 +182,8 @@ watch(
   max-width: 720px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   animation: fadeInUp 0.4s ease;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 .modal-title {
   font-size: 1.6rem;
@@ -175,6 +205,9 @@ watch(
   color: #5b3a29;
   padding: 12px;
   text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 .product-table td {
   background-color: #fffefb;
