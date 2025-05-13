@@ -1,4 +1,5 @@
 <template>
+  
     <div>
       <!-- 導覽列 -->
       <Header :cartCount="cartCount" />
@@ -168,42 +169,66 @@
   const searchKeyword = ref('')
   const cartCount = ref(0)
   
-const fetchProducts = async () => {
+
+  // 🔍 進入頁面時立即搜尋「手機」
+onMounted(() => {
+  fetchByKeyword('手機')
+})
+async function fetchByKeyword(keyword) {
   try {
-    const { data } = await axios.get('/api/products', {
-      params: {
-        category: selectedCategory.value,
-        brand: selectedBrand.value,
-        search: searchKeyword.value
-      }
-    })
-
-    console.log("⚠️ API 回傳內容：", data)
-
-    // ✅ 修正這裡，改為 data.data
-    if (Array.isArray(data.data)) {
-      products.value = data.data
-    } else {
-      console.error('⚠️ 錯誤資料格式：', data)
-      products.value = []
-    }
-  } catch (error) {
-    console.error('❌ 取得商品失敗：', error)
-    products.value = []
+    const response = await axios.get('/api/products/search', {
+      params: { keyword }
+    });
+    products.value = response.data;
+    console.log('✅ 查到商品：', products.value)
+  } catch (err) {
+    console.error('❌ 查詢失敗：', err)
   }
 }
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get('/api/products', {
+      params: {
+        category: selectedCategory.value || null,
+        brand: selectedBrand.value || null,
+        search: searchKeyword.value || null
+      }
+    });
+
+    // ⏺️ 確認實際發出什麼請求
+    console.log("📦 發出請求 URL：", response.config.url);
+
+    if (Array.isArray(response.data?.data)) {
+      products.value = response.data.data;
+    } else {
+      console.error('⚠️ 回傳格式錯誤：', response.data);
+      products.value = [];
+    }
+  } catch (error) {
+    console.error('❌ 取得商品失敗：', error);
+    products.value = [];
+  }
+};
   
   const fetchCategories = async () => {
     const { data } = await axios.get('/api/categories')
     categories.value = data
   }
   
-  const fetchBrands = async () => {
-    const { data } = await axios.get('/api/brands', {
-      params: { category: selectedCategory.value }
-    })
-    brands.value = data
+const fetchBrands = async () => {
+  try {
+    const response = await axios.get('/api/brands', {
+      params: {
+        category: selectedCategory.value || null
+      }
+    });
+    console.log("📦 發送 brands 查詢：", response.config.url);
+    brands.value = response.data;
+  } catch (error) {
+    console.error('❌ 取得品牌失敗：', error);
+    brands.value = [];
   }
+}
   
   const filterByCategory = (categoryId) => {
     selectedCategory.value = categoryId
@@ -211,8 +236,8 @@ const fetchProducts = async () => {
   }
   
   const searchProducts = () => {
-    fetchProducts()
-  }
+  fetchByKeyword(searchKeyword.value)
+}
   
   const resetFilters = () => {
     selectedCategory.value = ''
