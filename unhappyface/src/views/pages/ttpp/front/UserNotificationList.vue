@@ -205,14 +205,15 @@ const deleteNotification = async (notification) => {
     if (showModal.value && selectedNotification.value?.id === notification.id) {
       showModal.value = false;
     }
+    // 同步更新 Header 的未讀數量
+    notificationStore.fetchNotifications(userStore.userId); // 成功刪除後重新獲取未讀數量
     await Swal.fire({
       icon: 'success',
       title: '刪除成功',
       text: '通知已刪除',
       confirmButtonText: '確定',
     });
-    // 同步更新 Header 的未讀數量
-    notificationStore.fetchNotifications(userStore.userId); // 成功刪除後重新獲取未讀數量
+    
   } catch (err) {
     await Swal.fire({
       icon: 'error',
@@ -248,14 +249,15 @@ const deleteAll = async () => {
     if (showModal.value) {
       showModal.value = false;
     }
+    // 同步更新 Header 的未讀數量
+    notificationStore.fetchNotifications(userStore.userId); // 成功刪除後重新獲取未讀數量
     await Swal.fire({
       icon: 'success',
       title: '刪除成功',
       text: '所有通知已刪除',
       confirmButtonText: '確定',
     });
-    // 同步更新 Header 的未讀數量
-    notificationStore.fetchNotifications(userStore.userId); // 成功刪除後重新獲取未讀數量
+    
   } catch (err) {
     await Swal.fire({
       icon: 'error',
@@ -298,12 +300,14 @@ const markAllAsRead = async () => {
 
     if (response.data.success) {
       notifications.value = notifications.value.map((n) => ({ ...n, isRead: true }));
+      notificationStore.fetchNotifications(userStore.userId);
       await Swal.fire({
         icon: 'success',
         title: '操作成功',
         text: `已將 ${response.data.data.updatedCount} 則通知標示為已讀`,
         confirmButtonText: '確定',
       });
+      
     } else {
       throw new Error(response.data.message || '無未讀通知需要更新');
     }
