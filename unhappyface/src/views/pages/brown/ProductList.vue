@@ -169,16 +169,7 @@
     })
   }
   
-  const toggleWishlist = (product) => {
-    product.isWishlisted = !product.isWishlisted
-    Swal.fire({
-      icon: product.isWishlisted ? 'success' : 'info',
-      title: product.isWishlisted ? '已加入收藏！' : '已取消收藏！',
-      text: product.name,
-      timer: 1200,
-      showConfirmButton: false
-    })
-  }
+
   const toggleSubCategory = (category) => {
     category.show = !category.show
   }

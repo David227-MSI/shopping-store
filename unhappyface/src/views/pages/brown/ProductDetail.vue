@@ -13,7 +13,7 @@
         <ProductInfo
           :product="product"
           :quantity="quantity"
-          :isWishlisted="product?.isWishlisted ?? false"
+          :isWishlisted="isWishlisted? isWishlisted : false"
           @increase="increaseQuantity"
           @decrease="decreaseQuantity"
           @add-to-cart="addToCart"
@@ -57,6 +57,7 @@
   <script setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useUserStore } from '@/stores/userStore'
   import axios from 'axios'
   import Swal from 'sweetalert2'
   import { useCartStore } from '@/stores/cart/cartStore.js'
@@ -76,13 +77,15 @@
   
   const route = useRoute()
   const router = useRouter()
-  
+  const userStore = useUserStore()
+
   const product = ref(null)
   const reviews = ref([])
   const recommended = ref([])
   const cartCount = ref(0)
   const showBackToTop = ref(false)
   const isWishlisted = ref(false)
+  const productId = ref(null)
   
   const selectedMainImage = ref('');
   const productImages = ref([]);
@@ -107,17 +110,62 @@
       input.classList.add('shake')
     }
   }
-  const toggleWishlist = (item) => {
-    if (!item) return
-    item.isWishlisted = !item.isWishlisted
-    Swal.fire({
-      icon: item.isWishlisted ? 'success' : 'info',
-      title: item.isWishlisted ? '已加入收藏！' : '已取消收藏！',
-      text: item.name,
-      timer: 1200,
-      showConfirmButton: false
-    })
+
+
+
+
+
+
+  
+
+
+  const toggleWishlist = async (item) => {
+    if (!item) return;
+    if (userStore.userId) {
+      try {
+        const response = await axios.post(`/api/user/subscribes/switch`, {
+          userId: userStore.userId,
+          itemId: item.id,
+          itemType: 'PRODUCT'
+        })
+        if (response.data.success) {
+          item.isWishlisted = !item.isWishlisted
+          Swal.fire({
+            icon: item.isWishlisted ? 'success' : 'info',
+            title: item.isWishlisted ? '已加入收藏！' : '已取消收藏！',
+            text: item.name,
+            timer: 1200,
+            showConfirmButton: false
+          })
+          fetchProductDetail();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: '操作失敗',
+            text: response.data.message || '無法更新收藏狀態',
+          })
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: '操作失敗',
+          text: '與伺服器通訊發生錯誤',
+        })
+      }
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: '請先登入',
+        text: '登入後才能使用收藏功能',
+        confirmButtonText: '前往登入'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/secure/login') // 請確保你的登入路由是正確的
+        }
+      })
+    }
   }
+
   
   
   const scrollToTopAnimated = () => {
@@ -148,6 +196,8 @@
         product.value = productData;
         console.log('獲取到的 ProductDTO 數據:', productData);
 
+        checkWishlistStatus(productData.id);
+        
         if (productData.images && Array.isArray(productData.images) && productData.images.length > 0) {
           productImages.value = productData.images.map(mediaDto => mediaDto.mediaUrl);
           selectedMainImage.value = productImages.value[0];
@@ -259,6 +309,28 @@
       })
     }
   }
+
+
+  const checkWishlistStatus = async (productId) => {
+    try {
+      const response = await axios.post(`/api/user/subscribes/getSubscribeStatus`, {
+        userId: userStore.userId,
+        itemType: 'PRODUCT',
+        itemId: productId
+      })
+      
+      isWishlisted.value = response.data.data
+      console.log('userId: ' + userStore.userId);
+      console.log('productId ' + productId)
+      console.log('data ' + response.data.data);
+      
+      console.log('isWishlisted ' + isWishlisted.value);
+      
+    } catch (error) {
+      console.error('Error checking wishlist status:', error)
+      isWishlisted.value = false // 出錯時預設為未收藏
+    }
+  }
   
   
   
@@ -297,6 +369,8 @@
     fetchRecommended();
     console.log('--- onMounted finished initiating fetches ---');
     window.addEventListener('scroll', handleScroll)
+    
+    
   })
 
   onUnmounted(() => window.removeEventListener('scroll', handleScroll))

@@ -36,11 +36,23 @@
   defineEmits(['remove-subscription', 'add-to-cart'])
   
   const getImage = (name) => {
-    if (name === '香水 A') return '/images/perfumeA.jpg'
-    if (name === '香水 B') return '/images/perfumeB.jpg'
-    if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png'
-    if (name === '黑色棉T') return '/images/black_T.png'
-    return 'https://via.placeholder.com/300x180?text=No+Image'
+    if (name === 'Bvantgardey') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/perfumeA.jpg'
+    if (name === 'Whitepink') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/perfumeB.jpg'
+    if (name === 'MyPhone 15 Pro Max') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone1.png'
+    if (name === '黑色棉T') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/black_T.png'
+    if (name === '夏日晨露淡香水') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/grass.png'
+    if (name === '雲彩男款輕薄外套') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/jacket_men.jpg'
+    if (name === '雲彩女款休閒洋裝') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/dress_women.jpg'
+    if (name === 'StarPhone X9') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone2.png'
+    if (name === '竹風防滑拖鞋組') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/slippers.jpg'
+    if (name === '極光連帽機能外套') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/jacket_aurora.jpg'
+    if (name === 'Threelight Edge S5') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone3.png'
+    if (name === '木田可堆疊收納箱') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/storage_box.jpg'
+    if (name === '木田天然洗碗精') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/dish_soap.jpg'
+    if (name === '映月氣質長裙') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/skirt.png'
+    if (name === '聆香月光花語香水') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/moon.png'
+    if (name === 'QF-Smart X Ultra') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone4.png'
+    return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/product_coming_soon.jpg'
   }
   </script>
   

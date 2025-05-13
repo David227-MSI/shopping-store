@@ -11,6 +11,14 @@
      </template>
      <template v-else>
        <a href="/secure/member-center">👤 會員中心</a>
+       <template v-if="unreadNotificationCount > 0">
+         <a href="/pages/user-notification-list">
+           🔔 通知 (<span class="unread-count">{{ unreadNotificationCount }}</span>)
+         </a>
+       </template>
+       <template v-else>
+         <a href="/pages/user-notification-list">🔔 通知</a>
+       </template>
        <a href="#" @click.prevent="logout">🚪 登出</a>
      </template>
 
@@ -27,12 +35,18 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { useCartStore } from '@/stores/cart/cartStore';
-import { computed } from 'vue';
+import { useNotificationStore } from '@/stores/ttpp/notificationStore';
+import { ref, onMounted, computed } from 'vue';
 
 const { logout } = useAuth();
 const userStore = useUserStore();
 const cartStore = useCartStore();
 const router = useRouter()
+const notificationStore = useNotificationStore();
+
+const showNotifications = ref(false);
+const notifications = computed(() => notificationStore.notifications);
+const unreadNotificationCount = computed(() => notificationStore.unreadNotificationCount);
 
 const handleCartClick = async () => {
   if (!userStore.isLoggedIn) {
@@ -56,6 +70,14 @@ const handleCartClick = async () => {
 const cartCount = computed(() => {
   return cartStore.cartItems.reduce((sum, item) => sum + item.quantity, 0);
 });
+
+onMounted(() => {
+  if (userStore.isLoggedIn && userStore.userId) {
+    notificationStore.fetchNotifications(userStore.userId);
+  }
+});
+
+
 </script>
 
  <style scoped>
@@ -86,5 +108,8 @@ const cartCount = computed(() => {
  .topbar a:hover {
    text-decoration: underline;
  }
+ .unread-count {
+  color: rgb(255, 255, 255);
+}
  </style>
 
