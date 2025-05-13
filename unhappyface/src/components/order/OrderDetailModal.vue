@@ -45,7 +45,7 @@
             </td>
           </tr>
           <tr v-if="discountAmount > 0">
-            <td colspan="4" class="text-right">折價券</td>
+            <td colspan="5" class="text-right">折價券</td>
             <td class="discount">-{{ discountAmount }} 元</td>
           </tr>
           <tr>
