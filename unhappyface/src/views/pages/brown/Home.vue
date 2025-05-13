@@ -38,7 +38,7 @@
 
   <!-- 右側活動圖 -->
   <div class="promo-image" style="margin-left: 120px;">
-     <img src="/images/promo.png" alt="活動檔期" style="width: 350px; height: 180px;" />
+     <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/promo.gif" alt="活動檔期" style="width: 350px; height: 180px;" />
   </div>
 </div>
 </div>
