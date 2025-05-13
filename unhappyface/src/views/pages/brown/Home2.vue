@@ -44,36 +44,10 @@
 </div>
 <div class="top-banner-layout">
   <!-- 左側：分類選單 -->
-  <div class="left-sidebar">
-    <CategorySidebar
-      :sideCategories="sideCategories"
-      @filter-category="filterByCategory"
-      @toggle-sub="toggleSubCategory"
-    />
-  </div>
-
-  <!-- 中間：輪播區 -->
-  <div class="center-banner">
-    <BannerSwiper :banners="banners" />
-  </div>
-
-  <!-- 右側：預留區 -->
-<!-- 右側：功能區 -->
-<div class="right-placeholder">
-  <div class="quick-actions">
-    <div class="action-item">
-      🛒 <span>購物車</span>
-    </div>
-    <div class="action-item">
-      ❤️ <span>追蹤清單</span>
-    </div>
-    <div class="action-item">
-      🎁 <span>優惠券</span>
-    </div>
-  </div>
+  
 </div>
 
-</div>
+
 
   
       <div class="layout">
@@ -95,18 +69,29 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue'
+ import { ref, onMounted, watch } from 'vue'
+ import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios'
   import Swal from 'sweetalert2'
-  import { useRouter } from 'vue-router'
   import Header from '@/components/common/Header.vue'
   import Footer from '@/components/common/Footer.vue'
-  //import BannerSwiper from '@/components/common/BannerSwiper.vue'
   import CategorySidebar from '@/components/common/CategorySidebar.vue'
   import ProductSearchBar from '@/components/product/ProductSearchBar.vue'
   import ProductCard from '@/components/product/ProductCard.vue'
   import BannerSwiper from '@/components/common/BannerSwiper.vue'
-const router = useRouter()    
+ const route = useRoute()
+const router = useRouter()
+   
+// ✅ 🔁 監聽網址列 ?keyword=xxx，自動搜尋
+watch(
+  () => route.query.keyword,
+  (newKeyword) => {
+    if (newKeyword) {
+      fetchByKeyword(newKeyword)
+    }
+  },
+  { immediate: true }
+)
   const banners = [
     'https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/banner1.jpg',
     'https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/banner2.jpg',
@@ -169,11 +154,18 @@ const router = useRouter()
   const searchKeyword = ref('')
   const cartCount = ref(0)
   
+// ✅ 正確方式：一進入就根據網址 keyword 查詢
+watch(
+  () => route.query.keyword,
+  (newKeyword) => {
+    if (newKeyword) {
+      searchKeyword.value = newKeyword
+      fetchByKeyword(newKeyword)
+    }
+  },
+  { immediate: true }
+)
 
-  // 🔍 進入頁面時立即搜尋「手機」
-onMounted(() => {
-  fetchByKeyword('手機')
-})
 async function fetchByKeyword(keyword) {
   try {
     const response = await axios.get('/api/products/search', {
@@ -235,7 +227,7 @@ const fetchBrands = async () => {
     fetchProducts()
   }
   
-const searchProducts = () => {
+ const searchProducts = () => {
   if (searchKeyword.value.trim()) {
     router.push({
       path: '/products',
@@ -278,7 +270,6 @@ const searchProducts = () => {
   onMounted(() => {
     fetchCategories()
     fetchBrands()
-    fetchProducts()
   })
   </script>
   
@@ -299,7 +290,7 @@ const searchProducts = () => {
   width: 120px;                    /* ✅ 左右欄寬一致，對稱 */
   flex-shrink: 0;
   margin-left: 80px;
-  margin-right: 80px; /* ✅ 左推 10px，更靠邊緣一點 */
+  margin-right: 1300px; /* ✅ 左推 10px，更靠邊緣一點 */
 }
 .right-placeholder {
   width: 120px;                    /* ✅ 左右欄寬一致，對稱 */
