@@ -64,12 +64,14 @@ import axios from '@/services/order/orderAxios.js';
 import Swal from 'sweetalert2';
 import LottiePlayer from '@/components/order/LottiePlayer.vue';
 import paymentSuccess from '@/assets/animations/paymentSuccess.json';
+import { useCartStore } from '@/stores/cart/cartStore';
 
 const route = useRoute();
 const router = useRouter();
 const order = ref(null);
 const orderDetails = ref([]);
 const isNavigating = ref(false);
+const cartStore = useCartStore();
 
 onMounted(async () => {
   const orderId = route.params.orderId;
@@ -79,6 +81,7 @@ onMounted(async () => {
     const response = await axios.get(`/api/orders/${orderId}`);
     order.value = response.order;
     orderDetails.value = response.orderDetails;
+    await cartStore.fetchCart();
   } catch (error) {
     console.error('載入訂單失敗', error);
   }
