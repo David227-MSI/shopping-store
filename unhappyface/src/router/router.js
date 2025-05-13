@@ -20,7 +20,7 @@ import LoginPage from '@/views/order/LoginPage.vue'
 // ttpp
 import UserCouponList from '@/views/pages/ttpp/front/UserCouponList.vue'
 import UserSubscribeList from '@/views/pages/ttpp/front/UserSubscribeList.vue';
-
+import UserEventList2 from '@/views/pages/ttpp/front/UserEventList2.vue'
 import UserNotificationList from '@/views/pages/ttpp/front/UserNotificationList.vue'
 
 import UserLogin from '@/views/pages/ttpp/_fake/UserLogin.vue'
@@ -86,13 +86,12 @@ const routes = [
     component: UserSubscribeList,
     meta: { requiresAuth: true },
   },
-
-  // back
   {
-    path: '/events/:eventId/add-prizes',
-    name: 'AdminAddPrizeToEvent',
-    component: AdminAddPrizeToEvent
+    path: '/pages/user-event-list',
+    name: 'UserEventList2',
+    component: UserEventList2,
   },
+
 
     // 訂單相關頁面
   { path: '/cart', name: 'cart', component: CartPage },

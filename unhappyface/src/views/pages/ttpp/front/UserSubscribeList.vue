@@ -53,9 +53,12 @@ import Swal from 'sweetalert2';
 import SubscribeProductCard from '@/components/ttpp/UserSubscribeProductCard.vue';
 
 import { useUserStore } from '@/stores/userStore';
+import { useCartStore } from '@/stores/cart/cartStore';
 import { useRouter } from 'vue-router';
 
+
 const userStore = useUserStore();
+const cartStore = useCartStore();
 const router = useRouter();
 
 const filters = ref({
@@ -188,10 +191,22 @@ const removeBrandSubscription = async (brandId) => {
   }
 };
 
-const addToCart = (product) => {
-  // 加入購物車邏輯
+const addToCart = async (product) => {
+  try {
+    await cartStore.addToCart(product); //
+    await cartStore.fetchCart();
+    Swal.fire({
+      icon: 'success',
+      title: '已加入購物車',
+      text: product.name,
+      timer: 1200,
+      showConfirmButton: false
+    });
+  } catch (err) {
+    console.error('加入購物車失敗', err);
+    Swal.fire('加入失敗', '請稍後再試', 'error');
+  }
   console.log('加入購物車:', product);
-  // ... 你的加入購物車邏輯
 };
 
 watch([() => filters.value.categoryId, () => filters.value.keyword], fetchSubscriptions);

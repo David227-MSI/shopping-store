@@ -53,7 +53,9 @@
 
   <!-- 中間：輪播區 -->
   <div class="center-banner">
-    <BannerSwiper :banners="banners" />
+    <router-link to="/pages/user-event-list">
+      <BannerSwiper :banners="banners" />
+    </router-link>
   </div>
 
   <!-- 右側：預留區 -->
@@ -287,7 +289,7 @@ const fetchProducts = async () => {
           wishlistedStatus.value[item.id] = !wishlistedStatus.value[item.id];
       Swal.fire({
         icon: wishlistedStatus.value[item.id] ? 'success' : 'info',
-        title: wishlistedStatus.value[item.id] ? '已加收藏！' : '已取消收藏！',
+        title: wishlistedStatus.value[item.id] ? '已加入收藏！' : '已取消收藏！',
         text: item.name,
         timer: 1200,
         showConfirmButton: false
