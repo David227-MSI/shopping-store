@@ -25,20 +25,20 @@
     </div>
 
     <!-- 熱門商品 對齊上方 input -->
-    <div class="hot-keywords" style="margin-top: 6px;">
-      熱門商品：
-      <a href="/products/1">月亮香水</a> /
-      <a href="/products/2">竹風拖鞋</a> /
-      <a href="/products/3">奧創手機</a> /
-      <a href="/products/4">雲彩洋裝</a> 
-    </div>
+   <div class="hot-keywords" style="margin-top: 6px;">
+  熱門商品：
+  <router-link :to="{ name: 'ProductDetail', params: { id: 111 } }">月亮香水</router-link> /
+  <router-link :to="{ name: 'ProductDetail', params: { id: 105 } }">竹風拖鞋</router-link> /
+  <router-link :to="{ name: 'ProductDetail', params: { id: 112 } }">奧創手機</router-link> /
+  <router-link :to="{ name: 'ProductDetail', params: { id: 103 } }">雲彩洋裝</router-link>
+</div>
   </div>
 </div>
 
 
   <!-- 右側活動圖 -->
-  <div class="promo-image" style="margin-left: 20px;">
-    <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/promo.gif" alt="活動檔期" />
+  <div class="promo-image" style="margin-left: 120px;">
+     <img src="/images/promo.png" alt="活動檔期" style="width: 350px; height: 180px;" />
   </div>
 </div>
 </div>
