@@ -236,8 +236,10 @@ const clearCart = async () => {
   try {
     if (userId.value) {
       await cartStore.clearCart();
+      await cartStore.fetchCart();
     } else {
-      cartStore.clearCart();
+      await cartStore.clearCart();
+      await cartStore.fetchCart();
     }
     await Swal.fire({
       icon: 'success',
