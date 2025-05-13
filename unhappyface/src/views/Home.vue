@@ -84,6 +84,7 @@
                 v-for="product in products"
                 :key="product.id"
                 :product="product"
+                :isWishlisted="wishlistedStatus[product.id]"
                 @add-to-cart="addToCart"
                 @toggle-wishlist="toggleWishlist"
               />
@@ -95,6 +96,8 @@
   
   <script setup>
   import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useUserStore } from '@/stores/userStore'
   import { useCartStore } from '@/stores/cart/cartStore.js'
   import axios from 'axios'
   import Swal from 'sweetalert2'
@@ -107,7 +110,9 @@
   import ProductCard from '@/components/product/ProductCard.vue'
   import BannerSwiper from '@/components/common/BannerSwiper.vue'
 
+  const userStore = useUserStore()
   const cartStore = useCartStore()
+  const router = useRouter()
 
   const banners = [
     'https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/banner1.jpg',
@@ -169,6 +174,28 @@
   const selectedCategory = ref('')
   const selectedBrand = ref('')
   const searchKeyword = ref('')
+
+  const wishlistedStatus = ref({});
+
+
+  const checkWishlistStatus = async (productId) => {
+  if (!userStore.userId) {
+    wishlistedStatus.value[productId] = false;
+    return;
+  }
+  try {
+    const response = await axios.post(`/api/user/subscribes/getSubscribeStatus`, {
+      userId: userStore.userId,
+      itemType: 'PRODUCT',
+      itemId: productId
+    });
+    wishlistedStatus.value[productId] = response.data.data;
+  } catch (error) {
+    console.error('Error checking wishlist status for product ' + productId + ':', error);
+    wishlistedStatus.value[productId] = false; // 發生錯誤預設未收藏
+  }
+};
+
 
 const fetchProducts = async () => {
   try {
@@ -244,24 +271,66 @@ const fetchProducts = async () => {
       })
     }
   }
+
+
   
-  const toggleWishlist = (product) => {
-    product.isWishlisted = !product.isWishlisted
-    Swal.fire({
-      icon: product.isWishlisted ? 'success' : 'info',
-      title: product.isWishlisted ? '已加入收藏！' : '已取消收藏！',
-      text: product.name,
-      timer: 1200,
-      showConfirmButton: false
-    })
+  const toggleWishlist = async (item) => {
+    if (!item) return;
+    if (userStore.userId) {
+      try {
+        const response = await axios.post(`/api/user/subscribes/switch`, {
+          userId: userStore.userId,
+          itemId: item.id,
+          itemType: 'PRODUCT'
+        })
+        if (response.data.success) {
+          wishlistedStatus.value[item.id] = !wishlistedStatus.value[item.id];
+      Swal.fire({
+        icon: wishlistedStatus.value[item.id] ? 'success' : 'info',
+        title: wishlistedStatus.value[item.id] ? '已加收藏！' : '已取消收藏！',
+        text: item.name,
+        timer: 1200,
+        showConfirmButton: false
+      });
+          fetchProducts();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: '操作失敗',
+            text: response.data.message || '無法更新收藏狀態',
+          })
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: '操作失敗',
+          text: error + '與伺服器通訊發生錯誤',
+        })
+      }
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: '請先登入',
+        text: '登入後才能使用收藏功能',
+        confirmButtonText: '前往登入'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/secure/login')
+        }
+      })
+    }
   }
+
   const toggleSubCategory = (category) => {
     category.show = !category.show
   }
-  onMounted(() => {
+  onMounted(async () => {
     fetchCategories()
     fetchBrands()
-    fetchProducts()
+    await fetchProducts()
+    products.value.forEach(product => {
+    checkWishlistStatus(product.id);
+  });
   })
   </script>
   

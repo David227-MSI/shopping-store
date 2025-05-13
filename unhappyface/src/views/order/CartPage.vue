@@ -14,7 +14,7 @@
     </div>
 
     <div v-else class="cart-main">
-      <!-- 左邊 商品列表 / 追蹤未放功能 (只提供按鈕) -->
+      <!-- 左邊 商品列表 / 收藏未放功能 (只提供按鈕) -->
       <div class="cart-list">
         <ul>
           <li v-for="item in cartItems" :key="item.productId" class="cart-item">
@@ -32,7 +32,14 @@
                 <span class="quantity">{{ item.quantity }}</span>
                 <button @click="updateQuantity(item.productId, item.quantity + 1)" :disabled="isLoading">+</button>
                 <button @click="removeItem(item.productId)" :disabled="isLoading" class="delete-btn">刪除</button>
-                <button disabled class="watch-button">追蹤</button>
+                <button
+                  @click="toggleWatch(item.productId)"
+                  :class="{'watched': watchedProducts.has(item.productId)}"
+                  :disabled="isLoading"
+                  class="watch-button"
+                >
+                  {{ watchedProducts.has(item.productId) ? '取消收藏' : '收藏' }}
+                </button>  
               </div>
             </div>
           </li>
@@ -113,6 +120,8 @@ const userStore = useUserStore();
 const couponStore = useCouponStore();
 const productImageMap = ref({});
 
+const watchedProducts = ref(new Set());
+
 const userId = computed(() => userStore.userId);
 const cartItems = computed(() => cartStore.cartItems);
 const totalAmount = computed(() => cartStore.totalAmount);
@@ -172,6 +181,7 @@ const loadCart = async () => {
       await cartStore.fetchCart();
     }
     await fetchMainImageForCartItems();
+    await loadWatchStatus();
   } catch (error) {
     console.error('載入購物車失敗', error);
     Swal.fire({
@@ -271,8 +281,128 @@ const goToCheckout = async () => {
   }
 };
 
-onMounted(() => {
-  loadCart();
+
+const loadWatchStatus = async () => {
+  // console.log('loadWatchStatus 開始，cartItems:', cartItems.value);
+  if (userId.value && cartItems.value.length > 0) {
+    try {
+      const requests = cartItems.value.map(item =>
+        axios.post(`/api/user/subscribes/getSubscribeStatus`, {
+          userId: userId.value,
+          itemType: 'PRODUCT',
+          itemId: item.productId
+        })
+      );
+
+      const responses = await Promise.all(requests);
+
+      responses.forEach((res, index) => {
+        // console.log(`商品 ${cartItems.value[index].productId} 的收藏狀態回應：`, res.data);
+        // 直接檢查 res.data 的布林值
+        if (res.data === true) {
+          // console.log('收藏成功，productId:', cartItems.value[index].productId);
+          watchedProducts.value.add(cartItems.value[index].productId);
+        } else {
+          // console.log('未收藏，productId:', cartItems.value[index].productId, '回應:', res.data);
+        }
+      });
+      // console.log('loadWatchStatus 完成，watchedProducts:', watchedProducts.value);
+    } catch (error) {
+      console.error('載入收藏狀態失敗', error);
+    }
+  } else {
+    watchedProducts.value.clear();
+    console.log('loadWatchStatus 完成，因無使用者或無購物車商品，已清空 watchedProducts');
+  }
+};
+
+
+
+const toggleWatch = async (productId) => {
+  if (!userId.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: '請先登入',
+      text: '登入後才能使用收藏功能',
+      confirmButtonText: '前往登入',
+    });
+    return;
+  }
+
+  isLoading.value = true;
+  try {
+    const response = await axios.post(`/api/user/subscribes/switch`, {
+      userId: userId.value,
+      itemId: productId,
+      itemType: 'PRODUCT'
+    });
+    console.log('後端 switch API 回應:', response.data);
+
+    if (response?.success) {
+      const isSubscribing = response.data.isSubscribing; // 直接從 response.data 取值
+      console.log('isSubscribing 狀態:', isSubscribing);
+
+      if (isSubscribing !== undefined) {
+        if (isSubscribing) {
+          watchedProducts.value.add(productId);
+          Swal.fire({
+            icon: 'success',
+            title: '已加入收藏！',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+          });
+        } else {
+          watchedProducts.value.delete(productId);
+          Swal.fire({
+            icon: 'info',
+            title: '已取消收藏！',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: '操作成功',
+          text: '但未收到收藏狀態更新',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 1000,
+          timerProgressBar: true,
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: '操作失敗',
+        text: response.data?.message || '無法更新收藏狀態',
+      });
+    }
+  } catch (error) {
+    console.error('切換收藏狀態失敗', error);
+    Swal.fire({
+      icon: 'error',
+      title: '操作失敗',
+      text: '與伺服器通訊發生錯誤',
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+
+
+onMounted(async () => {
+  await loadCart();
+  loadWatchStatus();
+
 });
 
 // const getImageUrl = (productName) => {

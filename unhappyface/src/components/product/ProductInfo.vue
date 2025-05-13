@@ -29,6 +29,7 @@
   </template>
   
   <script setup>
+  
   defineProps({
     product: Object,
     quantity: Number,
@@ -36,5 +37,7 @@
   })
   
   defineEmits(['increase', 'decrease', 'add-to-cart', 'toggle-wishlist'])
+
+
   </script>
   

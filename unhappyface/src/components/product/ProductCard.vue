@@ -8,8 +8,10 @@
       <div style="margin-top: 8px;">
         <a class="action-button" :href="`/products/${product.id}`">🔍 查看</a>
         <a class="action-button" @click="$emit('add-to-cart', product, $event)">🛒</a>
-        <a href="#" class="action-button" @click.prevent="$emit('toggle-wishlist', product)">
-          <span v-if="product.isWishlisted">❤️</span>
+        <a href="#" 
+        class="action-button" 
+        @click.prevent="$emit('toggle-wishlist', product)">
+          <span v-if="isWishlisted">❤️</span>
           <span v-else>🤍</span>
         </a>
       </div>
@@ -18,7 +20,8 @@
   
   <script setup>
   const props = defineProps({
-    product: Object
+    product: Object,
+    isWishlisted: Boolean
   })
   
   const getProductImage = (name) => {
@@ -40,6 +43,7 @@
     if (name === 'QF-Smart X Ultra') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone4.png'
     return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/product_coming_soon.jpg'
   }
+
 
   </script>
   <style scoped>

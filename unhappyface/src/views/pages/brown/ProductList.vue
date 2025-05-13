@@ -128,6 +128,8 @@
       }
     })
     products.value = data
+    console.log('data: ' + data);
+    
   }
   
   const fetchCategories = async () => {
@@ -173,6 +175,21 @@
   const toggleSubCategory = (category) => {
     category.show = !category.show
   }
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
   onMounted(() => {
     fetchCategories()
     fetchBrands()

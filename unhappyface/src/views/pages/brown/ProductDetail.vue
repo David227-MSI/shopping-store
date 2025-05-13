@@ -129,10 +129,12 @@
           itemType: 'PRODUCT'
         })
         if (response.data.success) {
-          item.isWishlisted = !item.isWishlisted
+          isWishlisted.value = !isWishlisted.value
+          console.log('item.isWishlisted: ' + isWishlisted.value);
+          
           Swal.fire({
-            icon: item.isWishlisted ? 'success' : 'info',
-            title: item.isWishlisted ? '已加入收藏！' : '已取消收藏！',
+            icon: isWishlisted.value ? 'success' : 'info',
+            title: isWishlisted.value ? '已加入收藏！' : '已取消收藏！',
             text: item.name,
             timer: 1200,
             showConfirmButton: false
@@ -320,11 +322,10 @@
       })
       
       isWishlisted.value = response.data.data
-      console.log('userId: ' + userStore.userId);
-      console.log('productId ' + productId)
-      console.log('data ' + response.data.data);
-      
-      console.log('isWishlisted ' + isWishlisted.value);
+      // console.log('userId: ' + userStore.userId);
+      // console.log('productId ' + productId)
+      // console.log('data ' + response.data.data);
+      // console.log('isWishlisted ' + isWishlisted.value);
       
     } catch (error) {
       console.error('Error checking wishlist status:', error)
@@ -369,8 +370,6 @@
     fetchRecommended();
     console.log('--- onMounted finished initiating fetches ---');
     window.addEventListener('scroll', handleScroll)
-    
-    
   })
 
   onUnmounted(() => window.removeEventListener('scroll', handleScroll))
