@@ -45,12 +45,14 @@
             </td>
           </tr>
           <tr v-if="discountAmount > 0">
-            <td colspan="5" class="text-right">折價券</td>
+            <td colspan="4" class="text-right">折價券</td>
             <td class="discount">-{{ discountAmount }} 元</td>
+            <td></td> <!-- 空白欄對應評論欄 -->
           </tr>
           <tr>
-            <td colspan="5" class="text-right total-label">總計</td>
+            <td colspan="4" class="text-right total-label">總計</td>
             <td class="total-value">{{ finalAmount }} 元</td>
+            <td></td> <!-- 空白欄對應評論欄 -->
           </tr>
           </tbody>
         </table>
