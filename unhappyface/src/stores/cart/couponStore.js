@@ -53,7 +53,7 @@ export const useCouponStore = defineStore('coupon', () => {
         }
 
         try {
-            const res = await axios.post('/api/admin/coupons/getValidCoupon', {
+            const res = await axios.post('/api/user/coupons/getValidCoupon', {
                 userId: userStore.userId,
                 totalAmount: cartStore.totalAmount,
                 productIds: productIds.value,
