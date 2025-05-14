@@ -276,11 +276,26 @@
 }
   
   const fetchRecommended = async () => {
+    console.log('--- fetchRecommended function called ---');
     try {
-      const { data } = await axios.get(`/api/products/${route.params.id}/recommended`)
-      recommended.value = data
-    } catch (e) {
-      console.error('推薦商品讀取失敗', e)
+      const response = await axios.get(`/api/products/${route.params.id}/recommended`);
+      let recommendedProductsArray = [];
+      
+      if (response.data && Array.isArray(response.data.data)) {
+      recommendedProductsArray = response.data.data;
+      console.log('✅ 獲取推薦商品成功，陣列在 data 屬性中');
+      }
+      else {
+        console.error('⚠️ 獲取推薦商品回傳格式不正確或沒有 data 屬性：', response.data);
+        recommended.value = [];
+        return;
+      }
+    recommended.value = recommendedProductsArray;
+    console.log('✅ 已更新推薦商品列表:', recommended.value);
+
+    } catch (error) {
+      console.error('❌ 獲取推薦商品失敗:', error);
+      recommended.value = [];
     }
   }
 
