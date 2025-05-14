@@ -6,7 +6,7 @@
    <div class="detail-layout">
         <!-- 左邊圖片 -->
         <ZoomImage
-          :productImage="productImage"
+          :mediaItem="currentMainMedia"
         />
   
         <!-- 右邊資訊 -->
@@ -20,21 +20,33 @@
           @toggle-wishlist="toggleWishlist"
         />
       </div>
-  
-      <!-- 添加縮略圖區塊 -->
-      <!-- 使用 v-if="productImages.length > 1" 只在有多張圖片時顯示 -->
-      <div v-if="productImages.length > 1" class="thumbnail-gallery">
-        <!-- 使用 v-for 迴圈顯示圖片列表 -->
+
+      <div v-if="productMediaList.length > 1" class="thumbnail-gallery">
+        <div
+          v-for="(media, index) in productMediaList"
+          :key="media.id || index"
+          class="thumbnail-wrapper"
+          :class="{ 'is-selected': media.mediaUrl === selectedMainMedia?.mediaUrl }"
+          @click="selectMainMedia(media)"
+        >
           <img
-          v-for="(image, index) in productImages"
-          :key="index"
-          :src="image"
-          alt="Product thumbnail"
-          class="thumbnail"
-          :class="{ 'is-selected': image === selectedMainImage }"
-          @click="selectMainImage(image)"
-          loading="lazy"
-        />
+            v-if="media.mediaType === 'IMAGE'"
+            :src="media.mediaUrl"
+            :alt="media.altText || 'Product thumbnail'"
+            class="thumbnail"
+            loading="lazy"
+          />
+          <video
+            v-else-if="media.mediaType === 'VIDEO'"
+            :src="media.mediaUrl"
+            :alt="media.altText || 'Product video thumbnail'"
+            class="thumbnail video-thumbnail"
+            preload="metadata"
+          ></video>
+          <span v-else class="thumbnail-placeholder">N/A</span>
+
+          <div v-if="media.mediaType === 'VIDEO'" class="video-play-icon">▶️</div>
+        </div>
       </div>
     </div>
 
@@ -55,7 +67,7 @@
   </template>
 
   <script setup>
-  import { ref, computed, onMounted, onUnmounted } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, onUnmounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useUserStore } from '@/stores/userStore'
   import axios from 'axios'
@@ -116,7 +128,7 @@
 
 
 
-  
+
 
 
   const toggleWishlist = async (item) => {
@@ -131,7 +143,7 @@
         if (response.data.success) {
           isWishlisted.value = !isWishlisted.value
           console.log('item.isWishlisted: ' + isWishlisted.value);
-          
+
           Swal.fire({
             icon: isWishlisted.value ? 'success' : 'info',
             title: isWishlisted.value ? '已加入收藏！' : '已取消收藏！',
@@ -199,16 +211,26 @@
         console.log('獲取到的 ProductDTO 數據:', productData);
 
         checkWishlistStatus(productData.id);
-        
+
         if (productData.images && Array.isArray(productData.images) && productData.images.length > 0) {
-          productImages.value = productData.images.map(mediaDto => mediaDto.mediaUrl);
-          selectedMainImage.value = productImages.value[0];
-          console.log('圖片列表從產品詳細 API 獲取成功:', productImages.value);
-          console.log('Selected main image:', selectedMainImage.value);
+
+          productMediaList.value = productData.images
+              .sort((a, b) => a.mediaOrder - b.mediaOrder);
+
+          const mainMedia = productMediaList.value.find(m => m.isMain) || productMediaList.value[0];
+          selectedMainMedia.value = mainMedia;
+
+          console.log('媒體列表從產品詳細 API 獲取成功:', productMediaList.value);
+          console.log('Selected main media:', selectedMainMedia.value);
         } else {
-          productImages.value = [];
-          selectedMainImage.value = getProductImage(productData.name || '');
-          console.log('產品詳細 API 返回的圖片列表為空或不存在，使用備用圖片。');
+          productMediaList.value = [];
+
+          selectedMainMedia.value = {
+            mediaUrl: getProductImage(productData.name || ''),
+            mediaType: 'IMAGE',
+            altText: productData.name || 'Placeholder Image'
+          };
+          console.log('產品詳細 API 返回的媒體列表為空或不存在，使用備用圖片。');
         }
     } else {
       console.error('獲取產品詳細資料失敗：API 返回失敗狀態或無效數據', apiResponse);
@@ -226,11 +248,23 @@
   }
 };
 
-  const selectMainImage = (imageUrl) => {
-  selectedMainImage.value = imageUrl;
-  // 如果需要，點擊縮略圖時可以讓主圖區域也捲動到頂部
-  // window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  // 修改縮圖點擊事件，接收完整的媒體物件 (包含 mediaType, mediaUrl 等)
+  const selectMainMedia = (mediaItem) => {
+    selectedMainMedia.value = mediaItem;
+    // 如果點擊的是影片，確保其自動播放
+    if (mediaItem.mediaType === 'VIDEO') {
+      // 給予 DOM 渲染一點時間，然後嘗試播放
+      setTimeout(() => {
+        const videoElement = document.querySelector('.main-media-container video');
+        if (videoElement) {
+          // 為了確保播放，可能需要先暫停再播放 (特別是在某些移動瀏覽器)
+          videoElement.pause();
+          videoElement.currentTime = 0; // 從頭開始
+          videoElement.play().catch(e => console.error("Error playing video:", e));
+        }
+      }, 50);
+    }
+  };
   
   async function fetchReviews() {
   try {
@@ -270,46 +304,51 @@
         quantity: quantity.value
       })
 
-      for (let i = 0; i < quantity.value; i++) {
-        const img = document.createElement('img')
-        img.src = getProductImage(item.name)
-        img.style.position = 'fixed'
-        img.style.left = `${event.clientX}px`
-        img.style.top = `${event.clientY}px`
-        img.style.width = '80px'
-        img.style.height = '80px'
-        img.style.borderRadius = '50%'
-        img.style.zIndex = 2000
-        img.style.pointerEvents = 'none'
-        img.style.transition = 'all 0.9s cubic-bezier(0.22, 1, 0.36, 1)'
-        document.body.appendChild(img)
-        setTimeout(() => {
-          img.style.left = `calc(92% + ${Math.random() * 100 - 50}px)`
-          img.style.top = `calc(2% + ${Math.random() * 100 - 30}px)`
-          img.style.width = '0px'
-          img.style.height = '0px'
-          img.style.opacity = '0'
-        }, 10 + i * 100)
-        setTimeout(() => document.body.removeChild(img), 1000 + i * 100)
-      }
-
-      Swal.fire({
-        icon: 'success',
-        title: '已加入購物車！',
-        text: `${item.name} 已成功加入購物車（${quantity.value} 件）！`,
-        timer: 1500,
-        showConfirmButton: false
-      })
-    } catch (error) {
-      console.error('加入購物車錯誤', error)
-      Swal.fire({
-        icon: 'error',
-        title: '加入購物車失敗',
-        text: '請稍後再試',
-        timer: 1500,
-        showConfirmButton: false
-      })
+    // 動畫部分保持不變
+    for (let i = 0; i < quantity.value; i++) {
+      const img = document.createElement('img');
+      // 使用 getProductImage 獲取圖片 URL，這部分邏輯沒變
+      img.src = getProductImage(item.name); // 注意這裡還是使用圖片作為動畫
+      img.style.position = 'fixed';
+      img.style.left = `${event.clientX}px`;
+      img.style.top = `${event.clientY}px`;
+      img.style.width = '80px';
+      img.style.height = '80px';
+      img.style.borderRadius = '50%';
+      img.style.zIndex = 2000;
+      img.style.pointerEvents = 'none';
+      img.style.transition = 'all 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
+      document.body.appendChild(img);
+      setTimeout(() => {
+        img.style.left = `calc(92% + ${Math.random() * 100 - 50}px)`;
+        img.style.top = `calc(2% + ${Math.random() * 100 - 30}px)`;
+        img.style.width = '0px';
+        img.style.height = '0px';
+        img.style.opacity = '0';
+      }, 10 + i * 100);
+      setTimeout(() => document.body.removeChild(img), 1000 + i * 100);
     }
+
+    // 購物車數量更新可能會由 store 內部處理，這裡的 cartCount.value += quantity.value 可能需要調整
+    // 如果 Header 組件是直接讀取 cartStore 的 state，這裡就不需要手動更新 cartCount 了
+    // cartCount.value += quantity.value // 如果 cartCount 是從 store 映射來的，請刪除這行
+
+    Swal.fire({
+      icon: 'success',
+      title: '已加入購物車！',
+      text: `<span class="math-inline">\{item\.name\} 已成功加入購物車（</span>{quantity.value} 件）！`,
+      timer: 1500,
+      showConfirmButton: false
+    });
+  } catch (error) {
+    console.error('加入購物車錯誤', error);
+    Swal.fire({
+      icon: 'error',
+      title: '加入購物車失敗',
+      text: '請稍後再試',
+      timer: 1500,
+      showConfirmButton: false
+    });
   }
 
 
@@ -320,19 +359,19 @@
         itemType: 'PRODUCT',
         itemId: productId
       })
-      
+
       isWishlisted.value = response.data.data
       // console.log('userId: ' + userStore.userId);
       // console.log('productId ' + productId)
       // console.log('data ' + response.data.data);
       // console.log('isWishlisted ' + isWishlisted.value);
-      
+
     } catch (error) {
       console.error('Error checking wishlist status:', error)
       isWishlisted.value = false // 出錯時預設為未收藏
     }
   }
-  
+
   
   
   const getProductImage = (name) => {
@@ -354,11 +393,6 @@
     if (name === 'QF-Smart X Ultra') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone4.png'
     return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/product_coming_soon.jpg'
   }
-  
-  const productImage = computed(() => {
-    // 如果 selectedMainImage 有值，就用它；否則使用舊的根據產品名稱獲取佔位圖的邏輯 (作為備用)
-    return selectedMainImage.value || getProductImage(product.value?.name || '');
-  });
   
   const handleScroll = () => showBackToTop.value = window.scrollY > 200
 
@@ -404,23 +438,67 @@
     margin-bottom: 20px;
   }
 
-  .thumbnail {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: border-color 0.2s, transform 0.2s;
-  }
+.thumbnail-wrapper {
+  position: relative;
+  width: 60px; /* 縮圖容器寬度 */
+  height: 60px; /* 縮圖容器高度 */
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+  overflow: hidden; /* 確保內容不會溢出圓角 */
+  display: flex; /* 使用 flex 居中內容 */
+  justify-content: center;
+  align-items: center;
+  background-color: #eee; /* 預設背景色 */
+}
 
-  .thumbnail:hover {
-    border-color: #a47551;
-    transform: scale(1.05);
-  }
+.thumbnail-wrapper:hover {
+  border-color: #a47551;
+  transform: scale(1.05);
+}
 
-  .thumbnail.is-selected {
-    border-color: #5C4033;
-    box-shadow: 0 0 5px rgba(92, 64, 51, 0.5);
-  }
-  </style>
+.thumbnail-wrapper.is-selected {
+  border-color: #5c4033;
+  box-shadow: 0 0 5px rgba(92, 64, 51, 0.5);
+}
+
+.thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 圖片和影片覆蓋容器 */
+  display: block;
+}
+
+.video-thumbnail {
+  /* 影片縮圖的特定樣式 */
+  background-color: black;
+}
+
+.video-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px; /* 播放圖示大小 */
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 5px;
+  line-height: 1;
+  pointer-events: none; /* 允許點擊穿透到 wrapper */
+  z-index: 1; /* 確保在影片縮圖之上 */
+}
+
+/* 可選：如果媒體類型未知，顯示佔位符的樣式 */
+.thumbnail-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  color: #ccc;
+  font-size: 12px;
+}
+</style>

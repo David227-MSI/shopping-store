@@ -41,7 +41,12 @@
             <td>{{ item.subtotal }} 元</td>
             <!-- 評論欄位 -->
             <td>
-              <button class="review-btn" type="button" title="撰寫評論" @click="openReview(item.productId)">撰寫評論</button>
+              <ReviewEntry
+                  v-if="userStore.userId && item.orderItemId"
+                  :orderItemId="item.orderItemId"
+                  :userId="userStore.userId"
+              />
+              <span v-else>無法評論</span>
             </td>
           </tr>
           <tr v-if="discountAmount > 0">
@@ -66,6 +71,8 @@
 <script setup>
 import { ref, watch } from 'vue';
 import axios from '@/services/order/orderAxios.js';
+import { useUserStore } from '@/stores/userStore.js';
+import ReviewEntry from '@/components/ra/review/ReviewEntry.vue';
 
 const props = defineProps({
   visible: Boolean,
@@ -81,6 +88,8 @@ const finalAmount = ref(0);
 const isLoading = ref(false);
 const productImageMap = ref({});
 
+const userStore = useUserStore();
+
 // 載入訂單明細 + 抓圖片
 watch(
     () => props.orderId,
@@ -90,8 +99,8 @@ watch(
       try {
         const res = await axios.get(`/api/orders/${newId}`);
         orderDetails.value = res.orderDetails || [];
-        discountAmount.value = res.order.discountAmount || 0;
-        finalAmount.value = res.order.finalAmount || 0;
+        discountAmount.value = res.order?.discountAmount || 0;
+        finalAmount.value = res.order?.finalAmount || 0;
 
         // 同步抓主圖
         const tasks = orderDetails.value.map(async (item) => {
@@ -103,6 +112,7 @@ watch(
           }
         });
         await Promise.all(tasks);
+
       } catch (err) {
         console.error('載入訂單明細失敗', err);
       } finally {
@@ -111,6 +121,16 @@ watch(
     },
     { immediate: true }
 );
+
+watch(() => props.visible, (isVisible) => {
+  if (!isVisible) {
+    orderDetails.value = [];
+    discountAmount.value = 0;
+    finalAmount.value = 0;
+    productImageMap.value = {};
+  }
+});
+
 </script>
 
 <style scoped>
@@ -123,22 +143,6 @@ watch(
 }
 .product-img:hover {
   transform: scale(1.08);
-}
-
-.review-btn {
-  background-color: #a07855;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  box-shadow: 0 2px 6px rgba(160, 120, 85, 0.2);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-}
-.review-btn:hover {
-  background-color: #8c6242;
-  box-shadow: 0 4px 12px rgba(140, 98, 66, 0.3);
 }
 
 .modal-overlay {

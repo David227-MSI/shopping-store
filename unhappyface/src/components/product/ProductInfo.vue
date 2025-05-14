@@ -1,5 +1,6 @@
 <template>
     <div v-if="product">
+      <h2>{{ product.name || '未命名商品' }}</h2>
       <p><strong>分類：</strong>{{ product.categoryName || '未分類' }}</p>
       <p><strong>品牌：</strong>{{ product.brandName || '未設定' }}</p>
       <p><strong>價格：</strong><span class="price-tag">{{ product.unitPrice }} 元</span></p>
@@ -29,15 +30,27 @@
   </template>
   
   <script setup>
-  
+  import { defineProps, defineEmits } from 'vue';
+
   defineProps({
     product: Object,
     quantity: Number,
     isWishlisted: Boolean
   })
-  
+
   defineEmits(['increase', 'decrease', 'add-to-cart', 'toggle-wishlist'])
 
 
   </script>
+
+<style scoped>
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.quantity-selector {
+  margin-top: 60px;
+}
+</style>
   
