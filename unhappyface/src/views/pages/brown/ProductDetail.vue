@@ -404,7 +404,7 @@
       Swal.fire({
         icon: 'success',
         title: '已加入購物車！',
-        text: `<span class="math-inline">\{item\.name\} 已成功加入購物車（</span>{quantity.value} 件）！`,
+        text: `${item.name} 已成功加入購物車！`,
         timer: 1500,
         showConfirmButton: false
       });
