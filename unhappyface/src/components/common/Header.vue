@@ -22,7 +22,7 @@
        <a href="#" @click.prevent="logout">🚪 登出</a>
      </template>
 
-     <a href="/member/orders">📦 查訂單</a>
+     <a href="#" @click.prevent="handleOrdersClick">📦 查訂單</a>
      <a href="/pages/user-subscribe-list">⭐️ 追蹤清單</a>
      <a href="/pages/user-coupon-list">🎫 折價券</a>
      <a href="#" @click.prevent="handleCartClick">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
@@ -66,6 +66,25 @@ const handleCartClick = async () => {
     router.push('/cart')
   }
 }
+
+const handleOrdersClick = async () => {
+  if (!userStore.isLoggedIn) {
+    const result = await Swal.fire({
+      title: '請先登入',
+      text: '登入後可查看訂單記錄',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: '前往登入',
+      cancelButtonText: '取消'
+    });
+
+    if (result.isConfirmed) {
+      router.push('/secure/login');
+    }
+  } else {
+    router.push('/member/orders');
+  }
+};
 
 const cartCount = computed(() => {
   return cartStore.cartItems.reduce((sum, item) => sum + item.quantity, 0);
