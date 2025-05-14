@@ -26,10 +26,10 @@
     <!-- 熱門商品 對齊上方 input -->
     <div class="hot-keywords" style="margin-top: 6px;">
       熱門商品：
-      <a href="/products/1">月亮香水</a> /
-      <a href="/products/2">竹風拖鞋</a> /
-      <a href="/products/3">奧創手機</a> /
-      <a href="/products/4">雲彩洋裝</a> 
+      <router-link :to="{ name: 'ProductDetail', params: { id: 111 } }">月亮香水</router-link> /
+      <router-link :to="{ name: 'ProductDetail', params: { id: 105 } }">竹風拖鞋</router-link> /
+      <router-link :to="{ name: 'ProductDetail', params: { id: 112 } }">奧創手機</router-link> /
+      <router-link :to="{ name: 'ProductDetail', params: { id: 103 } }">雲彩洋裝</router-link>
     </div>
   </div>
 </div>
@@ -179,6 +179,21 @@
 
   const wishlistedStatus = ref({});
 
+  // 🔍 進入頁面時立即搜尋「手機」
+  onMounted(() => {
+    fetchByKeyword('手機')
+  })
+  async function fetchByKeyword(keyword) {
+    try {
+      const response = await axios.get('/api/products/search', {
+        params: { keyword }
+      });
+      products.value = response.data;
+      console.log('✅ 查到商品：', products.value)
+    } catch (err) {
+      console.error('❌ 查詢失敗：', err)
+    }
+  }
 
   const checkWishlistStatus = async (productId) => {
   if (!userStore.userId) {
@@ -199,50 +214,63 @@
 };
 
 
-const fetchProducts = async () => {
-  try {
-    const { data } = await axios.get('/api/products', {
-      params: {
-        category: selectedCategory.value,
-        brand: selectedBrand.value,
-        search: searchKeyword.value
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('/api/products', {
+        params: {
+          category: selectedCategory.value || null,
+          brand: selectedBrand.value || null,
+          search: searchKeyword.value || null
+        }
+      });
+
+      // ⏺️ 確認實際發出什麼請求
+      console.log("📦 發出請求 URL：", response.config.url);
+
+      if (Array.isArray(response.data?.data)) {
+        products.value = response.data.data;
+      } else {
+        console.error('⚠️ 回傳格式錯誤：', response.data);
+        products.value = [];
       }
-    })
-
-    console.log("⚠️ API 回傳內容：", data)
-
-    // ✅ 修正這裡，改為 data.data
-    if (Array.isArray(data.data)) {
-      products.value = data.data
-    } else {
-      console.error('⚠️ 錯誤資料格式：', data)
-      products.value = []
+    } catch (error) {
+      console.error('❌ 取得商品失敗：', error);
+      products.value = [];
     }
-  } catch (error) {
-    console.error('❌ 取得商品失敗：', error)
-    products.value = []
-  }
-}
+  };
   
   const fetchCategories = async () => {
     const { data } = await axios.get('/api/categories')
     categories.value = data
   }
-  
+
   const fetchBrands = async () => {
-    const { data } = await axios.get('/api/brands', {
-      params: { category: selectedCategory.value }
-    })
-    brands.value = data
+    try {
+      const response = await axios.get('/api/brands', {
+        params: {
+          category: selectedCategory.value || null
+        }
+      });
+      console.log("📦 發送 brands 查詢：", response.config.url);
+      brands.value = response.data;
+    } catch (error) {
+      console.error('❌ 取得品牌失敗：', error);
+      brands.value = [];
+    }
   }
   
   const filterByCategory = (categoryId) => {
     selectedCategory.value = categoryId
     fetchProducts()
   }
-  
+
   const searchProducts = () => {
-    fetchProducts()
+    if (searchKeyword.value.trim()) {
+      router.push({
+        path: '/products',
+        query: { keyword: searchKeyword.value.trim() }
+      })
+    }
   }
   
   const resetFilters = () => {
