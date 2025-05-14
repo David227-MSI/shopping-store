@@ -1,7 +1,6 @@
 <template>
     <div>
        <!-- ✅ 補上 Header，這樣購物車才會出現 -->
-   <Header :cartCount="cartCount" />
    <div class="product-page-content">
    <div class="detail-layout">
         <!-- 左邊圖片 -->
@@ -67,7 +66,7 @@
   </template>
 
   <script setup>
-  import { ref, computed, onMounted, onUnmounted, onUnmounted } from 'vue'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useUserStore } from '@/stores/userStore'
   import axios from 'axios'
@@ -94,13 +93,12 @@
   const product = ref(null)
   const reviews = ref([])
   const recommended = ref([])
-  const cartCount = ref(0)
   const showBackToTop = ref(false)
   const isWishlisted = ref(false)
   const productId = ref(null)
   
-  const selectedMainImage = ref('');
-  const productImages = ref([]);
+  const selectedMainMedia = ref('');
+  const productMediaList = ref([]);
   
   const increaseQuantity = () => {
     quantity.value++
@@ -285,72 +283,6 @@
       console.error('推薦商品讀取失敗', e)
     }
   }
-  
-  const addToCart = async (targetProductOrEvent, optionalEvent) => {
-    let item = product.value
-    let event = targetProductOrEvent
-  
-    // 如果是從推薦商品來的，第一參數是 product，第二是 event
-    if (optionalEvent && targetProductOrEvent?.id) {
-      item = targetProductOrEvent
-      event = optionalEvent
-    }
-  
-    if (!item || !event) return
-
-    try {
-      await cartStore.addToCart({
-        ...item,
-        quantity: quantity.value
-      })
-
-    // 動畫部分保持不變
-    for (let i = 0; i < quantity.value; i++) {
-      const img = document.createElement('img');
-      // 使用 getProductImage 獲取圖片 URL，這部分邏輯沒變
-      img.src = getProductImage(item.name); // 注意這裡還是使用圖片作為動畫
-      img.style.position = 'fixed';
-      img.style.left = `${event.clientX}px`;
-      img.style.top = `${event.clientY}px`;
-      img.style.width = '80px';
-      img.style.height = '80px';
-      img.style.borderRadius = '50%';
-      img.style.zIndex = 2000;
-      img.style.pointerEvents = 'none';
-      img.style.transition = 'all 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
-      document.body.appendChild(img);
-      setTimeout(() => {
-        img.style.left = `calc(92% + ${Math.random() * 100 - 50}px)`;
-        img.style.top = `calc(2% + ${Math.random() * 100 - 30}px)`;
-        img.style.width = '0px';
-        img.style.height = '0px';
-        img.style.opacity = '0';
-      }, 10 + i * 100);
-      setTimeout(() => document.body.removeChild(img), 1000 + i * 100);
-    }
-
-    // 購物車數量更新可能會由 store 內部處理，這裡的 cartCount.value += quantity.value 可能需要調整
-    // 如果 Header 組件是直接讀取 cartStore 的 state，這裡就不需要手動更新 cartCount 了
-    // cartCount.value += quantity.value // 如果 cartCount 是從 store 映射來的，請刪除這行
-
-    Swal.fire({
-      icon: 'success',
-      title: '已加入購物車！',
-      text: `<span class="math-inline">\{item\.name\} 已成功加入購物車（</span>{quantity.value} 件）！`,
-      timer: 1500,
-      showConfirmButton: false
-    });
-  } catch (error) {
-    console.error('加入購物車錯誤', error);
-    Swal.fire({
-      icon: 'error',
-      title: '加入購物車失敗',
-      text: '請稍後再試',
-      timer: 1500,
-      showConfirmButton: false
-    });
-  }
-
 
   const checkWishlistStatus = async (productId) => {
     try {
@@ -372,28 +304,123 @@
     }
   }
 
-  
-  
+  // 獲取備用圖片 URL 的邏輯，這部分保持不變
   const getProductImage = (name) => {
-    if (name === 'Bvantgardey') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/perfumeA.jpg'
-    if (name === 'Whitepink') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/perfumeB.jpg'
-    if (name === 'MyPhone 15 Pro Max') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone1.png'
-    if (name === '黑色棉T') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/black_T.png'
-    if (name === '夏日晨露淡香水') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/grass.png'
-    if (name === '雲彩男款輕薄外套') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/jacket_men.jpg'
-    if (name === '雲彩女款休閒洋裝') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/dress_women.jpg'
-    if (name === 'StarPhone X9') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone2.png'
-    if (name === '竹風防滑拖鞋組') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/slippers.jpg'
-    if (name === '極光連帽機能外套') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/jacket_aurora.jpg'
-    if (name === 'Threelight Edge S5') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone3.png'
-    if (name === '木田可堆疊收納箱') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/storage_box.jpg'
-    if (name === '木田天然洗碗精') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/dish_soap.jpg'
-    if (name === '映月氣質長裙') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/skirt.png'
-    if (name === '聆香月光花語香水') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/moon.png'
-    if (name === 'QF-Smart X Ultra') return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone4.png'
-    return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/product_coming_soon.jpg'
+    if (name === 'Bvantgardey')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/perfumeA.jpg';
+    if (name === 'Whitepink')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/perfumeB.jpg';
+    if (name === 'MyPhone 15 Pro Max')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone1.png';
+    if (name === '黑色棉T')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/black_T.png';
+    if (name === '夏日晨露淡香水')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/grass.png';
+    if (name === '雲彩男款輕薄外套')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/jacket_men.jpg';
+    if (name === '雲彩女款休閒洋裝')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/dress_women.jpg';
+    if (name === 'StarPhone X9')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone2.png';
+    if (name === '竹風防滑拖鞋組')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/slippers.jpg';
+    if (name === '極光連帽機能外套')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/jacket_aurora.jpg';
+    if (name === 'Threelight Edge S5')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone3.png';
+    if (name === '木田可堆疊收納箱')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/storage_box.jpg';
+    if (name === '木田天然洗碗精')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/dish_soap.jpg';
+    if (name === '映月氣質長裙')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/skirt.png';
+    if (name === '聆香月光花語香水')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/moon.png';
+    if (name === 'QF-Smart X Ultra')
+      return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/phone4.png';
+    return 'https://unhappyproductmedia.blob.core.windows.net/product-media/test/product/product_coming_soon.jpg';
+  };
+
+
+  // 修改計算屬性，以處理包含 mediaType 的媒體物件
+  const currentMainMedia = computed(() => {
+    // 如果 selectedMainMedia 存在並且有 mediaUrl，則使用它。
+    // 否則，使用備用圖片作為 IMAGE 類型。
+    if (selectedMainMedia.value && selectedMainMedia.value.mediaUrl) {
+      return selectedMainMedia.value;
+    }
+    // 備用：使用 getProductImage 獲取佔位圖，並設定 mediaType 為 'IMAGE'
+    return {
+      mediaUrl: getProductImage(product.value?.name || ''),
+      mediaType: 'IMAGE',
+      altText: product.value?.name || 'Placeholder Image' // 提供 altText
+    };
+  });
+
+
+  const addToCart = async (targetProductOrEvent, optionalEvent) => {
+    let item = product.value
+    let event = targetProductOrEvent
+
+    // 如果是從推薦商品來的，第一參數是 product，第二是 event
+    if (optionalEvent && targetProductOrEvent?.id) {
+      item = targetProductOrEvent
+      event = optionalEvent
+    }
+
+    if (!item || !event) return
+
+    try {
+      await cartStore.addToCart({
+        ...item,
+        quantity: quantity.value
+      })
+
+      // 動畫部分保持不變
+      for (let i = 0; i < quantity.value; i++) {
+        const img = document.createElement('img');
+        // 使用 getProductImage 獲取圖片 URL，這部分邏輯沒變
+        img.src = getProductImage(item.name); // 注意這裡還是使用圖片作為動畫
+        img.style.position = 'fixed';
+        img.style.left = `${event.clientX}px`;
+        img.style.top = `${event.clientY}px`;
+        img.style.width = '80px';
+        img.style.height = '80px';
+        img.style.borderRadius = '50%';
+        img.style.zIndex = 2000;
+        img.style.pointerEvents = 'none';
+        img.style.transition = 'all 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
+        document.body.appendChild(img);
+        setTimeout(() => {
+          img.style.left = `calc(92% + ${Math.random() * 100 - 50}px)`;
+          img.style.top = `calc(2% + ${Math.random() * 100 - 30}px)`;
+          img.style.width = '0px';
+          img.style.height = '0px';
+          img.style.opacity = '0';
+        }, 10 + i * 100);
+        setTimeout(() => document.body.removeChild(img), 1000 + i * 100);
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: '已加入購物車！',
+        text: `<span class="math-inline">\{item\.name\} 已成功加入購物車（</span>{quantity.value} 件）！`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error('加入購物車錯誤', error);
+      Swal.fire({
+        icon: 'error',
+        title: '加入購物車失敗',
+        text: '請稍後再試',
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+
   }
-  
+
   const handleScroll = () => showBackToTop.value = window.scrollY > 200
 
   onMounted(() => {
@@ -407,8 +434,7 @@
   })
 
   onUnmounted(() => window.removeEventListener('scroll', handleScroll))
-  
-  
+
   </script>
   
   <style scoped>
