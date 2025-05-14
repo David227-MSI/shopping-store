@@ -11,7 +11,7 @@
 
 <!-- 中間搜尋欄區塊 -->
 <div style="flex: 1; display: flex; justify-content: center;">
-  <div style="display: flex; flex-direction: column; width: 100%; max-width: 600px;">
+  <div style="display: flex; flex-direction: column; width: 100%; max-width: 700px;">
     <!-- 搜尋列 -->
     <div style="display: flex; gap: 12px; align-items: center;">
       <input
@@ -25,12 +25,12 @@
     </div>
 
     <!-- 熱門商品 對齊上方 input -->
-    <div class="hot-keywords" style="margin-top: 6px;">
-      熱門商品：
-      <a href="/products/1">月亮香水</a> /
-      <a href="/products/2">竹風拖鞋</a> /
-      <a href="/products/3">奧創手機</a> /
-      <a href="/products/4">雲彩洋裝</a> 
+   <div class="hot-keywords" style="margin-top: 6px;">
+  熱門商品：
+  <router-link :to="{ name: 'ProductDetail', params: { id: 111 } }">月光香水</router-link> /
+  <router-link :to="{ name: 'ProductDetail', params: { id: 105 } }">竹風拖鞋</router-link> /
+  <router-link :to="{ name: 'ProductDetail', params: { id: 112 } }">奧創手機</router-link> /
+  <router-link :to="{ name: 'ProductDetail', params: { id: 103 } }">雲彩洋裝</router-link>
     </div>
   </div>
 </div>
@@ -38,7 +38,7 @@
 
   <!-- 右側活動圖 -->
   <div class="promo-image" style="margin-left: 20px;">
-    <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/promo.gif" alt="活動檔期" />
+    <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/promo.gif" alt="活動檔期" style="width: 350px; height: 180px;"/>
   </div>
 </div>
 </div>
@@ -168,13 +168,24 @@ watch(
 
 async function fetchByKeyword(keyword) {
   try {
-    const response = await axios.get('/api/products/search', {
+    const response = await axios.get('/api/products/fullsearch', {
       params: { keyword }
     });
-    products.value = response.data;
-    console.log('✅ 查到商品：', products.value)
+    let productArray = [];
+
+    if (response.data && Array.isArray(response.data.data)) {
+      productArray = response.data.data;
+    }
+    else {
+      console.error('API 回傳的商品資料格式不正確或沒有 data 屬性：', response.data);
+      products.value = [];
+      return;
+    }
+    products.value = productArray;
+
   } catch (err) {
     console.error('❌ 查詢失敗：', err)
+    products.value = [];
   }
 }
 const fetchProducts = async () => {
@@ -349,11 +360,11 @@ const fetchBrands = async () => {
   z-index: 1;
 }
 .search-logo {
-  transform: translateX(100px); /* 向右移動 */
+  transform: translateX(0px); /* 向右移動 */
 }
 
 .promo-image {
-  transform: translateX(-100px); /* 向左移動 */
+  transform: translateX(-10px); /* 向左移動 */
 }
 
   </style>

@@ -27,7 +27,7 @@
     <!-- 熱門商品 對齊上方 input -->
    <div class="hot-keywords" style="margin-top: 6px;">
   熱門商品：
-  <router-link :to="{ name: 'ProductDetail', params: { id: 111 } }">月亮香水</router-link> /
+  <router-link :to="{ name: 'ProductDetail', params: { id: 111 } }">月光香水</router-link> /
   <router-link :to="{ name: 'ProductDetail', params: { id: 105 } }">竹風拖鞋</router-link> /
   <router-link :to="{ name: 'ProductDetail', params: { id: 112 } }">奧創手機</router-link> /
   <router-link :to="{ name: 'ProductDetail', params: { id: 103 } }">雲彩洋裝</router-link>
@@ -299,7 +299,7 @@ const searchProducts = () => {
   width: 120px;                    /* ✅ 左右欄寬一致，對稱 */
   flex-shrink: 0;
   margin-left: 80px;
-  margin-right: 80px; /* ✅ 左推 10px，更靠邊緣一點 */
+  margin-right: 1300px; /* ✅ 左推 10px，更靠邊緣一點 */
 }
 .right-placeholder {
   width: 120px;                    /* ✅ 左右欄寬一致，對稱 */
