@@ -56,7 +56,18 @@
   import CategorySidebar from '@/components/common/CategorySidebar.vue'
   import ProductSearchBar from '@/components/product/ProductSearchBar.vue'
   import ProductCard from '@/components/product/ProductCard.vue'
-  
+  import { useRoute } from 'vue-router'
+const route = useRoute()
+
+onMounted(() => {
+  const keyword = route.query.keyword || ''
+  if (keyword) {
+    searchKeyword.value = keyword
+    fetchByKeyword(keyword)
+  } else {
+    fetchProducts()
+  }
+})
   const banners = [
     '/images/banner1.jpg',
     '/images/banner2.jpg',

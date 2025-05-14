@@ -8,7 +8,7 @@ import NotFound from '@/views/errors/NotFound.vue'
 import Forbidden from '@/views/errors/Forbidden.vue'
 
 // 商品頁面
-import ProductList from '@/views/pages/brown/ProductList.vue'
+//import ProductList from '@/views/pages/brown/ProductList.vue'
 import ProductDetail from '@/views/pages/brown/ProductDetail.vue'
 
 // 0428 order相關頁面
@@ -36,6 +36,11 @@ import AdminAddPrizeToEvent from '@/views/pages/ttpp/back/AdminAddPrizeToEvent.v
 // 設定頁面參數
 // path:網址, name:頁面名稱, component:元件名
 const routes = [
+  {
+  path: '/products',
+  name: 'ProductList',
+  component: () => import('@/views/pages/brown/Home2.vue')
+},
   // 一般頁面
   { path: '/', name: 'Home', component: Home},
 
@@ -43,7 +48,7 @@ const routes = [
 
     // 商品詳情含評論頁面
     { path: '/products/:id', name: 'ProductDetail', component: ProductDetail },
-    { path: '/products', name: 'ProductList', component: ProductList },
+   // { path: '/products', name: 'ProductList', component: ProductList },
 
     // 錯誤顯示頁面
   { path: "/:pathMatch(.*)", component: NotFound, name: "notfound-link" },
