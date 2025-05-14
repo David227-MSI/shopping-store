@@ -59,15 +59,6 @@
   import { useRoute } from 'vue-router'
 const route = useRoute()
 
-onMounted(() => {
-  const keyword = route.query.keyword || ''
-  if (keyword) {
-    searchKeyword.value = keyword
-    fetchByKeyword(keyword)
-  } else {
-    fetchProducts()
-  }
-})
   const banners = [
     '/images/banner1.jpg',
     '/images/banner2.jpg',
@@ -190,7 +181,7 @@ onMounted(() => {
 
 
 
-  
+
 
 
 
@@ -204,8 +195,15 @@ onMounted(() => {
   onMounted(() => {
     fetchCategories()
     fetchBrands()
+
+    const keyword = route.query.keyword || ''
+    if (keyword) {
+      searchKeyword.value = keyword
+    }
+
     fetchProducts()
   })
+
   </script>
   
   <style scoped>
