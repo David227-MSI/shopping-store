@@ -6,11 +6,11 @@
 <!-- 🔍 搜尋列整體包裝 -->
 <div class="search-bar keyword-with-logo">
   <!-- 左側 LOGO -->
-  <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/logo1.png" alt="LOGO" class="search-logo" style="margin-right: 50px;" />
+  <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/logo1.png" alt="LOGO" class="search-logo" />
 
 <!-- 中間搜尋欄區塊 -->
 <div style="flex: 1; display: flex; justify-content: center;">
-  <div style="display: flex; flex-direction: column; width: 100%; max-width: 600px;">
+  <div class="search-input-container"> 
     <!-- 搜尋列 -->
     <div style="display: flex; gap: 12px; align-items: center;">
       <input
@@ -36,8 +36,8 @@
 
 
   <!-- 右側活動圖 -->
-  <div class="promo-image" style="margin-left: 20px;">
-    <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/promo.gif" alt="活動檔期" />
+  <div class="promo-image" style="margin-left: 120px;">
+    <img src="https://unhappyproductmedia.blob.core.windows.net/product-media/test/Web/promo.gif" alt="活動檔期" style="width: 350px; height: 180px;"/>
   </div>
 </div>
 </div>
@@ -394,7 +394,7 @@
 .center-banner {
   flex: 1;                         /* ✅ 自動撐滿中間寬度 */
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 .right-placeholder {
@@ -439,12 +439,9 @@
   top: 100px; /* ✅ 你可以調整這個值：離視窗頂端的距離 */
   z-index: 1;
 }
-.search-logo {
-  transform: translateX(100px); /* 向右移動 */
-}
 
 .promo-image {
-  transform: translateX(-100px); /* 向左移動 */
+  transform: translateX(-30px);  /*向左移動 */
 }
 
   </style>
