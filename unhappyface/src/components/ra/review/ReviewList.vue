@@ -106,14 +106,28 @@ const filtered=computed(()=>{
 })
 
 /* --- utils --- */
-const maskName=(n:string)=>n?n[0]+'***':'匿名'
-const formatDate=(dt:string)=> new Date(dt).toLocaleDateString()
+const maskName = (n: string | null | undefined): string => {
+  // 檢查 n 是否為有效的非空字串
+  if (typeof n === 'string' && n.length > 0) {
+    // 返回第一個字元 + 'OO'
+    return n[0] + 'OO';
+  } else {
+    // 名稱不存在或為空，返回 '匿名'
+    return '匿名';
+  }
+};
 
-function toggleTag(code:string){
-  const a=activeTags.value
-  const i=a.indexOf(code)
-  i===-1?a.push(code):a.splice(i,1)
-}
+const formatDate = (dt: string): string => {
+  if (!dt) {
+    return '無日期'; // 或其他處理方式
+  }
+  try {
+      return new Date(dt).toLocaleDateString();
+  } catch (e) {
+      console.error("Error formatting date:", dt, e);
+      return '無效日期';
+  }
+};
 
 /** 獲取總平均分數 */
 async function fetchOverallAvg() {
@@ -159,7 +173,7 @@ async function fetch(reset = false) {
       comment: r.reviewText ?? '',
       tagsRaw: r.tags,
       tags: (r.tags ?? []).map((t: string) => TAG_MAP[t] ?? t),
-      userName: r.userName ?? '使用者',
+      userName: r.userName,
       avg: (r.scoreQuality + r.scoreDescription + r.scoreDelivery) / 3
     }));
 
