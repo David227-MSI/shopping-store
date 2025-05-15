@@ -199,7 +199,17 @@ async function fetch(reset = false) {
 
 function loadMore(){fetch()}
 function resetAndFetch(){fetch(true)}
-function applyFilter(){}
+function applyFilter(){resetAndFetch();}
+
+function toggleTag(tagCode: string) {
+  const index = activeTags.value.indexOf(tagCode);
+  if (index === -1) {
+    activeTags.value.push(tagCode);
+  } else {
+    activeTags.value.splice(index, 1);
+  }
+  resetAndFetch();
+}
 
 /* --- like --- */
 async function toggleLike(r:any){
