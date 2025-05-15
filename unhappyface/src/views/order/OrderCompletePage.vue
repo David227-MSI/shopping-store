@@ -91,7 +91,7 @@ const goHome = async () => {
   if (isNavigating.value) return;
   isNavigating.value = true;
   try {
-    await router.push({ name: 'home' });
+    await router.push({ name: 'Home' });
   } catch (error) {
     await Swal.fire('錯誤', '跳轉失敗，請稍後再試', 'error');
   } finally {
