@@ -34,6 +34,9 @@
       <div v-if="uploadProgress > 0 && uploadProgress < 100" class="progress-section">
         <el-progress :percentage="uploadProgress" />
       </div>
+      <div v-if="isEditMode" class="edit-warning-message">
+          <p>評價僅只能編輯一次，送出後將無法再次編輯內容。</p>
+      </div>
       <div class="actions">
         <el-button @click="$emit('close')">取消</el-button>
         <el-button type="primary" :disabled="submitting" @click="submitForm">
@@ -148,17 +151,24 @@ async function checkReview() {
       if (review) {
         form.value = {
           qualityScore: review.scoreQuality || 0,
-          descriptionScore: review.descriptionScore || 0,
-          shippingScore: review.shippingScore || 0,
+          descriptionScore: review.scoreDescription || 0,
+          shippingScore: review.scoreDelivery || 0,
           tags: Array.isArray(review.tags) ? review.tags.map(label => {
             const foundKey = Object.keys(tagMap).find(key => tagMap[key] === label);
             return foundKey || label;
           }).filter(tag => Object.keys(tagMap).includes(tag))
             : [],
           reviewText: review.reviewText || '',
-          images: []
+
+          images: Array.isArray(review.reviewImages) ? review.reviewImages.map((url, index) => ({
+            name: `existing-image-${index + 1}`,
+            url: url,
+            status: 'success',
+            uid: Date.now() + index
+          })) : []
         };
         console.log('載入評論後，成功賦值給 form:', form.value);
+        console.log('form.value.images 內容:', form.value.images);
 
       } else {
         console.warn('獲取到評論存在，但詳細資料為空:', reviewResponse.data);
