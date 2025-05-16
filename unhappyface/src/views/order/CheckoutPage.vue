@@ -60,7 +60,7 @@
           <h2>付款方式</h2>
           <p>本商店僅支援綠界 <strong>信用卡</strong> 線上付款</p>
           <p class="note">付款成功後將跳轉至訂單完成頁面</p>
-          <LottieAnimation :animationData="approved" :loop="true" />
+          <LottieAnimation :animationData="approved" :loop="true"/>
         </div>
       </div>
     </div>
@@ -80,16 +80,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useCartStore } from '@/stores/cart/cartStore.js';
-import { useUserStore } from '@/stores/userStore.js';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {useCartStore} from '@/stores/cart/cartStore.js';
+import {useUserStore} from '@/stores/userStore.js';
 import axios from '@/services/order/orderAxios.js';
 import Swal from 'sweetalert2';
 import AddressDialog from '@/components/order/AddressDialog.vue';
 import LottieAnimation from '@/components/order/LottiePlayer.vue';
 import approved from '@/assets/animations/approved.json';
-import { useCouponStore } from '@/stores/cart/couponStore.js';
+import {useCouponStore} from '@/stores/cart/couponStore.js';
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -99,12 +99,12 @@ const discountAmount = computed(() => couponStore.discountAmount);
 const selectedCouponId = computed(() => couponStore.selectedCouponId);
 
 const userId = computed(() => cartStore.userId);
-const cartItems = computed(() => cartStore.cartItems);
-const totalAmount = computed(() => cartItems.value.reduce((sum, item) => sum + item.subtotal, 0));
+const cartItems = computed(() => cartStore.selectedCartItems);
+const totalAmount = computed(() => cartStore.selectedTotalAmount);
 
 const isSubmitting = ref(false);
 const showAddressDialog = ref(false);
-const recipientInfo = ref({ name: '', phone: '', address: '' });
+const recipientInfo = ref({name: '', phone: '', address: ''});
 
 onMounted(async () => {
   if (!userStore.userId) {
@@ -129,7 +129,7 @@ const loadCart = async () => {
 };
 
 const handleAddressConfirm = (newInfo) => {
-  recipientInfo.value = { ...newInfo };
+  recipientInfo.value = {...newInfo};
   showAddressDialog.value = false;
 };
 
@@ -139,6 +139,16 @@ const maskPhone = (phone) => {
 };
 
 const submitOrder = async () => {
+
+  if (cartStore.selectedItems.length === 0) {
+    await Swal.fire({
+      icon: 'warning',
+      title: '請先勾選要結帳的商品',
+      confirmButtonText: '了解'
+    });
+    return;
+  }
+
   const confirm = await Swal.fire({
     title: '確認送出訂單？',
     text: '請再次確認購物車內容與收件資訊。',
@@ -151,7 +161,10 @@ const submitOrder = async () => {
 
   try {
     isSubmitting.value = true;
-    const orderItems = cartItems.value.map(item => ({ productId: item.productId, quantity: item.quantity }));
+    const orderItems = cartStore.selectedCartItems.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+    }));
     const orderRequest = {
       userId: userStore.userId,
       couponPublishedId: selectedCouponId.value,
@@ -160,8 +173,11 @@ const submitOrder = async () => {
       recipientAddress: recipientInfo.value.address,
       items: orderItems,
     };
-    const { orderId, finalAmount } = await axios.post('/api/orders', orderRequest);
-    const fields = await axios.post('/api/ecpay/start-payment', { orderId, amount: finalAmount });
+    const {orderId, finalAmount} = await axios.post('/api/orders', orderRequest);
+    const fields = await axios.post('/api/ecpay/start-payment', {orderId, amount: finalAmount});
+
+    cartStore.removeCheckedItems();
+
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
@@ -190,6 +206,7 @@ const submitOrder = async () => {
   padding: 30px;
   color: var(--text-dark);
 }
+
 .page-title {
   text-align: center;
   font-size: 2.4rem;
@@ -197,6 +214,7 @@ const submitOrder = async () => {
   color: var(--primary);
   margin-bottom: 30px;
 }
+
 .step-bar {
   display: flex;
   justify-content: center;
@@ -204,23 +222,31 @@ const submitOrder = async () => {
   font-size: 18px;
   margin-bottom: 40px;
 }
-.step { color: #bbb; font-weight: bold; }
+
+.step {
+  color: #bbb;
+  font-weight: bold;
+}
+
 .step.active {
   color: var(--primary);
   border-bottom: 3px solid var(--primary);
   padding-bottom: 4px;
 }
+
 .checkout-main {
   display: flex;
   gap: 40px;
   align-items: flex-start;
 }
+
 .left-side, .right-side {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
+
 .info-card {
   background: #fffaf4;
   border-radius: 12px;
@@ -228,20 +254,24 @@ const submitOrder = async () => {
   border: 1px solid #e2cfc0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
+
 .info-card h2 {
   font-size: 20px;
   margin-bottom: 12px;
   color: var(--primary);
 }
+
 .info-card p {
   font-size: 16px;
   margin: 4px 0;
 }
+
 .item-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .edit-btn {
   margin-top: 12px;
   padding: 8px 16px;
@@ -252,9 +282,11 @@ const submitOrder = async () => {
   cursor: pointer;
   transition: 0.3s;
 }
+
 .edit-btn:hover {
   background: #40291d;
 }
+
 .summary-item {
   display: flex;
   justify-content: space-between;
@@ -262,6 +294,7 @@ const submitOrder = async () => {
   font-size: 16px;
   color: #555;
 }
+
 .summary-total {
   display: flex;
   justify-content: space-between;
@@ -272,14 +305,17 @@ const submitOrder = async () => {
   padding-top: 12px;
   color: #333;
 }
+
 .final {
   font-size: 1.6rem;
   color: var(--primary);
   font-weight: 700;
 }
+
 .discount {
   color: #e57373;
 }
+
 .submit-btn {
   width: 100%;
   margin-top: 24px;
@@ -293,11 +329,13 @@ const submitOrder = async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s;
 }
+
 .submit-btn:hover {
   background-color: #40291d;
   transform: translateY(-2px);
   opacity: 0.95;
 }
+
 .note {
   font-size: 14px;
   color: #666;
