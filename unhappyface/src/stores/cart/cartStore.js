@@ -5,9 +5,39 @@ import { useUserStore } from '@/stores/userStore';
 
 export const useCartStore = defineStore('cart', () => {
   const cartItems = ref([]);
+  const selectedItems = ref([]);
   const userStore = useUserStore();
 
   const isLoggedIn = () => !!userStore.userId;
+
+  // 勾選的商品列表
+  const selectedCartItems = computed(() =>
+      cartItems.value.filter(item => selectedItems.value.includes(item.productId))
+  );
+
+  // 勾選的商品總金額
+  const selectedTotalAmount = computed(() =>
+      selectedCartItems.value.reduce((sum, item) => sum + item.subtotal, 0)
+  );
+
+  // 全選
+  function selectAllItems() {
+    selectedItems.value = cartItems.value.map(item => item.productId);
+  }
+
+  // 取消全選
+  function deselectAllItems() {
+    selectedItems.value = [];
+  }
+
+  // 切換單一商品的選取狀態
+  function toggleItemSelection(productId) {
+    if (selectedItems.value.includes(productId)) {
+      selectedItems.value = selectedItems.value.filter(id => id !== productId);
+    } else {
+      selectedItems.value.push(productId);
+    }
+  }
 
   const totalAmount = computed(() =>
       cartItems.value.reduce((sum, item) => sum + item.subtotal, 0)
@@ -122,6 +152,14 @@ export const useCartStore = defineStore('cart', () => {
     await fetchCart();
   }
 
+  // 購買後移除
+  function removeCheckedItems() {
+    cartItems.value = cartItems.value.filter(
+        item => !selectedItems.value.includes(item.productId)
+    );
+    deselectAllItems();
+  }
+
   // 設定畫面上的購物車（可直接替換）
   function setCartItems(items) {
     cartItems.value = items;
@@ -142,6 +180,12 @@ export const useCartStore = defineStore('cart', () => {
     isLoggedIn,
     addToCart,
     addGuestCartItem,
+    selectedItems,
+    selectedCartItems,
+    selectedTotalAmount,
+    selectAllItems,
+    deselectAllItems,
+    toggleItemSelection,
     loadGuestCart,
     updateQuantity,
     removeItem,
@@ -150,6 +194,7 @@ export const useCartStore = defineStore('cart', () => {
     loginAndMerge,
     setCartItems,
     resetCartLocalState,
+    removeCheckedItems,
   };
 }, {
   persist: true,
