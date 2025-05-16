@@ -24,7 +24,7 @@
 
      <a href="#" @click.prevent="handleOrdersClick">📦 查訂單</a>
      <a href="/pages/user-subscribe-list">⭐️ 追蹤清單</a>
-     <a href="/pages/user-coupon-list">🎫 折價券</a>
+     <a href="/pages/user-coupon-list">🎫 優惠券</a>
      <a href="#" @click.prevent="handleCartClick">🛒 購物車 (<span>{{ cartCount }}</span>)</a>
    </div>
  </template>

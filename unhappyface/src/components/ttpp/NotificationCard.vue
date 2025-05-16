@@ -1,13 +1,26 @@
 <template>
   <div class="notification">
     <div class="notification-image">
-      <img
-        v-if="notification?.imageData"
-        :src="getImageSrc(notification.imageData)"
+      <img v-if="notification?.noticeType==='WISHLIST'"
+        src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiuVEr-cnrFixh2J35I6aI1_qaQRWlXe_lcKr1UV9vuxrnAsbSwQxSU5JnoMLyb80bXvc8tkNIq37qzFTdVZq9oW8AZZiH0FsU49G4AGBtdT3xYHpjEfC8iBfxt5mWb5IesxXVzBDRu5EI/s800/yuubin_mail_bin.png"
         alt="notification image"
         class="notification-img"
       />
-      <span v-else class="no-image">無圖片</span>
+      <img v-else-if="notification?.noticeType==='SUBSCRIPTION'"
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEVhKeC_nhwenQA_eM1Quu3Mg1-EyWW7SYeDZ9dl9ixYFX7qCI&s"
+        alt="notification image"
+        class="notification-img"
+      />
+      <img v-else-if="notification?.noticeType==='ORDER'"
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRABQ-01ASA89hNpt-ad9-jkxWgRt9T5OAdImaI6t1ouDtc6Ko&s"
+        alt="notification image"
+        class="notification-img"
+      />
+      <img v-else
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc1_z_HCYjkHSfn7lBCWTHsYvOg1L3KLBq71cwVwZ_Kemd5pg&s"
+        alt="notification image"
+        class="notification-img"
+      />
     </div>
 
     <div class="notification-content">

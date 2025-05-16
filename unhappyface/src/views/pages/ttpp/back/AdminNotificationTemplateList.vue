@@ -132,7 +132,7 @@ const handleEdit = (id) => {
 
 const handleDelete = async (id) => {
   const result = await Swal.fire({
-    title: '確定要刪除這個通知模板嗎？',
+    title: '確定要刪除這個通知嗎？',
     text: '刪除後將無法恢復！',
     icon: 'warning',
     showCancelButton: true,
