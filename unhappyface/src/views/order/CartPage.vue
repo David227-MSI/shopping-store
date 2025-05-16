@@ -16,8 +16,25 @@
     <div v-else class="cart-main">
       <!-- 左邊 商品列表 / 收藏未放功能 (只提供按鈕) -->
       <div class="cart-list">
+        <div class="select-all-bar">
+          <label>
+            <input
+                type="checkbox"
+                :checked="selectedItems.length === cartItems.length"
+                @change="toggleSelectAll"
+            />
+            全選 / 取消全選
+          </label>
+        </div>
         <ul>
           <li v-for="item in cartItems" :key="item.productId" class="cart-item">
+            <div class="checkbox-wrapper">
+              <input
+                  type="checkbox"
+                  :checked="selectedItems.includes(item.productId)"
+                  @change="toggleItemSelection(item.productId)"
+              />
+            </div>
             <div class="item-image">
               <img :src="productImageMap[item.productId]" alt="商品圖片" />
             </div>
@@ -124,12 +141,22 @@ const watchedProducts = ref(new Set());
 
 const userId = computed(() => userStore.userId);
 const cartItems = computed(() => cartStore.cartItems);
-const totalAmount = computed(() => cartStore.totalAmount);
+const totalAmount = computed(() => cartStore.selectedTotalAmount);
 const selectedCoupon = computed(() => couponStore.selectedCoupon);
 const discountAmount = computed(() => couponStore.discountAmount);
+const selectedItems = computed(() => cartStore.selectedItems);
 
 const isLoading = ref(false);
 const showCouponDialog = ref(false);
+const toggleItemSelection = cartStore.toggleItemSelection;
+
+const toggleSelectAll = () => {
+  if (selectedItems.value.length === cartItems.value.length) {
+    cartStore.deselectAllItems();
+  } else {
+    cartStore.selectAllItems();
+  }
+};
 
 const openCouponModal = () => {
   console.log('優惠券清單：', couponStore.couponList);
@@ -154,26 +181,6 @@ const fetchMainImageForCartItems = async () => {
   });
   await Promise.all(promises);
 };
-
-// const getImageByProductName = (name) => {
-//   if (name === 'Bvantgardey') return '/images/perfumeA.jpg';
-//   if (name === 'Whitepink') return '/images/perfumeB.jpg';
-//   if (name === 'MyPhone 15 Pro Max') return '/images/phone1.png';
-//   if (name === '黑色棉T') return '/images/black_T.png';
-//   if (name === '夏日晨露淡香水') return '/images/grass.png';
-//   if (name === '雲彩男款輕薄外套') return '/images/jacket_men.jpg';
-//   if (name === '雲彩女款休閒洋裝') return '/images/dress_women.jpg';
-//   if (name === 'StarPhone X9') return '/images/phone2.png';
-//   if (name === '竹風防滑拖鞋組') return '/images/slippers.jpg';
-//   if (name === '極光連帽機能外套') return '/images/jacket_aurora.jpg';
-//   if (name === 'Threelight Edge S5') return '/images/phone3.png';
-//   if (name === '木田可堆疊收納箱') return '/images/storage_box.jpg';
-//   if (name === '木田天然洗碗精') return '/images/dish_soap.jpg';
-//   if (name === '映月氣質長裙') return '/images/skirt.png';
-//   if (name === '聆香月光花語香水') return '/images/moon.png';
-//   if (name === 'QF-Smart X Ultra') return '/images/phone4.png';
-//   return '/images/placeholder.png';
-// };
 
 const loadCart = async () => {
   try {
@@ -401,22 +408,25 @@ const toggleWatch = async (productId) => {
 
 onMounted(async () => {
   await loadCart();
+  cartStore.selectAllItems();
   loadWatchStatus();
 
 });
 
-// const getImageUrl = (productName) => {
-//   if (productName.includes('香水')) {
-//     return 'https://www.jomalone.com.tw/media/export/cms/products/1000x1000/jo_sku_L00C01_1000x1000_0.png';
-//   }
-//   if (productName.toLowerCase().includes('iphone')) {
-//     return 'https://d2lfcsub12kx0l.cloudfront.net/tw/product/img/Apple_apple_iphone_plus_0907185907356_360x270.jpg';
-//   }
-//   return 'https://via.placeholder.com/80?text=No+Image';
-// };
 </script>
 
 <style scoped>
+
+.select-all-bar {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+}
 
 .product-brand,
 .product-category {
