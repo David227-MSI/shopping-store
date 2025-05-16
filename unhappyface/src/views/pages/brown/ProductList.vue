@@ -122,7 +122,7 @@ const route = useRoute()
   const cartCount = ref(0)
   
   const fetchProducts = async () => {
-    const { data } = await axios.get('/api/products', {
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/products`, {
       params: {
         category: selectedCategory.value,
         brand: selectedBrand.value,
@@ -135,12 +135,12 @@ const route = useRoute()
   }
   
   const fetchCategories = async () => {
-    const { data } = await axios.get('/api/categories')
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/categories`)
     categories.value = data
   }
   
   const fetchBrands = async () => {
-    const { data } = await axios.get('/api/brands', {
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/brands`, {
       params: { category: selectedCategory.value }
     })
     brands.value = data

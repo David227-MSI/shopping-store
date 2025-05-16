@@ -132,7 +132,7 @@ const formatDate = (dt: string): string => {
 /** 獲取總平均分數 */
 async function fetchOverallAvg() {
   try {
-    const { data } = await axios.get(`/api/products/${props.productId}/avg`);
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/products/${props.productId}/avg`);
     overallAvg.value = {
       scoreQuality: data.data.scoreQuality || 0,
       scoreDescription: data.data.scoreDescription || 0,
@@ -156,7 +156,7 @@ async function fetch(reset = false) {
 
   try {
     const { data } = await axios.get(
-      `/api/products/${props.productId}/reviews`,
+      `${import.meta.env.VITE_API_URL}/api/user/products/${props.productId}/reviews`,
       {
         params: {
           sort: sort.value,
@@ -214,7 +214,7 @@ function toggleTag(tagCode: string) {
 /* --- like --- */
 async function toggleLike(r:any){
   try{
-    const {data}=await axios.post(`/api/reviews/${r.id}/like`,null,{params:{userId:1003}})
+    const {data}=await axios.post(`${import.meta.env.VITE_API_URL}/api/user/reviews/${r.id}/like`,null,{params:{userId:1003}})
     r.likeCount=data.data
   }catch{Swal.fire('失敗','請稍後再試','error')}
 }

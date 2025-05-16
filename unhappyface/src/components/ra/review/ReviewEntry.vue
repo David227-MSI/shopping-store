@@ -29,7 +29,7 @@ const loading = ref(true)
 
 async function checkReview() {
   try {
-    const response = await axios.get(`/api/reviews/${props.orderItemId}/exists?userId=${props.userId}`)
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/reviews/${props.orderItemId}/exists?userId=${props.userId}`)
     hasReview.value = response.data.data.exists
     console.log(`檢查評論是否存在 (orderItemId=${props.orderItemId}):`, response.data)
   } catch (e) {

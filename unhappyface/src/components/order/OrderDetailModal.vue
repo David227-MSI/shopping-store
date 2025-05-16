@@ -105,7 +105,7 @@ watch(
         // 同步抓主圖
         const tasks = orderDetails.value.map(async (item) => {
           try {
-            const imgRes = await axios.get(`/api/media/product/${item.productId}/main`);
+            const imgRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/media/${item.productId}/main`);
             productImageMap.value[item.productId] = imgRes.data?.mediaUrl || '/images/placeholder.png';
           } catch {
             productImageMap.value[item.productId] = '/images/placeholder.png';

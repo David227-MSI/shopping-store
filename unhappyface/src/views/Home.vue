@@ -185,7 +185,7 @@
   })
   async function fetchByKeyword(keyword) {
     try {
-      const response = await axios.get('/api/products/search', {
+      const response = await axios.get('/api/user/products/search', {
         params: { keyword }
       });
       products.value = response.data;
@@ -216,7 +216,7 @@
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/api/products', {
+      const response = await axios.get('/api/user/products', {
         params: {
           category: selectedCategory.value || null,
           brand: selectedBrand.value || null,
@@ -240,13 +240,13 @@
   };
   
   const fetchCategories = async () => {
-    const { data } = await axios.get('/api/categories')
+    const { data } = await axios.get('/api/user/categories')
     categories.value = data
   }
 
   const fetchBrands = async () => {
     try {
-      const response = await axios.get('/api/brands', {
+      const response = await axios.get('/api/user/brands', {
         params: {
           category: selectedCategory.value || null
         }

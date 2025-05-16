@@ -2,7 +2,7 @@
   
     <div>
       <!-- 導覽列 -->
-      <Header :cartCount="cartCount" />
+      <Header />
 
 <!-- 🔍 搜尋列整體包裝 -->
 <div class="search-bar keyword-with-logo">
@@ -176,7 +176,7 @@ onMounted(() => {
 })
 async function fetchByKeyword(keyword) {
   try {
-    const response = await axios.get('/api/products/search', {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/products/search`, {
       params: { keyword }
     });
     products.value = response.data;
@@ -187,7 +187,7 @@ async function fetchByKeyword(keyword) {
 }
 const fetchProducts = async () => {
   try {
-    const response = await axios.get('/api/products', {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/products`, {
       params: {
         category: selectedCategory.value || null,
         brand: selectedBrand.value || null,
@@ -211,13 +211,13 @@ const fetchProducts = async () => {
 };
   
   const fetchCategories = async () => {
-    const { data } = await axios.get('/api/categories')
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/categories`)
     categories.value = data
   }
   
 const fetchBrands = async () => {
   try {
-    const response = await axios.get('/api/brands', {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/brands`, {
       params: {
         category: selectedCategory.value || null
       }

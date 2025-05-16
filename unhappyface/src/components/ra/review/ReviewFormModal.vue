@@ -132,7 +132,7 @@ async function checkReview() {
 
   try {
     console.log(`準備檢查訂單項目 ${props.orderItemId} 是否存在評論 (userId: ${props.userId})`);
-    const response = await axios.get(`/api/reviews/${props.orderItemId}/exists?userId=${props.userId}`);
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/reviews/${props.orderItemId}/exists?userId=${props.userId}`);
     console.log('檢查評論存在性 API 回應:', response.data);
 
     if (response.data.data && response.data.data.exists) {
@@ -143,7 +143,7 @@ async function checkReview() {
       reviewId.value = existingReviewId;
 
       console.log(`準備獲取評論詳細資料 (reviewId: ${existingReviewId})`);
-      const reviewResponse = await axios.get(`/api/reviews/${existingReviewId}?userId=${props.userId}`);
+      const reviewResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/reviews/${existingReviewId}?userId=${props.userId}`);
       const review = reviewResponse.data.data;
       console.log('獲取評論詳細資料 API 回應:', reviewResponse.data);
       console.log('後端返回的原始 review 物件:', review);
@@ -269,7 +269,7 @@ async function submitForm() {
       };
       console.log('PUT 請求 payload:', payload);
 
-      response = await axios.put(`/api/reviews/${reviewId.value}?userId=${props.userId}`, payload);
+      response = await axios.put(`${import.meta.env.VITE_API_URL}/api/user/reviews/${reviewId.value}?userId=${props.userId}`, payload);
       console.log('PUT 請求回應:', response.data);
 
     } else { // 新增評論
@@ -293,7 +293,7 @@ async function submitForm() {
 
       formData.append('tags', JSON.stringify(tagsInChineseLabels));
       
-      response = await axios.post(`/api/reviews`, formData, {
+      response = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/reviews`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress(progressEvent) {
           if (progressEvent.total) {

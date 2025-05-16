@@ -145,7 +145,7 @@ const applyCoupon = (couponId) => {
 const fetchMainImageForCartItems = async () => {
   const promises = cartItems.value.map(async (item) => {
     try {
-      const res = await axios.get(`/api/media/product/${item.productId}/main`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/media/${item.productId}/main`);
       const mediaUrl = res.data?.mediaUrl || '/images/placeholder.png';
       productImageMap.value[item.productId] = mediaUrl;
     } catch {
@@ -287,7 +287,7 @@ const loadWatchStatus = async () => {
   if (userId.value && cartItems.value.length > 0) {
     try {
       const requests = cartItems.value.map(item =>
-        axios.post(`/api/user/subscribes/getSubscribeStatus`, {
+        axios.post(`${import.meta.env.VITE_API_URL}/api/user/subscribes/getSubscribeStatus`, {
           userId: userId.value,
           itemType: 'PRODUCT',
           itemId: item.productId
@@ -331,7 +331,7 @@ const toggleWatch = async (productId) => {
 
   isLoading.value = true;
   try {
-    const response = await axios.post(`/api/user/subscribes/switch`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/subscribes/switch`, {
       userId: userId.value,
       itemId: productId,
       itemType: 'PRODUCT'

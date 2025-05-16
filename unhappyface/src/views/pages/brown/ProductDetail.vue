@@ -133,7 +133,7 @@
     if (!item) return;
     if (userStore.userId) {
       try {
-        const response = await axios.post(`/api/user/subscribes/switch`, {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/subscribes/switch`, {
           userId: userStore.userId,
           itemId: item.id,
           itemType: 'PRODUCT'
@@ -200,7 +200,7 @@
   const fetchProductDetail = async () => {
     console.log('--- fetchProductDetail function called (combined API) ---');
     try {
-      const response = await axios.get(`/api/products/${route.params.id}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/products/${route.params.id}`);
 
       const apiResponse = response.data;
       const productData = apiResponse.data;
@@ -266,7 +266,7 @@
   
   async function fetchReviews() {
   try {
-    const res = await axios.get(`/api/products/${route.params.id}/reviews`, {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/products/${route.params.id}/reviews`, {
       params: { sort:'LATEST', page:0, size:10 }
     })
     reviews.value = res.data.data.content
@@ -278,7 +278,7 @@
   const fetchRecommended = async () => {
     console.log('--- fetchRecommended function called ---');
     try {
-      const response = await axios.get(`/api/products/${route.params.id}/recommended`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/products/${route.params.id}/recommended`);
       let recommendedProductsArray = [];
       
       if (response.data && Array.isArray(response.data.data)) {
@@ -301,7 +301,7 @@
 
   const checkWishlistStatus = async (productId) => {
     try {
-      const response = await axios.post(`/api/user/subscribes/getSubscribeStatus`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/subscribes/getSubscribeStatus`, {
         userId: userStore.userId,
         itemType: 'PRODUCT',
         itemId: productId

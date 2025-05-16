@@ -109,7 +109,7 @@ const fetchSubscriptions = async () => {
 
 const fetchCategories = async () => {
   try {
-    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/categories`);
     categories.value = data;
   } catch (err) {
     Swal.fire('分類載入失敗', err.response?.data?.message || '錯誤', 'error');

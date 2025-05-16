@@ -78,7 +78,7 @@
   onMounted(async () => {
     loading.value = true;
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/products/productSelector`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/products/productSelector`);
       if (response.data.success) {
         products.value = response.data.data;
         selectedProduct.value = products.value.find(p => p.id === props.selectedId) || null;
