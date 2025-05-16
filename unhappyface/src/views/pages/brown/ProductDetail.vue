@@ -56,6 +56,7 @@
 
       <RecommendList
     :products="recommended"
+    :isWishlisted="isWishlisted? isWishlisted : false"
     @add-to-cart="(product, event) => addToCart(product, event)"
     @toggle-wishlist="toggleWishlist"
   />

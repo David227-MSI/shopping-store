@@ -106,7 +106,7 @@ const selectedNotification = ref(null);
 const showModal = ref(false);
 const errors = ref({});
 
-// Debounce function (您可以將其移至一個 utilities 文件中以便重複使用)
+// Debounce function
 const debounce = (fn, delay) => {
   let timeout;
   return (...args) => {
@@ -126,7 +126,7 @@ const clientValidate = (field) => {
 
 const validateField = debounce((field) => {
   errors.value[field] = clientValidate(field);
-}, 300);
+}, 50);
 
 const search = async () => {
   errors.value = {};
@@ -352,7 +352,7 @@ onMounted(() => {
 });
 
 // Watch filters，當篩選條件改變時重新查詢
-watch(filters, debounce(search, 500), { deep: true });
+watch(filters, debounce(search, 0), { deep: true });
 </script>
 
 

@@ -219,7 +219,7 @@ import { ref, reactive, computed, watch } from 'vue';
    return '使用者名稱為必要資訊';
   }
   if (username.length > 50) {
-   return '使用者名稱不能超過 50 個字元';
+   return '使用者名稱過長';
   }
   return '';
  };
@@ -229,8 +229,8 @@ import { ref, reactive, computed, watch } from 'vue';
   if (!password) {
    return '密碼為必要資訊';
   }
-  if (password.length < 8 || password.length > 256) {
-   return '密碼長度需為 8~256 字元';
+  if (password.length < 8 || password.length > 22) {
+   return '密碼長度需為 8~22 字元';
   }
   if (!/[^\w\s]/.test(password)) {
    return '密碼必須包含至少一個特殊字元';
@@ -252,8 +252,8 @@ import { ref, reactive, computed, watch } from 'vue';
   if (!confirmPassword) {
    return '請再次輸入密碼確認';
   }
-  if (confirmPassword.length < 8 || confirmPassword.length > 256) {
-   return '密碼長度需為 8~256 字元';
+  if (confirmPassword.length < 8 || confirmPassword.length > 22) {
+   return '密碼長度需為 8~22 字元';
   }
   if (registrationData.password !== confirmPassword) {
    return '密碼不一致';
@@ -269,7 +269,7 @@ import { ref, reactive, computed, watch } from 'vue';
   const birthDate = new Date(birth);
   const today = new Date();
   if (birthDate >= today) {
-   return '生日必須是過去的日期';
+   return '請輸入有效生日日期';
   }
   return '';
  };
@@ -288,7 +288,7 @@ import { ref, reactive, computed, watch } from 'vue';
    return '請輸入詳細地址';
   }
   if (detailAddress.length > 255) {
-   return '詳細地址不能超過 255 個字元';
+   return '地址過長';
   }
   return '';
  };
