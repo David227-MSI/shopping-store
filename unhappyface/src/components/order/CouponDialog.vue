@@ -105,6 +105,17 @@ const formatDate = (dateStr) => {
     day: 'numeric',
   });
 };
+
+watch(
+    () => props.couponList,
+    (newList) => {
+      const exists = newList.some(c => c.id === tempSelectedId.value);
+      if (!exists) {
+        tempSelectedId.value = null;
+      }
+    }
+);
+
 </script>
 
 <style scoped>
