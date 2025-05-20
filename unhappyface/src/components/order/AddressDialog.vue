@@ -38,6 +38,7 @@
               :class="{ error: errors.customName }"
               @input="clearError('customName')"
           />
+          <p v-if="customName" class="hint-msg" :class="{ success: nameHint.startsWith('✅') }">{{ nameHint }}</p>
           <p v-if="errors.customName" class="error-msg">收件人為必填</p>
         </div>
 
@@ -48,6 +49,9 @@
               :class="{ error: errors.customPhone }"
               @input="clearError('customPhone')"
           />
+          <p v-if="customPhone" class="hint-msg" :class="{ success: phoneHint.startsWith('✅'), error: phoneHint.startsWith('❌') }">
+            {{ phoneHint }}
+          </p>
           <p v-if="errors.customPhone" class="error-msg">請輸入正確的手機或市話格式</p>
         </div>
 
@@ -56,6 +60,7 @@
             <option disabled value="">請選擇縣市</option>
             <option v-for="city in cityList" :key="city">{{ city }}</option>
           </select>
+          <p v-if="selectedCity" class="hint-msg" :class="{ success: cityHint.startsWith('✅') }">{{ cityHint }}</p>
           <p v-if="errors.selectedCity" class="error-msg">請選擇縣市</p>
         </div>
 
@@ -64,6 +69,7 @@
             <option disabled value="">請選擇區域</option>
             <option v-for="district in districtOptions" :key="district">{{ district }}</option>
           </select>
+          <p v-if="selectedDistrict" class="hint-msg" :class="{ success: districtHint.startsWith('✅') }">{{ districtHint }}</p>
           <p v-if="errors.selectedDistrict" class="error-msg">請選擇區域</p>
         </div>
 
@@ -74,6 +80,7 @@
               :class="{ error: errors.customDetail }"
               @input="clearError('customDetail')"
           />
+          <p v-if="customDetail" class="hint-msg" :class="{ success: detailHint.startsWith('✅') }">{{ detailHint }}</p>
           <p v-if="errors.customDetail" class="error-msg">詳細地址為必填</p>
         </div>
       </div>
@@ -105,6 +112,32 @@ const selectedDistrict = ref('');
 const customDetail = ref('');
 const errors = ref({});
 const hasError = ref(false);
+
+const phoneHint = computed(() => {
+  const phone = customPhone.value.trim();
+  if (!phone) return '';
+
+  if (/^09\d{8}$/.test(phone)) return '✅ 手機號碼格式正確';
+  if (/^0[2-8]\d{7,8}$/.test(phone)) return '✅ 市話格式正確';
+  if (/^08(2|3|6|9)\d{6,7}$/.test(phone)) return '✅ 離島地區市話格式正確';
+  return '❌ 請輸入手機"09"開頭或者台灣市話"02/03.."等格式';
+});
+
+const nameHint = computed(() => {
+  return customName.value.trim() ? '✅ 已輸入姓名' : '';
+});
+
+const detailHint = computed(() => {
+  return customDetail.value.trim() ? '✅ 已輸入詳細地址' : '';
+});
+
+const cityHint = computed(() => {
+  return selectedCity.value ? '✅ 已選擇縣市' : '';
+});
+
+const districtHint = computed(() => {
+  return selectedDistrict.value ? '✅ 已選擇區域' : '';
+});
 
 const addressData = {};
 rawData.forEach((entry) => {
@@ -185,6 +218,19 @@ const onCancel = () => emit('close');
 </script>
 
 <style scoped>
+
+.hint-msg {
+  font-size: 13px;
+  margin-top: -2px;
+  margin-bottom: 6px;
+}
+.hint-msg.success {
+  color: green;
+}
+.hint-msg.error {
+  color: red;
+}
+
 .dialog-overlay {
   position: fixed;
   inset: 0;
