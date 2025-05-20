@@ -13,8 +13,10 @@ export const useCouponStore = defineStore('coupon', () => {
 
     // 取得商品ID陣列
     const productIds = computed(() =>
-        cartStore.cartItems.map((item) => item.product?.id ?? item.productId)
+        cartStore.selectedCartItems.map((item) => item.product?.id ?? item.productId)
     );
+
+    const totalAmount = computed(() => cartStore.selectedTotalAmount);
 
     // 計算已選優惠券的詳細資料
     const selectedCoupon = computed(() =>
@@ -23,7 +25,7 @@ export const useCouponStore = defineStore('coupon', () => {
 
     const discountAmount = computed(() => {
         const coupon = selectedCoupon.value;
-        const total = cartStore.totalAmount;
+        const total = totalAmount.value;
 
         if (!coupon) return 0;
         if (coupon.discountType === 'VALUE') return coupon.discountValue;
@@ -43,7 +45,7 @@ export const useCouponStore = defineStore('coupon', () => {
         if (!userStore.userId) return;
 
         const hasProducts = productIds.value.length > 0;
-        const total = cartStore.totalAmount;
+        const total = totalAmount.value;
 
         // 購物車為空，不送出請求，並清空優惠券資料
         if (!hasProducts || total === 0) {
@@ -55,7 +57,7 @@ export const useCouponStore = defineStore('coupon', () => {
         try {
             const res = await axios.post('/api/user/coupons/getValidCoupon', {
                 userId: userStore.userId,
-                totalAmount: cartStore.totalAmount,
+                totalAmount: total,
                 productIds: productIds.value,
             });
             couponList.value = res.data.couponList;
@@ -64,9 +66,9 @@ export const useCouponStore = defineStore('coupon', () => {
         }
     }
 
-    // 監聽購物車變化，自動重新載入優惠券
+    // 監聽勾選商品的變化與其總金額
     watch(
-        () => [cartStore.totalAmount, productIds.value],
+        () => [totalAmount.value, productIds.value],
         fetchValidCoupons,
         { immediate: true }
     );
